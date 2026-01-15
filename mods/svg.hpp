@@ -1,0 +1,160 @@
+#pragma once
+
+#include <string>
+#include <vector>
+#include <iostream>
+#include <fstream>
+
+#include "strtools.hpp"
+
+class VHSVG {
+
+    public:
+
+        void append( const std::string & content ) {
+            svg_content.push_back(content); }
+
+        void append( const std::vector<std::string> & content) {
+            svg_content.insert(svg_content.end(), content.begin(), content.end() ); }
+
+        void savetosvg(std::string fname) {
+
+            // Create and open a text file for writing
+            std::ofstream output_file(fname); 
+
+            // Write each string followed by a newline
+            if (output_file.is_open()) {
+                for (const std::string& line : svg_content) {
+                    output_file << line << std::endl; }
+                output_file.close(); // Close the file
+                std::cout << "Data successfully saved to " << fname << std::endl;
+            } else { 
+                std::cerr << "Error: Unable to open file for writing " << fname << std::endl; } }
+
+
+    // -------------------------------------------------------------------------------------------------
+    std::string svg_param(std::string pn, std::string pv )  { return pn + "=\"" + pv + "\" "; }
+
+    // -------------------------------------------------------------------------------------------------
+    std::string svg_param(std::string pn, int pv )          { return pn + "=\"" + std::to_string(pv) + "\" "; }
+
+    // -------------------------------------------------------------------------------------------------
+    std::string svg_tline(std::string pfx, std::string content, bool close=true) {
+        return "<" + pfx + " " + content + (close ? "/" : "") + ">"; }
+
+    // -------------------------------------------------------------------------------------------------
+    void line(int x1, int y1, int x2, int y2, int wdt, std::string col, std::string dot = "" ) {
+        std::string txt = "";
+        txt += svg_param("x1", x1);
+        txt += svg_param("y1", y1);
+        txt += svg_param("x2", x2);
+        txt += svg_param("y2", y2);
+        if(wdt) txt += svg_param("stroke-width", wdt);
+        if(!col.empty()) txt += svg_param("stroke", col);
+        if(!dot.empty()) {
+            txt += svg_param("stroke-linecap", "round" );
+            txt += svg_param("stroke-dasharray", dot); }
+        append( svg_tline("line", txt) ); }
+
+    // -------------------------------------------------------------------------------------------------
+    void circ(int cx, int cy, int r, int wdt, std::string colf, std::string colb = "" ) {
+        std::string txt = "";
+        txt += svg_param("cx", cx);
+        txt += svg_param("cy", cy);
+        txt += svg_param( "r",  r);
+        if(wdt) txt += svg_param("stroke-width", wdt);
+        if(!colf.empty()) txt += svg_param("stroke", colf);
+        if(!colb.empty()) txt += svg_param("fill", colb);
+        append( svg_tline("circle", txt) ); }
+
+    // -------------------------------------------------------------------------------------------------
+    void arc(int x, int y, int rad, int wdt, std::string colf) {
+        std::string strsx = std::to_string(x-rad);
+        std::string strsy = std::to_string(y);
+        std::string strex = std::to_string(x+rad);
+        std::string strey = std::to_string(y);
+
+        std::vector<std::string> dparams = {
+        "M", strsx, strsy,
+        "A", std::to_string(rad), std::to_string(rad),
+        "0", // x-axis-rotation: Rotation of the ellipse.
+        "0", // large-arc-flag: 0 for the smaller arc, 1 for the larger arc.
+        "0", // sweep-flag: 0 for clockwise, 1 for counter-clockwise.
+        strex, strey };
+
+        std::string par_d       = svg_param( "d"                , join(dparams, " ") );
+        std::string par_fill    = svg_param( "fill"             , "none" );
+        std::string par_strk    = svg_param( "stroke"           , colf );
+        std::string par_strkc   = svg_param( "stroke-width"     , wdt );
+
+        std::vector<std::string> pparams = { par_d, par_fill, par_strk, par_strkc };
+        append( svg_tline("path", join(pparams, " ")) ); }
+
+    // <path fill="none" stroke="red"    stroke-width="2" d="M80,80 a30,30 0 0,1 30,-30" />
+    void path(int mx, int my, int ax, int ay, int fx, int fy, int ca, int wdt, std::string colf, std::string dot = "") {
+        std::string strsx = std::to_string(mx);
+        std::string strsy = std::to_string(my);
+        
+        std::string strax = std::to_string(ax);
+        std::string stray = std::to_string(ay);
+        std::string strfx = std::to_string(fx);
+        std::string strfy = std::to_string(fy);
+
+        std::string strca = std::to_string(ca);
+        std::vector<std::string> dparams = { "M", strsx, strsy, "A", strax, stray, "0", "0", strca, strfx, strfy };
+
+        std::string par_d       = svg_param( "d"                , join(dparams, " ") );
+        std::string par_fill    = svg_param( "fill"             , "none" );
+        std::string par_strk    = svg_param( "stroke"           , colf );
+        std::string par_strkc   = svg_param( "stroke-width"     , wdt );
+
+        std::vector<std::string> pparams = { par_d, par_fill, par_strk, par_strkc };
+        if(dot.size()) { 
+            std::string par_strdot  = svg_param("stroke-dasharray", dot);
+            pparams.push_back(par_strdot); }
+        append( svg_tline("path", join(pparams, " ")) ); }
+
+    // -------------------------------------------------------------------------------------------------
+    void rect(int x, int y, int width, int height, int wdt, std::string colf, std::string colb = "none", int rr = 0 ) {
+        std::string txt = "";
+        txt += svg_param("x", x);
+        txt += svg_param("y", y);
+        txt += svg_param("width",  width);
+        txt += svg_param("height", height);
+        if(rr) { txt += svg_param("rx", rr); txt += svg_param("ry", rr); }
+        if(wdt) txt += svg_param("stroke-width", wdt);
+        if(!colf.empty()) txt += svg_param("stroke", colf);
+        if(!colb.empty()) txt += svg_param("fill", colb);
+        append( svg_tline("rect", txt) ); }
+
+    // -------------------------------------------------------------------------------------------------
+
+    void text(int x, int y, std::string text, std::string fontfam, int fontsz, std::string col ) {
+        std::string txt = "";
+        txt += svg_param("x", x);
+        txt += svg_param("y", y);
+        txt += svg_param("font-family", fontfam);
+        txt += svg_param("font-size", std::to_string(fontsz) + "px" );
+        // if(wdt) txt += svg_param("stroke-width", wdt);
+        // if(!colf.empty()) txt += svg_param("stroke", colf);
+        if(!col.empty()) txt += svg_param("fill", col);
+        append( svg_tline("text", txt, false) + text + "</text>" ); }
+
+    // -------------------------------------------------------------------------------------------------
+
+    void begin( int svg_width , int svg_height ) {
+        std::string txt = "";
+        txt += svg_param("width",  svg_width  );
+        txt += svg_param("height", svg_height );
+        txt += svg_param("xmlns", "http://www.w3.org/2000/svg");
+        append( svg_tline("svg", txt, false) ); }
+
+    void end() { 
+        append("</svg>"); }
+
+    private:
+
+        std::vector<std::string>    svg_content;
+        const std::string           spc = " ";
+
+};

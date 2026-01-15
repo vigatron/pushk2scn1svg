@@ -1,0 +1,16 @@
+{
+"cmake.debugConfig": {
+        "args": [
+            // "CMakeCache.txt", "-s", "16"
+            // "data/backobjs.cells", "-s", "256"
+            // "data/backobjs.cells", "-s", "32",
+
+			// "../packv81/v81packlogs/step01recombo.bin", "-s", "32",
+			// "../packv81/v81packlogs/step01recombo.bin", "-s", "64",
+			// "../packv81/v81packlogs/step02cdrop.bin", "-s", "64",
+			
+			// Demo example
+			"../packv81/data/backobjs.cells", "-s", "128",
+			]
+		}
+}
