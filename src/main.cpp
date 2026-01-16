@@ -10,6 +10,8 @@
 #include "vhrect.hpp"
 #include "svg.hpp"
 
+#include "misc.hpp"
+
 
 // TODO : Scale Kb
 
@@ -18,13 +20,13 @@ using namespace std;
 DBG     dbg;
 VHSVG   svg;
 
+/*
+[ ] sint8_t			[ ] float16			[ ] 	[ ] 5:5:5
+[ ] uint8_t			[ ] double32		[ ] 	[ ] 6:5:5
+[ ] sint16_t		[ ] double64		[ ] 	[ ] 5:6:5
+[ ] uint16_t							[ ] 	[ ] 5:5:6
+*/
 
-struct stret { uint8_t min; uint8_t max; uint8_t wght; };
-
-
-verr verrmsg(int x, std::string strerr) {
-    std::cout << strerr << std::endl;
-    return x; }
 
 // ----------------------------------------------------------------------------
 // Colors MAP
@@ -43,36 +45,12 @@ std::string     clrmaxl = "#D0D0FF";
 
 std::string     clrwdt  = "#6090FF";
 
-// ----------------------------------------------------------------------------
-void scanblk(uint8_t *ptr, stret * r, int subsize ) {
 
-    int min = 256;
-    int max = -1;
+std::string clrshd_w 	= "#E0E0E0";
+std::string clrshd_bb	= "#F8F8F8";
+std::string clrshd_f 	= "#DADADA";
+std::string clrshd_b 	= "#F0F0F0";
 
-    uint8_t spc[256];
-    memset(spc, 0, sizeof(uint8_t) * 256);
-
-    for( int i=0; i < subsize; i++ ) {
-        if( *ptr > max ) max = *ptr; 
-        if( *ptr < min ) min = *ptr;
-        spc[*ptr] = 1; ptr++; }
-
-    int cnt = 0;
-    for(int i=0; i<256;i++) { if(spc[i]) cnt++; }
-    r->min  = min; r->max  = max; r->wght = cnt; }
-
-// ----------------------------------------------------------------------------
-std::vector<stret> GenSamplesArray( const VHMemBlock & mblk , int subsize ) {
-	std::vector<stret> r;
-
-    // Process block
-    int blkcnt = mblk.sz() / subsize;
-    for(int i=0; i<blkcnt;i++) {
-        stret s;
-        scanblk( mblk() + i * subsize, &s, subsize);
-        r.push_back(s); }
-
-	return r; }
 
 // ----------------------------------------------------------------------------
 void DumpSamples( const std::vector<stret> & arr ) {
@@ -91,9 +69,9 @@ void draw_column(int idx, const VHRect & rect, const std::vector<stret> & arr ) 
     int sx = rect.sx;
     int ey = rect.ey;
 
-    // Draw background
+    // Draw background bar
     std::string color = (idx & 1) ? clrbck1 : clrbck2;
-    svg.rect(rect.sx, rect.sy, rect.w, hh, 0, color, color);
+    svg.rect(rect, 0, color, color);
 
     const stret & s = arr[idx];
 
@@ -111,16 +89,56 @@ void draw_column(int idx, const VHRect & rect, const std::vector<stret> & arr ) 
     // svg.rect(sx, gfx_yund, ww, gfx_hwdt, 1, clrwdt, clrwdt );
 }
 
-void GenerateSection( const VHRect & rect, const std::vector<stret> & arr ) {
+// ----------------------------------------------------------------------------
+void DrawShadowBox( const VHRect & rect ) {
+
+	int dx = 32, dy = 32;
+
+	VHRect rect_shadow = rect;
+	rect_shadow.move(dx, dy);
+	svg.rect(rect_shadow,	1, clrshd_f, clrshd_b  );
+	svg.rect(rect,			1, clrshd_w, clrshd_bb ); }
+
+std::string colortxt = "#777777";
+
+// ----------------------------------------------------------------------------
+void DrawScale( const VHRect & rect , int size) {
+
+	int n 		= 0;
+	int s 		= size;
+	int fnsize 	= 18;
+
+	svg.text(rect.sx +  6, rect.ey - fnsize/2, "0", "verdana", fnsize, colortxt);
+
+	while(s>256) {
+
+		int dx 	= s * rect.w / size;
+		int dxt	= dx + ( (s == size) ? - 64 : 6 );
+		int dy = rect.h / 2;
+		VHRect r(rect.sx, rect.sy +dy, dx, rect.h / 2);
+		
+		std::string colf = "#AAAAAA";
+		std::string colb = (n++ & 1) ? "#D0D0D0" : "#E0E0E0";
+		std::string val	 = std::to_string(s);
+
+		svg.rect(r, 1, colf, colb);
+		svg.text(r.sx + dxt, r.ey - fnsize/2, val, "verdana", fnsize, colortxt);
+		s /= 2; }
+
+}
+
+// ----------------------------------------------------------------------------
+void DrawSection( const VHRect & rect, const std::vector<stret> & arr , int blksize, int ws ) {
 
 	int ww = rect.w;
 
-	int h1 = rect.h * 0.7,	h2 = rect.h * 0.2,	h3 = rect.h * 0.1;
+	int h1 = rect.h * 0.6,	h2 = rect.h * 0.2,	h3 = rect.h * 0.2;
 	int y1 = rect.sy,		y2 = y1 + h1,		y3 = y2 + h2;
 
-	VHRect rectgfx(rect.sx , y1, ww, h1);
-	VHRect rectdif(rect.sx , y2, ww, h2);
-	VHRect rectscl(rect.sx , y3, ww, h3);
+	VHRect rectgfx(rect.sx , y1, ww, h1);	// Quantization
+	VHRect rectdif(rect.sx , y2, ww, h2);	// Delta
+	VHRect rectscl(rect.sx , y3, ww, h3);	// Scale
+	DrawScale( rectscl, blksize );
 
 	float 	unitw 	= rect.w * 1.0 / arr.size();
 	int		cx 		= rect.sx;
@@ -130,26 +148,34 @@ void GenerateSection( const VHRect & rect, const std::vector<stret> & arr ) {
         VHRect rectcol(cx + unitw * i, cy, unitw, rectgfx.h);
         draw_column(i, rectcol, arr); }
 
-	{ const VHRect *p = & rectgfx;	svg.rect( p->sx, p->sy, p->w, p->h, 1, "#AAAAAA"); }
-	{ const VHRect *p = & rectdif;	svg.rect( p->sx, p->sy, p->w, p->h, 1, "#AAAAAA"); }
-	{ const VHRect *p = & rectscl;	svg.rect( p->sx, p->sy, p->w, p->h, 1, "#AAAAAA"); }
+	svg.rect( rectgfx, 	1, "#AAAAAA");
+	svg.rect( rectdif, 	1, "#AAAAAA");
+	svg.rect( rectscl, 	1, "#AAAAAA");
+	svg.rect( rect, 	1, "#CCCCCC");
 
-	{ const VHRect *p = & rect;		svg.rect( p->sx, p->sy, p->w, p->h, 1, "#CCCCCC"); }
-
+	std::string txt = "Размер окна: " + std::to_string(ws);
+	svg.text( rect.sx + 12, rect.sy - 16, txt, "verdana", 32, colortxt );
 }
 
 // ----------------------------------------------------------------------------
-void GenerateContent(const VHMemBlock & memblk , const VHRect & rect ) {
+void Draw2X4Content(const VHMemBlock & memblk , const VHRect & rect ) {
 
 	int ww = rect.w / 2;
 	int hh = rect.h / 4;
 
 	for(int j=0; j < 4; j++) {
 		for(int i=0; i < 2; i++) {
+
+			int chunksize = 64 * (j+1);
+
 			VHRect rect_section(rect.sx + i*ww, rect.sy + j*hh, ww, hh);
-			rect_section.shrink( 40, 40 );
-			const std::vector<stret> & arr = GenSamplesArray( memblk, 64 * (j+1) );
-			GenerateSection( rect_section, arr ); } }
+			rect_section.shrink( 64, 64 );
+			const std::vector<stret> & arr = GenSamplesArray( memblk, chunksize );
+
+			DrawShadowBox(rect_section);
+			if(!i) DrawSection( rect_section, arr, memblk.sz(), chunksize );
+		}
+	}
 }
 
 // ----------------------------------------------------------------------------
@@ -204,7 +230,7 @@ int main ( int argc, char * argv[] ) {
 
     svg.begin( SVG_W, SVG_H );
     svg.rect(0,0, SVG_W, SVG_H, 0, "white", "white");
-    GenerateContent( memblk, rect_paper_area );
+    Draw2X4Content( memblk, rect_paper_area );
     svg.end();
 
     // Save results

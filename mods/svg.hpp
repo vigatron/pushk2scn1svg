@@ -115,7 +115,7 @@ class VHSVG {
         append( svg_tline("path", join(pparams, " ")) ); }
 
     // -------------------------------------------------------------------------------------------------
-    void rect(int x, int y, int width, int height, int wdt, std::string colf, std::string colb = "none", int rr = 0 ) {
+    void rect(int x, int y, int width, int height, int wdt, std::string colf, std::string colb = "", int rr = 0 ) {
         std::string txt = "";
         txt += svg_param("x", x);
         txt += svg_param("y", y);
@@ -124,11 +124,10 @@ class VHSVG {
         if(rr) { txt += svg_param("rx", rr); txt += svg_param("ry", rr); }
         if(wdt) txt += svg_param("stroke-width", wdt);
         if(!colf.empty()) txt += svg_param("stroke", colf);
-        if(!colb.empty()) txt += svg_param("fill", colb);
+        txt += svg_param("fill", colb.empty() ? "none" : colb);
         append( svg_tline("rect", txt) ); }
 
     // -------------------------------------------------------------------------------------------------
-
     void text(int x, int y, std::string text, std::string fontfam, int fontsz, std::string col ) {
         std::string txt = "";
         txt += svg_param("x", x);
@@ -141,7 +140,6 @@ class VHSVG {
         append( svg_tline("text", txt, false) + text + "</text>" ); }
 
     // -------------------------------------------------------------------------------------------------
-
     void begin( int svg_width , int svg_height ) {
         std::string txt = "";
         txt += svg_param("width",  svg_width  );
@@ -149,8 +147,13 @@ class VHSVG {
         txt += svg_param("xmlns", "http://www.w3.org/2000/svg");
         append( svg_tline("svg", txt, false) ); }
 
+    // -------------------------------------------------------------------------------------------------
     void end() { 
         append("</svg>"); }
+
+    // -------------------------------------------------------------------------------------------------
+	void rect( const VHRect & r, int th, std::string colf, std::string colb = "") {
+		rect(r.sx, r.sy, r.w, r.h, 1, colf, colb  ); }
 
     private:
 
