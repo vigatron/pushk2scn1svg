@@ -4,7 +4,7 @@
 // ----------------------------------------------------------------------------
 void DrawShadowBox( const VHRect & rect ) {
 
-	int dx = 32, dy = 32;
+	int dx = 16, dy = 24;
 
 	VHRect rect_shadow = rect;
 	rect_shadow.move(dx, dy);
@@ -17,8 +17,6 @@ void DrawScale( const VHRect & rect , int size) {
 	int n 		= 0;
 	int s 		= size;
 	int fnsize 	= 18;
-
-	svg.text(rect.sx +  6, rect.ey - fnsize/2, "0", "verdana", fnsize, Colors::colortxt);
 
 	while(s>256) {
 
@@ -35,4 +33,5 @@ void DrawScale( const VHRect & rect , int size) {
 		svg.text(r.sx + dxt, r.ey - fnsize/2, val, "verdana", fnsize, Colors::colortxt);
 		s /= 2; }
 
+	svg.text(rect.sx +  6, rect.ey - fnsize/2, "0", "verdana", fnsize, Colors::colortxt);
 }

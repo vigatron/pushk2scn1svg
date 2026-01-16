@@ -15,13 +15,6 @@
 #include "draw.hpp"
 
 
-/*
-[ ] sint8_t			[ ] float16			[ ] 	[ ] 5:5:5
-[ ] uint8_t			[ ] double32		[ ] 	[ ] 6:5:5
-[ ] sint16_t		[ ] double64		[ ] 	[ ] 5:6:5
-[ ] uint16_t							[ ] 	[ ] 5:5:6
-*/
-
 struct stInParams {
 	std::string		fname;
 	int				subsize;

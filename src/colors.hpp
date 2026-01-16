@@ -29,5 +29,8 @@ class Colors {
 
 	// Scale
 	static std::string		colortxt;
+	static std::string		colortxtsh;
+	static std::string		colortxtsh2;
+
 };
 

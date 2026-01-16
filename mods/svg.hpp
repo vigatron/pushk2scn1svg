@@ -44,7 +44,7 @@ class VHSVG {
         return "<" + pfx + " " + content + (close ? "/" : "") + ">"; }
 
     // -------------------------------------------------------------------------------------------------
-    void line(int x1, int y1, int x2, int y2, int wdt, std::string col, std::string dot = "" ) {
+    void line(int x1, int y1, int x2, int y2, int wdt, std::string col, std::string dot = "", std::string opa = "" ) {
         std::string txt = "";
         txt += svg_param("x1", x1);
         txt += svg_param("y1", y1);
@@ -55,6 +55,7 @@ class VHSVG {
         if(!dot.empty()) {
             txt += svg_param("stroke-linecap", "round" );
             txt += svg_param("stroke-dasharray", dot); }
+		if(!opa.empty()) { txt += svg_param("stroke-opacity", opa); }
         append( svg_tline("line", txt) ); }
 
     // -------------------------------------------------------------------------------------------------

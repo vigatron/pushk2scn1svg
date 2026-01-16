@@ -18,8 +18,6 @@ class VHRect {
 				this->w  = src.w ; this->h  = src.h ; }
 			return * this; }
 
-		// void operator=(const VHRect & rect)     { set(rect.sx, rect.sy, rect.w, rect.h); }
-
 		void set(int16_t x, int16_t y, int16_t w, int16_t h)
 			{ sx = x; sy = y; this->w =  w; this->h = h; ex = x+w; ey = y+h; }
 
