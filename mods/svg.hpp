@@ -6,6 +6,7 @@
 #include <fstream>
 
 #include "strtools.hpp"
+#include "vhrect.hpp"
 
 class VHSVG {
 
