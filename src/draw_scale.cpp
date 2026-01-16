@@ -22,8 +22,8 @@ void DrawScale( const VHRect & rect , int size) {
 
 		int dx 	= s * rect.w / size;
 		int dxt	= dx + ( (s == size) ? - 64 : 6 );
-		int dy = rect.h / 2;
-		VHRect r(rect.sx, rect.sy +dy, dx, rect.h / 2);
+		int dy = rect.h;
+		VHRect r(rect.sx, rect.sy, dx, rect.h + 1);
 		
 		std::string colf = "#AAAAAA";
 		std::string colb = (n++ & 1) ? "#D0D0D0" : "#E0E0E0";
@@ -33,5 +33,4 @@ void DrawScale( const VHRect & rect , int size) {
 		svg.text(r.sx + dxt, r.ey - fnsize/2, val, "verdana", fnsize, Colors::colortxt);
 		s /= 2; }
 
-	svg.text(rect.sx +  6, rect.ey - fnsize/2, "0", "verdana", fnsize, Colors::colortxt);
-}
+	svg.text(rect.sx +  6, rect.ey - fnsize/2, "0", "verdana", fnsize, Colors::colortxt); }

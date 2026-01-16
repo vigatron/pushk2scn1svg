@@ -34,8 +34,7 @@ void draw_col_bck( int idx, const VHRect & rect ) {
 void DrawSection( const VHRect & rect, const std::vector<stret> & arr , int blksize, int ws ) {
 
 	int ww = rect.w;
-
-	int h1 = rect.h * 0.6,	h2 = rect.h * 0.2,	h3 = rect.h * 0.2;
+	int h1 = rect.h * 0.8,	h2 = rect.h * 0.1,	h3 = rect.h * 0.1;
 	int y1 = rect.sy,		y2 = y1 + h1,		y3 = y2 + h2;
 
 	VHRect rectgfx(rect.sx , y1, ww, h1);	// Quantization
@@ -66,9 +65,8 @@ void DrawSection( const VHRect & rect, const std::vector<stret> & arr , int blks
 	svg.rect( rectscl, 	1, "#AAAAAA");
 	svg.rect( rect, 	1, "#CCCCCC");
 
-	std::string txt = "Размер окна: " + std::to_string(ws);
+	std::string txt = "Размер окна: " + std::to_string(ws) + " байт";
 	svg.text( rect.sx + 14, rect.sy - 20, txt, "verdana", 32, Colors::colortxtsh2 );
 	svg.text( rect.sx + 12, rect.sy - 22, txt, "verdana", 32, Colors::colortxt );
 
 	DrawScale( rectscl, blksize ); }
-

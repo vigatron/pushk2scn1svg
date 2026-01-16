@@ -10,9 +10,12 @@
 void	DrawShadowBox	( const VHRect & rect );
 
 void	DrawScale		( const VHRect & rect , int size);
-void	DrawTypes		( const VHRect & rect );
 
 void	DrawSection		( const VHRect & rect , const std::vector<stret> & arr , int blksize, int ws );
 void	DrawDensity		( const VHRect & rect , const std::vector<stret> & arr , int blksize, int ws );
+
+void	DrawTypes		( const VHRect & rect );
+void	DrawProps		( const VHRect & rect );
+
 
 verr	GenerateDocument( const VHMemBlock & memblk );

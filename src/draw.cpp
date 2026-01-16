@@ -14,7 +14,7 @@ void Draw2X4Content(const VHMemBlock & memblk , const VHRect & rect ) {
 	for(int j=0; j < 4; j++) {
 		for(int i=0; i < 2; i++) {
 
-			int chunksize = 64 * (j+1);
+			int chunksize = 32 << j; // * (j+1) * (j+1);
 			const std::vector<stret> & arr = GenSamplesArray( memblk, chunksize );
 
 			VHRect rects(rect.sx + i*ww, rect.sy + j*hh, ww, hh);
@@ -47,20 +47,24 @@ verr GenerateDocument( const VHMemBlock & memblk ) {
 	rect_2X4.shrink	( 0, ( hh_hdr + hh_ftr )  / 2 );
 	rect_2X4.setpos	( rect_paper_area.sx, rect_paper_area.sy + hh_hdr );
 
-	VHRect 		rect_types( rect_2X4.sx, rect_2X4.ey, rect_2X4.w, hh_ftr );
+	VHRect		rect_types( rect_2X4.sx, rect_2X4.ey, rect_2X4.w/2, hh_ftr );
 	rect_types.shrink(64, 16);
 
-	// SVG Generation
-    svg.begin( SVG_W, SVG_H );
-    svg.rect(0,0, SVG_W, SVG_H, 0, "white", "white");
-	svg.rect( rect_paper_area, 1, "#AAAAAA" );
-    Draw2X4Content( memblk, rect_2X4 );
-	DrawTypes(rect_types);
-    svg.end();
+	VHRect		rect_props = rect_types;
+	rect_props.move( rect_2X4.w/2, 0);
 
-    // Save results
-    std::string     fnameout = "result";
-    svg.savetosvg( fnameout + ".svg");
+	// SVG Generation
+	svg.begin( SVG_W, SVG_H );
+	svg.rect(0,0, SVG_W, SVG_H, 0, "white", "white");
+	// svg.rect( rect_paper_area, 1, "#AAAAAA" );
+	Draw2X4Content( memblk, rect_2X4 );
+	DrawTypes(rect_types);
+	DrawProps(rect_props);
+	svg.end();
+
+	// Save results
+	std::string fnameout = "result";
+	svg.savetosvg( fnameout + ".svg");
 
 	return vok;
 }
