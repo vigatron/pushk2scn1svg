@@ -10,7 +10,10 @@
 			// "../packv81/v81packlogs/step02cdrop.bin", "-s", "64",
 			
 			// Demo example
-			"../packv81/data/backobjs.cells", "-s", "128",
+			// "../packv81/data/backobjs.cells", "-s", "128" ,
+
+			"../packv81/data/chip_cut0.cells", "-s", "8"
+
 			]
 		}
 }

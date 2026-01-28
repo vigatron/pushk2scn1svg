@@ -22,7 +22,7 @@ void draw_column(int idx, const VHRect & rect, const std::vector<stret> & arr ) 
     int gfx_hmid    = gfx_hdiff / 2;
     int gfx_ymid    = ey - gfx_hmin - gfx_hmid - gfx_hwdt/2;
     int gfx_yund    = ey + 128 - gfx_hwdt/2;
-    svg.rect(sx, gfx_ymid, ww, gfx_hwdt, 1, Colors::clrwdt, Colors::clrwdt ); }
+    svg.rect(sx, gfx_ymid, ww, gfx_hwdt, 0, "", Colors::clrwdt ); }
 
 // ----------------------------------------------------------------------------
 void draw_col_bck( int idx, const VHRect & rect ) {
