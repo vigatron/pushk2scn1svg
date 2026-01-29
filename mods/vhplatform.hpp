@@ -9,6 +9,8 @@
 #include <iostream>
 #include <fstream>
 
+#include "string.h"
+
 #define PACKED_STRUCT __attribute__((packed))
 
 #define u8          uint8_t

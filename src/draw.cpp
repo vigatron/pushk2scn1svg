@@ -5,6 +5,17 @@
 
 // svg.rect(sx, gfx_yund, ww, gfx_hwdt, 1, clrwdt, clrwdt );
 
+void DrawCenterLine( const VHRect & rect ) {
+
+	int ymid 	= rect.sy + rect.h/2;
+	int ymidu	= ymid - rect.h / 4;
+	int ymaxu	= ymid + rect.h / 4;
+
+	svg.line( rect.sx, ymid  , rect.ex, ymid  , 1, "gray", "10,10", "0.40" );
+	svg.line( rect.sx, ymidu , rect.ex, ymidu , 1, "gray", "4,4"  , "0.25" );
+	svg.line( rect.sx, ymaxu , rect.ex, ymaxu , 1, "gray", "4,4"  , "0.25" );
+}
+
 // ----------------------------------------------------------------------------
 void Draw2X4Content(const VHMemBlock & memblk , const VHRect & rect ) {
 
@@ -14,8 +25,8 @@ void Draw2X4Content(const VHMemBlock & memblk , const VHRect & rect ) {
 	for(int j=0; j < 4; j++) {
 		for(int i=0; i < 2; i++) {
 
-			int chunksize = 32 << j; // * (j+1) * (j+1);
-			const std::vector<stret> & arr = GenSamplesArray( memblk, chunksize );
+			int chunksize = 64 << j;
+			const std::vector<BlockProps> & arr = GenSamplesArray( memblk, chunksize );
 
 			VHRect rects(rect.sx + i*ww, rect.sy + j*hh, ww, hh);
 			rects.shrink( 64, 64 );
@@ -47,9 +58,12 @@ verr GenerateDocument( const VHMemBlock & memblk ) {
 	rect_2X4.shrink	( 0, ( hh_hdr + hh_ftr )  / 2 );
 	rect_2X4.setpos	( rect_paper_area.sx, rect_paper_area.sy + hh_hdr );
 
+
+	// Data types ( left )
 	VHRect		rect_types( rect_2X4.sx, rect_2X4.ey, rect_2X4.w/2, hh_ftr );
 	rect_types.shrink(64, 16);
 
+	// Draw props ( right ) empty
 	VHRect		rect_props = rect_types;
 	rect_props.move( rect_2X4.w/2, 0);
 

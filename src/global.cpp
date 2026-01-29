@@ -21,9 +21,9 @@ verr LoadSource(std::string fname, int minsize, VHMemBlock * r) {
 	return vok; }
 
 // ----------------------------------------------------------------------------
-void DumpSamples( const std::vector<stret> & arr ) {
+void DumpSamples( const std::vector<BlockProps> & arr ) {
 	int cnt = 0;
-	for( const stret & s : arr) {
+	for( const BlockProps & s : arr) {
 		dbg.itxt    ("BLK #%3d    ", cnt++ );
-		dbg.i3txt   ("min=%4d  max=%4d  width=%d ", s.min, s.max, s.wght );
+		dbg.i3txt   ("min=%4d  max=%4d  width=%d ", s._min, s._max, s.wght );
 		dbg.nl(); } }

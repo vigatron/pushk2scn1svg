@@ -4,7 +4,7 @@
 std::string		Colors::clrbck1		= "#F0F0F0";
 std::string		Colors::clrbck2		= "#F4F4F4";
 
-std::string		Colors::clrspr		= "#C0D0FF";
+std::string		Colors::clrspr		= "#ccd3e7";
 std::string		Colors::clrmin		= "#2020FF";
 std::string		Colors::clrminl		= "#D0D0FF";
 std::string		Colors::clrmax		= "#2020FF";

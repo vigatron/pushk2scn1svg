@@ -4,17 +4,17 @@
 #include "global.hpp"
 
 // ----------------------------------------------------------------------------
-void draw_column(int idx, const VHRect & rect, const std::vector<stret> & arr ) {
+static void draw_column_spread(int idx, const VHRect & rect, const std::vector<BlockProps> & arr ) {
 
     int ww = rect.w;
     int hh = rect.h;
     int sx = rect.sx;
     int ey = rect.ey;
 
-    const stret & s = arr[idx];
+    const BlockProps & s = arr[idx];
 
-    int gfx_hmin    = s.min * hh / 255;
-    int gfx_hmax    = s.max * hh / 255;
+    int gfx_hmin    = s._min * hh / 255;
+    int gfx_hmax    = s._max * hh / 255;
     int gfx_hdiff   = gfx_hmax - gfx_hmin;
     svg.rect(sx, ey - gfx_hmax, ww, gfx_hdiff, 0, "", Colors::clrspr);
 
@@ -25,13 +25,14 @@ void draw_column(int idx, const VHRect & rect, const std::vector<stret> & arr ) 
     svg.rect(sx, gfx_ymid, ww, gfx_hwdt, 0, "", Colors::clrwdt ); }
 
 // ----------------------------------------------------------------------------
+// Draw background bar
+// ----------------------------------------------------------------------------
 void draw_col_bck( int idx, const VHRect & rect ) {
-	// Draw background bar
 	std::string color = (idx & 1) ? Colors::clrbck1 : Colors::clrbck2;
 	svg.rect(rect, 0, color, color); }
 
 // ----------------------------------------------------------------------------
-void DrawSection( const VHRect & rect, const std::vector<stret> & arr , int blksize, int ws ) {
+void DrawSection( const VHRect & rect, const std::vector<BlockProps> & arr , int blksize, int ws ) {
 
 	int ww = rect.w;
 	int h1 = rect.h * 0.8,	h2 = rect.h * 0.1,	h3 = rect.h * 0.1;
@@ -49,16 +50,9 @@ void DrawSection( const VHRect & rect, const std::vector<stret> & arr , int blks
 
 	for(int i=0; i < arr.size(); i++) {
 		VHRect rectcol(rect.sx + unitw * i, rect.sy, unitw, rectgfx.h);
-		draw_column(i, rectcol, arr); }
+		draw_column_spread(i, rectcol, arr); }
 	
-	int ymid 	= rectgfx.sy + rectgfx.h/2;
-	int ymidu	= ymid - rectgfx.h / 4;
-	int ymaxu	= ymid + rectgfx.h / 4;
-
-	svg.line( rectgfx.sx, ymid  , rectgfx.ex, ymid  , 1, "gray", "10,10", "0.40" );
-	svg.line( rectgfx.sx, ymidu , rectgfx.ex, ymidu , 1, "gray", "4,4"  , "0.25" );
-	svg.line( rectgfx.sx, ymaxu , rectgfx.ex, ymaxu , 1, "gray", "4,4"  , "0.25" );
-
+	DrawCenterLine( rectgfx );
 
 	svg.rect( rectgfx, 	1, "#AAAAAA");
 	svg.rect( rectdif, 	1, "#AAAAAA");
