@@ -1,9 +1,17 @@
 #pragma once
 
+#include "vhplatform.hpp"
 #include "vhrect.hpp"
 #include "vhmemblk.hpp"
 #include "misc.hpp"
 #include "svg.hpp"
+
+
+
+struct stInParams {
+	std::string		fname;
+	int				subsize;
+};
 
 
 void	DrawCenterLine	( const VHRect & rect );
@@ -18,5 +26,6 @@ void	DrawDensity		( const VHRect & rect , const std::vector<BlockProps> & arr , 
 void	DrawTypes		( const VHRect & rect );
 void	DrawProps		( const VHRect & rect );
 
+void	Draw2X4Content	(const VHMemBlock & memblk , const VHRect & rect );
 
-verr	GenerateDocument( const VHMemBlock & memblk );
+verr	GenerateDocument( const VHMemBlock & memblk, stInParams * pInParams );

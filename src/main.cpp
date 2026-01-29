@@ -15,11 +15,6 @@
 #include "draw.hpp"
 
 
-struct stInParams {
-	std::string		fname;
-	int				subsize;
-};
-
 // ----------------------------------------------------------------------------
 static verr ParseArgs( int argc , char * argv[] , stInParams * pInParams ) {
 
@@ -61,7 +56,7 @@ int main ( int argc, char * argv[] ) {
 	if( vok != LoadSource( sinParams.fname , sinParams.subsize , & memblk ) )
 		return verror(1);
 
-	verr r = GenerateDocument( memblk );
+	verr r = GenerateDocument( memblk , & sinParams );
 	return (r == vok) ? 0 : 1; }
 
 // VHRect      svg_cont_area( svg_draw_area.sx, svg_draw_area.sy, svg_draw_area.w, svg_draw_area.h/4 );
