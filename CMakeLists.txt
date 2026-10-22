@@ -36,6 +36,9 @@ add_executable(vhpackv81scan
 
     src/mods/dbg/dbg.cpp
     src/mods/global/global.cpp
+ 
+    src/mods/widerange/vhkeyfingerprint.hpp
+    src/mods/widerange/vhkeyfingerprint.cpp
 
     src/mods/widerange/widerange.hpp
     src/mods/widerange/widerange.cpp

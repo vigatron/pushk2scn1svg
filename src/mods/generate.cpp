@@ -2,16 +2,7 @@
 #include "global.hpp"
 #include "misc.hpp"
 
-// No path, it's just a filename
-static std::string extract_filename(const std::string &fullPath)
-{
-    size_t last_slash = fullPath.find_last_of("/\\");
-    if (last_slash == std::string::npos)
-    {
-        return fullPath;
-    }
-    return fullPath.substr(last_slash + 1);
-}
+#include "vhfsys.hpp"
 
 /**
  * 
@@ -50,11 +41,10 @@ verr GenerateDocument(const VHMemBlock &memblk, stInParams *pInParams)
     // svg.rect( rect_paper_area, 1, "#AAAAAA" );
     Draw2X4Content(memblk, rect_2X4);
     DrawTypes(rect_types);
-    DrawProps(rect_props);
     svg.end();
 
     // Save results
-    std::string basefname = extract_filename(pInParams->fname);
+    std::string basefname = VHFSYS::ExtractFilename(pInParams->fname);
     std::string fnameout = basefname + "_scn.svg";
     svg.savetosvg(fnameout);
 

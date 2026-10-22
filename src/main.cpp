@@ -1,11 +1,13 @@
 
 #include "dbg.hpp"
+
 #include "vhfile.hpp"
+#include "vhfsys.hpp"
+
 #include "vhmemblk.hpp"
 
 #include <string.h>
 #include <vector>
-#include <filesystem>
 
 #include "vhrect.hpp"
 
@@ -52,7 +54,7 @@ static verr ParseArgs(int argc, char *argv[], stInParams *pInParams)
     }
 
     //
-    if (!std::filesystem::exists(strfname) || std::filesystem::is_directory(strfname))
+    if(!VHFSYS::FileExist(strfname))
     {
         return verrmsg(3, "Wrong input file " + strfname);
     }

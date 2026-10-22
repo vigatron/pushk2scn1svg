@@ -24,7 +24,6 @@ void	DrawSection		( const VHRect & rect , const std::vector<BlockProps> & arr , 
 void	DrawDensity		( const VHRect & rect , const std::vector<BlockProps> & arr , int blksize, int ws );
 
 void	DrawTypes		( const VHRect & rect );
-void	DrawProps		( const VHRect & rect );
 
 void	Draw2X4Content	(const VHMemBlock & memblk , const VHRect & rect );
 
