@@ -1,18 +1,58 @@
-cmake_minimum_required(VERSION 3.5)
-project(MyQtProject CXX)
+cmake_minimum_required(VERSION 3.16)
+
+project(vhpackv81scan VERSION 0.1.0 LANGUAGES CXX)
 
 # set(CMAKE_BUILD_TYPE "Release")
 # set(CMAKE_BUILD_TYPE "MinSizeRel")
 
-#
-set(PRJNAME pack81scansvg)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-include_directories(. .. mods misc)
+set(CMAKE_CXX_STANDARD 17)
+
+# Подключаем папку с субмодулем
+add_subdirectory(src/extmods/vhlibplatform)
+
+# Подключаем папку с субмодулем
+add_subdirectory(src/extmods/vhlibsvg)
+
 
 file( GLOB_RECURSE source_list_mods 
     src/*.cpp  src/*.hpp
     mods/*.cpp mods/*.hpp
     misc/*.cpp misc/*.hpp )
 
-add_executable(${PRJNAME} src/main.cpp ${source_list_mods} )
-add_custom_command(TARGET ${PRJNAME} POST_BUILD COMMAND cp "${PROJECT_BINARY_DIR}/${PRJNAME}"     "$ENV{HOME}/bin/${PRJNAME}"        )
+#
+add_executable(vhpackv81scan
+    src/main.cpp
+    ${source_list_mods}
+)
+
+#
+target_include_directories(${PROJECT_NAME} PUBLIC
+    src/mods
+    misc
+    
+    src
+    src/extmods
+)
+
+# Defines
+# target_compile_definitions(${PROJECT_NAME} PRIVATE
+#     # CFG_DISABLE_CRC_CACHE=1
+#     VHPLATFORM_PC
+# )
+
+target_link_libraries(${PROJECT_NAME} 
+    PRIVATE 
+    vhlib_platform
+    vhlib_svg
+    # vhlib_fsys
+    # vhlib_args
+    # vhlib_bitptr
+    # vhlib_metacrc
+    # vhlib_timerstamp
+    # vhlib_log
+)
+
+# add_custom_command(TARGET ${PRJNAME} POST_BUILD COMMAND
+#     cp "${PROJECT_BINARY_DIR}/${PRJNAME}"     "$ENV{HOME}/bin/${PRJNAME}"        )

@@ -1,24 +1,22 @@
 {
-"cmake.debugConfig": {
+    "cmake.debugConfig": {
         "args": [
             // "CMakeCache.txt", "-s", "16"
             // "data/backobjs.cells", "-s", "256"
             // "data/backobjs.cells", "-s", "32",
-
-			// "../packv81/v81packlogs/step01recombo.bin", "-s", "32",
-			// "../packv81/v81packlogs/step01recombo.bin", "-s", "64",
-			// "../packv81/v81packlogs/step02cdrop.bin", "-s", "64",
-			
-			// Demo example
-			// "../packv81/data/backobjs.cells", "-s", "128" ,
-
-			// "../packv81/data/chip_cut0.cells", "-s", "8"
-			"../packv81/data/chip_cut0.cells_stepRecombo_3.bin", "-s", "8"
-			// "../packv81/data/stepRecombo4x4.bin", "-s", "8"
-
-			// 
-			// 
-
-			]
-		}
+            // "../packv81/v81packlogs/step01recombo.bin", "-s", "32",
+            // "../packv81/v81packlogs/step01recombo.bin", "-s", "64",
+            // "../packv81/v81packlogs/step02cdrop.bin", "-s", "64",
+            // /**/
+            "../data/backobjs.cells",
+            "-s",
+            "128",
+            /**/
+            // "../packv81/data/chip_cut0.cells", "-s", "8"
+            // "../packv81/data/chip_cut0.cells_stepRecombo_3.bin", "-s", "8"
+            // "../packv81/data/stepRecombo4x4.bin", "-s", "8"
+            // 
+            // 
+        ]
+    }
 }

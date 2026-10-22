@@ -1,7 +1,7 @@
 #pragma once
 
 #include "dbg.hpp"
-#include "svg.hpp"
+#include "vhsvg.hpp"
 #include "colors.hpp"
 #include "vhmemblk.hpp"
 

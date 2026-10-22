@@ -4,7 +4,7 @@
 #include "vhrect.hpp"
 #include "vhmemblk.hpp"
 #include "misc.hpp"
-#include "svg.hpp"
+#include "vhsvg.hpp"
 
 
 

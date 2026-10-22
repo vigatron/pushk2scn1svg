@@ -2,6 +2,10 @@
 
 #include "vhplatform.hpp"
 
+#include <string>
+#include <vector>
+#include <list>
+#include <algorithm>
 
 class VHArgsParser {
 
