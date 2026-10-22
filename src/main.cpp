@@ -1,3 +1,4 @@
+
 #include "dbg.hpp"
 #include "vhfile.hpp"
 #include "vhmemblk.hpp"
@@ -6,51 +7,58 @@
 #include <vector>
 #include <filesystem>
 
-#include "args.hpp"
 #include "vhrect.hpp"
-#include "vhlibsvg/src/vhsvg.hpp"
+
+#include "vhsvg.hpp"
 
 #include "misc.hpp"
 #include "global.hpp"
 #include "draw.hpp"
 
-// vhlibplatform
-// vhlibfsys
-// vhlibargs
+#include "widerange/widerange.hpp"
+
+#include "argsparser.hpp"
+
+using namespace VHArgsParser;
 
 // ----------------------------------------------------------------------------
 static verr ParseArgs(int argc, char *argv[], stInParams *pInParams)
 {
 
-    VHArgsParser argsparser;
+    VHArgsParser::VHCmdLineParser cmdline;
+    verr parse_status;
 
-    argsparser.setappname("pack81scansvg");
+    cmdline.setAppName("vhpackv81scan");
+    cmdline.setAppDesc("PUSHK scan filter tool. V0.1.0");
 
-    argsparser.addopt("s", "Block size");
+    std::vector<VHArgTypeBase> arrcmd;
 
-    if (vok != argsparser.ParseArgs(argc, argv))
+    arrcmd.push_back(VHArgTypeFileName("-fname", "", "Source file"));
+    arrcmd.push_back(VHArgTypeInteger("-wndsz", "Window size", 128, 2, 256));
+
+    // Wrong args or syntax error ?
+    if (vok != cmdline.ParseCommandLine(arrcmd, argc, argv))
+    {
+        return verrmsg(1, "Error parsing command line");
+    }
+
+    std::string strfname = cmdline.GetFileName("-fname");
+
+    if (strfname.empty())
     {
         std::cout << "Parse args issue" << std::endl;
-        argsparser.Usage();
+        cmdline.ShowUsage(arrcmd);
         return verror(1);
     }
 
-    if (!argsparser.single().size())
+    //
+    if (!std::filesystem::exists(strfname) || std::filesystem::is_directory(strfname))
     {
-        dbg.txtnl("USAGE: pack81scansvg <filename>");
-        return verror(2);
+        return verrmsg(3, "Wrong input file " + strfname);
     }
 
-    pInParams->fname = argsparser.single()[0];
-    if (!std::filesystem::exists(pInParams->fname) ||
-        std::filesystem::is_directory(pInParams->fname))
-    {
-        std::string msg = "Wrong input file " + pInParams->fname;
-        dbg.txtnl(msg.c_str());
-        return verror(3);
-    }
-
-    pInParams->subsize = argsparser.getopt("s", 8);
+    pInParams->fname = strfname;
+    pInParams->subsize = cmdline.GetInt("-wndsz");
 
     return vok;
 }
@@ -68,6 +76,13 @@ int main(int argc, char *argv[])
     if (vok != LoadSource(sinParams.fname, sinParams.subsize, &memblk))
         return verror(1);
 
+    // WideRange Scan
+    VHWideRangeScan wscan;
+    std::vector<uint8_t> arrsrc(memblk.ptr(), memblk.ptr() + memblk.sz());
+    if (vok != wscan.scan(arrsrc))
+        return verrmsg(1, "Wide Range analisys failed");
+
+    // Generate SVG
     verr r = GenerateDocument(memblk, &sinParams);
     return (r == vok) ? 0 : 1;
 }

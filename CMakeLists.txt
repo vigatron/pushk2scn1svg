@@ -13,26 +13,46 @@ set(CMAKE_CXX_STANDARD 17)
 add_subdirectory(src/extmods/vhlibplatform)
 
 # Подключаем папку с субмодулем
+add_subdirectory(src/extmods/vhlibargs)
+
+# Подключаем папку с субмодулем
+add_subdirectory(src/extmods/vhlibfsys)
+
+# Подключаем папку с субмодулем
 add_subdirectory(src/extmods/vhlibsvg)
 
 
 file( GLOB_RECURSE source_list_mods 
-    src/*.cpp  src/*.hpp
-    mods/*.cpp mods/*.hpp
-    misc/*.cpp misc/*.hpp )
+    src/*.cpp
+    src/*.hpp
+    mods/*.cpp
+    mods/*.hpp
+)
 
 #
 add_executable(vhpackv81scan
     src/main.cpp
     ${source_list_mods}
+
+    src/mods/dbg/dbg.cpp
+    src/mods/global/global.cpp
+
+    src/mods/widerange/widerange.hpp
+    src/mods/widerange/widerange.cpp
+
 )
 
 #
 target_include_directories(${PROJECT_NAME} PUBLIC
-    src/mods
-    misc
-    
     src
+
+    src/mods
+
+    src/mods/dbg
+    src/mods/global
+
+    src/mods/widerange
+    
     src/extmods
 )
 
@@ -45,9 +65,10 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_link_libraries(${PROJECT_NAME} 
     PRIVATE 
     vhlib_platform
+    vhlib_args
+    vhlib_fsys
     vhlib_svg
-    # vhlib_fsys
-    # vhlib_args
+
     # vhlib_bitptr
     # vhlib_metacrc
     # vhlib_timerstamp
