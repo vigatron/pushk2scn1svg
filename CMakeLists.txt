@@ -9,6 +9,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 set(CMAKE_CXX_STANDARD 17)
 
+
 # Подключаем папку с субмодулем
 add_subdirectory(src/extmods/vhlibplatform)
 
@@ -43,6 +44,10 @@ add_executable(vhpackv81scan
     src/mods/widerange/widerange.hpp
     src/mods/widerange/widerange.cpp
 
+    src/mods/generatewnd/generatewnd.cpp
+    src/mods/generatedna/generatedna.cpp
+
+    src/mods/cmdline/cmdline.cpp
 )
 
 #
