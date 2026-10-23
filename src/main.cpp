@@ -15,7 +15,6 @@
 #include "global.hpp"
 #include "draw/draw.hpp"
 
-#include "widerange/widerange.hpp"
 
 // Generate SVG
 #include "generatewnd/generatewnd.hpp"
@@ -64,12 +63,8 @@ int main(int argc, char *argv[])
     if (vok != LoadSource(appcfg.fnameSource, appcfg.subsize, &memblk))
         return verror(1);
 
-    // WideRange Scan
-    VHWideRangeScan wscan;
+    // Convert source to std::vector
     std::vector<uint8_t> arrsrc(memblk.ptr(), memblk.ptr() + memblk.sz());
-
-    if (vok != wscan.scan(arrsrc))
-        return verrmsg(1, "Wide Range analisys failed");
 
     // Generate Wnd Doc / SVG
     {

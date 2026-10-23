@@ -15,6 +15,7 @@ add_library(vhlib_svg STATIC
 
     src/vhsvg.hpp
     src/vhsvg.cpp
+
     src/strtools.hpp
     src/strtools.cpp
 )

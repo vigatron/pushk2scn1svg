@@ -5,7 +5,7 @@
  */
 VHKeyFingerPrint::VHKeyFingerPrint() : avail(false)
 {
-    spectrum.fill(0);
+    arr.resize(MAX_RANGE/8, 0);
 }
 
 /**
@@ -17,23 +17,33 @@ void VHKeyFingerPrint::put(uint8_t sym, uint16_t pos)
     {
         avail = true;
         startpos = pos;
-        // prevpos = pos;
         endpos = pos;
     }
     else
     {
-        // count spc
-        // uint16_t dx = pos - prevpos;
         uint16_t dx = pos - startpos;
-
-        spectrum[dx]++;
-
+        mark(dx);
         if (pos > endpos)
             endpos = pos;
-
-        // prevpos = pos;
     }
 }
+
+/**
+ * 
+ */
+void VHKeyFingerPrint::mark(uint16_t pos)
+{
+    VHBits::BitSet(arr.data(), pos);
+}
+
+/**
+ *
+ */
+bool VHKeyFingerPrint::status(uint16_t pos) const
+{
+    return VHBits::BitVal(arr.data(), pos);
+}
+
 
 /**
  *
@@ -56,16 +66,16 @@ bool VHKeyFingerPrint::empty() const
  */
 void VHKeyFingerPrint::dump() const
 {
-    printf("S %3u | ", (uint16_t)startpos);
+    printf("[S %5u : E %3u] ", startpos, endpos);
 
-    for (size_t idx = startpos; idx <= endpos; idx++)
+    const auto* bits = arr.data();
+
+    for (size_t idx = startpos; idx < endpos + 1; idx++)
     {
-        if (spectrum[idx])
+        if (VHBits::BitVal(bits, idx))
         {
-            // printf("@%u %u | ", (uint16_t)idx, spectrum[idx]);
-            printf("%u (%u), ", (uint16_t)idx, spectrum[idx]);
+            printf("%zu ", idx);
         }
     }
 
-    printf("E %3u ", (uint16_t)endpos);
 }

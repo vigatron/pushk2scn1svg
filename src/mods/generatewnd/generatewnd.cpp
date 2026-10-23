@@ -5,6 +5,12 @@
 
 #include "vhfsys.hpp"
 
+// SVG Paper Parameters / Defines
+static const uint16_t SVG_Paper_Width = 3200, SVG_Paper_Height = 2400;
+static const uint16_t SVG_Paper_Border_X = 100;
+static const uint16_t SVG_Paper_Border_Y = 100;
+
+
 /**
  *
  */
@@ -13,18 +19,15 @@ verr VHDocWnd::GenerateDocument(
     const std::string &fnamewnd)
 {
 
-    // SVG Defines
-    int SVG_W = 3200, SVG_H = 2400;
-    int SVG_Border = 100;
+    VHRect rect_full_area(0, 0, SVG_Paper_Width, SVG_Paper_Height);
 
-    VHRect rect_full_area(0, 0, SVG_W, SVG_H);
+
+    // SVG Paper area (including border)
+    VHRect rect_paper_area = rect_full_area;
+    rect_paper_area.shrink(SVG_Paper_Border_X, SVG_Paper_Border_Y);
 
     int hh_hdr = 200;
     int hh_ftr = 200;
-
-    // Paper area including border
-    VHRect rect_paper_area = rect_full_area;
-    rect_paper_area.shrink(SVG_Border, SVG_Border);
 
     VHRect rect_2X4 = rect_paper_area;
     rect_2X4.shrink(0, (hh_hdr + hh_ftr) / 2);
@@ -39,8 +42,9 @@ verr VHDocWnd::GenerateDocument(
     rect_props.move(rect_2X4.w / 2, 0);
 
     // SVG Generation
-    svg.begin(SVG_W, SVG_H);
-    svg.rect(0, 0, SVG_W, SVG_H, 0, "white", "white");
+    svg.begin(rect_full_area.width(), rect_full_area.height());
+    
+    svg.rect(0, 0, rect_full_area.width(), rect_full_area.height(), 0, "gray", "white");
     // svg.rect( rect_paper_area, 1, "#AAAAAA" );
 
     Draw2X4Content(arrsrc, rect_2X4);

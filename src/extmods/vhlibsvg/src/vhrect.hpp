@@ -30,4 +30,7 @@ class VHRect {
 		int16_t     sx; int16_t     sy;
 		uint16_t    w;  uint16_t    h;
 		int16_t     ex; int16_t     ey;
+
+        const uint16_t width() const { return w; }
+        const uint16_t height() const { return h; }
 };

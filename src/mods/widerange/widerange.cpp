@@ -12,6 +12,14 @@ VHWideRangeScan::VHWideRangeScan()
 /**
  *
  */
+const VHKeyFingerPrint & VHWideRangeScan::wobj(size_t idx)
+{
+    return arrelms[idx];
+}
+
+/**
+ *
+ */
 verr VHWideRangeScan::scan(const std::vector<uint8_t> &arrsrc)
 {
     //
