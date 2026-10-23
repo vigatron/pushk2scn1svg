@@ -52,7 +52,6 @@ std::string strrgb(uint32_t v)
 // ----------------------------------------------------------------------------
 std::string lincolor(uint8_t vv)
 {
-
     uint8_t val = 64 + vv * 2 / 3;
     uint8_t pos = val / 86; // /3
     uint8_t dv = val % 86;
@@ -72,7 +71,11 @@ std::string lincolor(uint8_t vv)
 }
 
 // ----------------------------------------------------------------------------
-static void draw_column_mask(int idx, const VHSVGRect &rect, const std::vector<BlockProps> &arr)
+static void draw_column_mask(
+    VHSVG &svg,
+    int idx,
+    const VHSVGRect &rect,
+    const std::vector<BlockProps> &arr)
 {
 
     int ww = rect.width();
@@ -113,7 +116,12 @@ static void draw_column_mask(int idx, const VHSVGRect &rect, const std::vector<B
 }
 
 // ----------------------------------------------------------------------------
-void DrawDensity(const VHSVGRect &rect, const std::vector<BlockProps> &arr, int blksize, int ws)
+void DrawDensity(
+    VHSVG &svg,
+    const VHSVGRect &rect,
+    const std::vector<BlockProps> &arr,
+    int blksize,
+    int ws)
 {
 
     int ww = rect.width();
@@ -135,10 +143,10 @@ void DrawDensity(const VHSVGRect &rect, const std::vector<BlockProps> &arr, int 
     for (int i = 0; i < arr.size(); i++)
     {
         VHSVGRect rectcol(rect.startx() + unitw * i, rect.starty(), unitw, rectgfx.height());
-        draw_column_mask(i, rectcol, arr);
+        draw_column_mask(svg, i, rectcol, arr);
     }
 
-    DrawCenterLine(rectgfx);
+    DrawCenterLine(svg, rectgfx);
 
     for (int i = 0; i < arr.size(); i++)
     {
@@ -150,5 +158,5 @@ void DrawDensity(const VHSVGRect &rect, const std::vector<BlockProps> &arr, int 
         // draw_col_bck( i , rectcol );
     }
 
-    DrawScale(rectscl, blksize);
+    DrawScale(svg, rectscl, blksize);
 }

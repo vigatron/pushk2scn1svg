@@ -29,6 +29,16 @@ public:
     //
     void dump() const;
 
+    /** */
+    const uint16_t getStartPos() const {
+        return startpos;
+    }
+
+    /** */
+    const uint16_t getEndPos() const {
+        return endpos; 
+    }
+
     //
     static const size_t MAX_RANGE = 32 * F1K;
 

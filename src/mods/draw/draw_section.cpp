@@ -4,7 +4,11 @@
 #include "global.hpp"
 
 // ----------------------------------------------------------------------------
-static void draw_column_spread(int idx, const VHSVGRect &rect, const std::vector<BlockProps> &arr)
+static void draw_column_spread(
+    VHSVG &svg,
+    int idx,
+    const VHSVGRect &rect,
+    const std::vector<BlockProps> &arr)
 {
     int ww = rect.width();
     int hh = rect.height();
@@ -28,14 +32,19 @@ static void draw_column_spread(int idx, const VHSVGRect &rect, const std::vector
 // ----------------------------------------------------------------------------
 // Draw background bar
 // ----------------------------------------------------------------------------
-void draw_col_bck(int idx, const VHSVGRect &rect)
+void draw_col_bck(VHSVG &svg, int idx, const VHSVGRect &rect)
 {
     std::string color = (idx & 1) ? Colors::clrbck1 : Colors::clrbck2;
     svg.rect(rect, 0, color, color);
 }
 
 // ----------------------------------------------------------------------------
-void DrawSection(const VHSVGRect &rect, const std::vector<BlockProps> &arr, int blksize, int ws)
+void DrawSection(
+    VHSVG &svg,
+    const VHSVGRect &rect,
+    const std::vector<BlockProps> &arr,
+    int blksize,
+    int ws)
 {
 
     int ww = rect.width();
@@ -55,16 +64,16 @@ void DrawSection(const VHSVGRect &rect, const std::vector<BlockProps> &arr, int 
     for (int i = 0; i < arr.size(); i++)
     {
         VHSVGRect rectcol(rect.startx() + unitw * i, rect.starty(), unitw, rectgfx.height());
-        draw_col_bck(i, rectcol);
+        draw_col_bck(svg, i, rectcol);
     }
 
     for (int i = 0; i < arr.size(); i++)
     {
         VHSVGRect rectcol(rect.startx() + unitw * i, rect.starty(), unitw, rectgfx.height());
-        draw_column_spread(i, rectcol, arr);
+        draw_column_spread(svg, i, rectcol, arr);
     }
 
-    DrawCenterLine(rectgfx);
+    DrawCenterLine(svg, rectgfx);
 
     svg.rect(rectgfx, 1, "#AAAAAA");
     svg.rect(rectdif, 1, "#AAAAAA");
@@ -75,5 +84,5 @@ void DrawSection(const VHSVGRect &rect, const std::vector<BlockProps> &arr, int 
     svg.text(rect.startx() + 14, rect.starty() - 20, txt, "verdana", 32, Colors::colortxtsh2);
     svg.text(rect.startx() + 12, rect.starty() - 22, txt, "verdana", 32, Colors::colortxt);
 
-    DrawScale(rectscl, blksize);
+    DrawScale(svg, rectscl, blksize);
 }

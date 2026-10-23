@@ -1,10 +1,8 @@
 #pragma once
 
 #include "vhplatform.hpp"
-
 #include "structs/blockprops.hpp"
 #include "draw/draw.hpp"
-
 #include "vhsvg.hpp"
 
 class VHDocWnd
@@ -18,7 +16,7 @@ public:
     /**
      *
      */
-    void Draw2X4Content(const std::vector<uint8_t> &arrsrc, const VHSVGRect &rect);
+    void Draw2X4Content(VHSVG &svg, const std::vector<uint8_t> &arrsrc, const VHSVGRect &rect);
 
     /**
      *

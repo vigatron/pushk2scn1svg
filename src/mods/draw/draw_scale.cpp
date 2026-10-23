@@ -4,7 +4,7 @@
 #include "draw/colors.hpp"
 
 // ----------------------------------------------------------------------------
-void DrawShadowBox(const VHSVGRect &rect)
+void DrawShadowBox(VHSVG &svg, const VHSVGRect &rect)
 {
 
     int dx = 16, dy = 24;
@@ -16,7 +16,7 @@ void DrawShadowBox(const VHSVGRect &rect)
 }
 
 // ----------------------------------------------------------------------------
-void DrawScale(const VHSVGRect &rect, int size)
+void DrawScale(VHSVG &svg, const VHSVGRect &rect, int size)
 {
 
     int n = 0;

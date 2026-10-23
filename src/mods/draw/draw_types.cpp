@@ -47,7 +47,7 @@ std::string gettype(int i, int j)
     return arrtypes[n];
 }
 
-void DrawTypes(const VHSVGRect &rect)
+void DrawTypes(VHSVG &svg, const VHSVGRect &rect)
 {
 
     int fnsize = 18;
@@ -58,7 +58,7 @@ void DrawTypes(const VHSVGRect &rect)
     int ww = rect.width() / cols;
     int hh = rect.height() / rows;
 
-    DrawShadowBox(rect);
+    DrawShadowBox(svg, rect);
 
     svg.rect(rect, 1, "gray");
 

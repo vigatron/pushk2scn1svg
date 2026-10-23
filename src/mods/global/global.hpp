@@ -4,4 +4,3 @@
 #include "vhsvg.hpp"
 
 extern DBG     dbg;
-extern VHSVG   svg;

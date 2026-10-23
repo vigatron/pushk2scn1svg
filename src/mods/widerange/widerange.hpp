@@ -20,12 +20,17 @@ class VHWideRangeScan
 
         static const size_t MAX_ELMS = 256;
 
-        const VHKeyFingerPrint & wobj(size_t idx);
+        const VHKeyFingerPrint & operator[](size_t idx) const;
+
+        const size_t width() const { return arrwidth; }
 
     private:
 
         //
         std::vector<VHKeyFingerPrint> arrelms;
+
+        //
+        size_t arrwidth;
 
 };
 

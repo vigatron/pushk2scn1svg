@@ -5,7 +5,7 @@
 /**
  *
  */
-void DrawCenterLine(const VHSVGRect &rect)
+void DrawCenterLine(VHSVG &svg, const VHSVGRect &rect)
 {
 
     int ymid1 = rect.starty() + rect.height() / 2;

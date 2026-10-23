@@ -2,7 +2,6 @@
 #include "structs/blockprops.hpp"
 
 DBG dbg;
-VHSVG svg;
 
 // ----------------------------------------------------------------------------
 void DumpSamples(const std::vector<BlockProps> &arr)

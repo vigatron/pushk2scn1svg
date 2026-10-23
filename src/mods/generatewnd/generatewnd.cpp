@@ -19,8 +19,8 @@ verr VHDocWnd::GenerateDocument(
     const std::string &fnamewnd)
 {
 
+    // Document 
     VHSVGRect rect_full_area(0, 0, SVG_Paper_Width, SVG_Paper_Height);
-
 
     // SVG Paper area (including border)
     VHSVGRect rect_paper_area = rect_full_area;
@@ -41,15 +41,19 @@ verr VHDocWnd::GenerateDocument(
     VHSVGRect rect_props = rect_types;
     rect_props.move(rect_2X4.width() / 2, 0);
 
+
+    // === SVG GENERATION ===
+    VHSVG svg;
+
     // SVG Generation
     svg.begin(rect_full_area.width(), rect_full_area.height());
     
     svg.rect(0, 0, rect_full_area.width(), rect_full_area.height(), 0, "gray", "white");
     // svg.rect( rect_paper_area, 1, "#AAAAAA" );
 
-    Draw2X4Content(arrsrc, rect_2X4);
+    Draw2X4Content(svg, arrsrc, rect_2X4);
 
-    DrawTypes(rect_types);
+    DrawTypes(svg, rect_types);
     svg.end();
 
     // Save results
@@ -61,7 +65,7 @@ verr VHDocWnd::GenerateDocument(
 /**
  *
  */
-void VHDocWnd::Draw2X4Content(const std::vector<uint8_t> &arrsrc, const VHSVGRect &rect)
+void VHDocWnd::Draw2X4Content(VHSVG &svg, const std::vector<uint8_t> &arrsrc, const VHSVGRect &rect)
 {
 
     int ww = rect.width() / 2;
@@ -78,12 +82,12 @@ void VHDocWnd::Draw2X4Content(const std::vector<uint8_t> &arrsrc, const VHSVGRec
             VHSVGRect rects(rect.startx() + i * ww, rect.starty() + j * hh, ww, hh);
             rects.shrink(64, 64);
 
-            DrawShadowBox(rects);
+            DrawShadowBox(svg, rects);
 
             if (!i)
-                DrawSection(rects, arrprops, arrsrc.size(), chunksize);
+                DrawSection(svg, rects, arrprops, arrsrc.size(), chunksize);
             else
-                DrawDensity(rects, arrprops, arrsrc.size(), chunksize);
+                DrawDensity(svg, rects, arrprops, arrsrc.size(), chunksize);
         }
     }
 }
