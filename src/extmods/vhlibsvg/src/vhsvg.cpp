@@ -167,7 +167,7 @@ void VHSVG::rect(int x, int y, int width, int height, int wdt, std::string colf,
 /** */
 void VHSVG::rect(const VHSVGRect &r, int th, std::string colf, std::string colb)
 {
-    rect(r.sx, r.sy, r.w, r.h, 1, colf, colb);
+    rect(r.startx(), r.starty(), r.width(), r.height(), 1, colf, colb);
 }
 
 /** */

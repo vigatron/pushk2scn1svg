@@ -6,10 +6,10 @@
 // ----------------------------------------------------------------------------
 static void draw_column_spread(int idx, const VHSVGRect &rect, const std::vector<BlockProps> &arr)
 {
-    int ww = rect.w;
-    int hh = rect.h;
-    int sx = rect.sx;
-    int ey = rect.ey;
+    int ww = rect.width();
+    int hh = rect.height();
+    int sx = rect.startx();
+    int ey = rect.endy();
 
     const BlockProps &s = arr[idx];
 
@@ -38,25 +38,29 @@ void draw_col_bck(int idx, const VHSVGRect &rect)
 void DrawSection(const VHSVGRect &rect, const std::vector<BlockProps> &arr, int blksize, int ws)
 {
 
-    int ww = rect.w;
-    int h1 = rect.h * 0.8, h2 = rect.h * 0.1, h3 = rect.h * 0.1;
-    int y1 = rect.sy, y2 = y1 + h1, y3 = y2 + h2;
+    int ww = rect.width();
+    int h1 = rect.height() * 0.8;
+    int h2 = rect.height() * 0.1;
+    int h3 = rect.height() * 0.1;
+    int y1 = rect.starty();
+    int y2 = y1 + h1;
+    int y3 = y2 + h2;
 
-    VHSVGRect rectgfx(rect.sx, y1, ww, h1); // Quantization
-    VHSVGRect rectdif(rect.sx, y2, ww, h2); // Delta
-    VHSVGRect rectscl(rect.sx, y3, ww, h3); // Scale
+    VHSVGRect rectgfx(rect.startx(), y1, ww, h1); // Quantization
+    VHSVGRect rectdif(rect.startx(), y2, ww, h2); // Delta
+    VHSVGRect rectscl(rect.startx(), y3, ww, h3); // Scale
 
-    float unitw = rect.w * 1.0 / arr.size();
+    float unitw = rect.width() * 1.0 / arr.size();
 
     for (int i = 0; i < arr.size(); i++)
     {
-        VHSVGRect rectcol(rect.sx + unitw * i, rect.sy, unitw, rectgfx.h);
+        VHSVGRect rectcol(rect.startx() + unitw * i, rect.starty(), unitw, rectgfx.height());
         draw_col_bck(i, rectcol);
     }
 
     for (int i = 0; i < arr.size(); i++)
     {
-        VHSVGRect rectcol(rect.sx + unitw * i, rect.sy, unitw, rectgfx.h);
+        VHSVGRect rectcol(rect.startx() + unitw * i, rect.starty(), unitw, rectgfx.height());
         draw_column_spread(i, rectcol, arr);
     }
 
@@ -68,8 +72,8 @@ void DrawSection(const VHSVGRect &rect, const std::vector<BlockProps> &arr, int 
     svg.rect(rect, 1, "#CCCCCC");
 
     std::string txt = "Размер окна: " + std::to_string(ws) + " байт";
-    svg.text(rect.sx + 14, rect.sy - 20, txt, "verdana", 32, Colors::colortxtsh2);
-    svg.text(rect.sx + 12, rect.sy - 22, txt, "verdana", 32, Colors::colortxt);
+    svg.text(rect.startx() + 14, rect.starty() - 20, txt, "verdana", 32, Colors::colortxtsh2);
+    svg.text(rect.startx() + 12, rect.starty() - 22, txt, "verdana", 32, Colors::colortxt);
 
     DrawScale(rectscl, blksize);
 }

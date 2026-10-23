@@ -8,12 +8,12 @@
 void DrawCenterLine(const VHSVGRect &rect)
 {
 
-    int ymid = rect.sy + rect.h / 2;
-    int ymidu = ymid - rect.h / 4;
-    int ymaxu = ymid + rect.h / 4;
+    int ymid1 = rect.starty() + rect.height() / 2;
+    int ymidu = ymid1 - rect.height() / 4;
+    int ymaxu = ymid1 + rect.height() / 4;
 
-    svg.line(rect.sx, ymid, rect.ex, ymid, 1, "gray", "10,10", "0.40");
-    svg.line(rect.sx, ymidu, rect.ex, ymidu, 1, "gray", "4,4", "0.25");
-    svg.line(rect.sx, ymaxu, rect.ex, ymaxu, 1, "gray", "4,4", "0.25");
+    svg.line(rect.startx(), ymid1, rect.endx(), ymid1, 1, "gray", "10,10", "0.40");
+    svg.line(rect.startx(), ymidu, rect.endx(), ymidu, 1, "gray", "4,4", "0.25");
+    svg.line(rect.startx(), ymaxu, rect.endx(), ymaxu, 1, "gray", "4,4", "0.25");
 }
 

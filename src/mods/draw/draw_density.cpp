@@ -73,10 +73,10 @@ std::string lincolor(uint8_t vv)
 static void draw_column_mask(int idx, const VHSVGRect &rect, const std::vector<BlockProps> &arr)
 {
 
-    int ww = rect.w;
-    int hh = rect.h;
-    int sx = rect.sx;
-    int ey = rect.ey;
+    int ww = rect.width();
+    int hh = rect.height();
+    int sx = rect.startx();
+    int ey = rect.endy();
 
     const BlockProps &blk = arr[idx];
 
@@ -93,8 +93,8 @@ static void draw_column_mask(int idx, const VHSVGRect &rect, const std::vector<B
         if (blk.spc[i])
         {
             int val = blk.spc[i];
-            int posy = rect.ey - i * hh / 255;
-            svg.line(rect.sx, posy, rect.ex, posy, 1, "red");
+            int posy = rect.endy() - i * hh / 255;
+            svg.line(rect.startx(), posy, rect.endx(), posy, 1, "red");
         }
     }
 
@@ -114,19 +114,25 @@ static void draw_column_mask(int idx, const VHSVGRect &rect, const std::vector<B
 void DrawDensity(const VHSVGRect &rect, const std::vector<BlockProps> &arr, int blksize, int ws)
 {
 
-    int ww = rect.w;
-    int h1 = rect.h * 0.8, h2 = rect.h * 0.1, h3 = rect.h * 0.1;
-    int y1 = rect.sy, y2 = y1 + h1, y3 = y2 + h2;
+    int ww = rect.width();
 
-    VHSVGRect rectgfx(rect.sx, y1, ww, h1); // Quantization
-    VHSVGRect rectdif(rect.sx, y2, ww, h2); // Delta
-    VHSVGRect rectscl(rect.sx, y3, ww, h3); // Scale
+    int h1 = rect.height() * 0.8;
+    int h2 = rect.height() * 0.1;
+    int h3 = rect.height() * 0.1;
 
-    float unitw = rectgfx.w * 1.0f / arr.size();
+    int y1 = rect.starty();
+    int y2 = y1 + h1;
+    int y3 = y2 + h2;
+
+    VHSVGRect rectgfx(rect.startx(), y1, ww, h1); // Quantization
+    VHSVGRect rectdif(rect.startx(), y2, ww, h2); // Delta
+    VHSVGRect rectscl(rect.startx(), y3, ww, h3); // Scale
+
+    float unitw = rectgfx.width() * 1.0f / arr.size();
 
     for (int i = 0; i < arr.size(); i++)
     {
-        VHSVGRect rectcol(rect.sx + unitw * i, rect.sy, unitw, rectgfx.h);
+        VHSVGRect rectcol(rect.startx() + unitw * i, rect.starty(), unitw, rectgfx.height());
         draw_column_mask(i, rectcol, arr);
     }
 
@@ -134,7 +140,7 @@ void DrawDensity(const VHSVGRect &rect, const std::vector<BlockProps> &arr, int 
 
     for (int i = 0; i < arr.size(); i++)
     {
-        VHSVGRect rectcol(rectdif.sx + unitw * i + 1, rectdif.sy, unitw, rectdif.h);
+        VHSVGRect rectcol(rectdif.startx() + unitw * i + 1, rectdif.starty(), unitw, rectdif.height());
         int color = i * 255 / arr.size();
 
         std::string clr = lincolor(color);
