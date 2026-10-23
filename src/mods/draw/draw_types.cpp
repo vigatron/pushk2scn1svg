@@ -1,6 +1,8 @@
 #include "draw.hpp"
 #include "global.hpp"
 
+#include "draw/colors.hpp"
+
 
 std::vector<std::string> arrtypes = {
 	"sint8_t" ,

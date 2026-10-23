@@ -1,32 +1,8 @@
 #include "global.hpp"
-#include "blockprops.hpp"
+#include "structs/blockprops.hpp"
 
 DBG dbg;
 VHSVG svg;
-
-// ----------------------------------------------------------------------------
-verr LoadSource(std::string fname, int minsize, VHMemBlock *r)
-{
-
-    VHFile f(fname);
-
-    int fsize = f.flen();
-    if (fsize < minsize)
-    {
-        std::string msg = "Minimal size less than " + std::to_string(minsize);
-        dbg.txtnl(msg.c_str());
-        return 3;
-    }
-
-    if (!r->LoadFromFile(fname.c_str()))
-    {
-        std::string msg = "Cant read file " + std::to_string(minsize);
-        dbg.txtnl(msg.c_str());
-        return 4;
-    }
-
-    return vok;
-}
 
 // ----------------------------------------------------------------------------
 void DumpSamples(const std::vector<BlockProps> &arr)

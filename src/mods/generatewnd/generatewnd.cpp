@@ -1,6 +1,6 @@
 #include "generatewnd.hpp"
 
-#include "draw.hpp"
+#include "draw/draw.hpp"
 #include "global.hpp"
 
 #include "vhfsys.hpp"

@@ -2,7 +2,7 @@
 #include "strtools.hpp"
 #include "global.hpp"
 
-#include "blockprops.hpp"
+#include "structs/blockprops.hpp"
 
 // white	#FFFFFF
 // green	#80E080

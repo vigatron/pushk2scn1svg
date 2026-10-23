@@ -1,6 +1,8 @@
 #include "draw.hpp"
 #include "global.hpp"
 
+#include "draw/colors.hpp"
+
 // ----------------------------------------------------------------------------
 void DrawShadowBox( const VHRect & rect ) {
 

@@ -23,17 +23,9 @@ add_subdirectory(src/extmods/vhlibfsys)
 add_subdirectory(src/extmods/vhlibsvg)
 
 
-file( GLOB_RECURSE source_list_mods 
-    src/*.cpp
-    src/*.hpp
-    mods/*.cpp
-    mods/*.hpp
-)
-
 #
 add_executable(vhpackv81scan
     src/main.cpp
-    ${source_list_mods}
 
     src/mods/dbg/dbg.cpp
     src/mods/global/global.cpp
@@ -48,6 +40,13 @@ add_executable(vhpackv81scan
     src/mods/generatedna/generatedna.cpp
 
     src/mods/cmdline/cmdline.cpp
+
+    src/mods/draw/colors.cpp
+    src/mods/draw/draw.cpp
+    src/mods/draw/draw_density.cpp
+    src/mods/draw/draw_scale.cpp
+    src/mods/draw/draw_section.cpp
+    src/mods/draw/draw_types.cpp
 )
 
 #

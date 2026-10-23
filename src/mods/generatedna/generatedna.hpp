@@ -2,9 +2,10 @@
 
 #include "vhplatform.hpp"
 
-#include "vhrect.hpp"
-#include "blockprops.hpp"
-#include "draw.hpp"
+#include "structs/blockprops.hpp"
+
+#include "draw/draw.hpp"
+
 
 class VHDocDNA
 {

@@ -1,20 +1,19 @@
+#include "vhplatform.hpp"
+
 
 #include "dbg.hpp"
 
 #include "vhfile.hpp"
 #include "vhfsys.hpp"
 
-#include "vhmemblk.hpp"
-
-#include <string.h>
-#include <vector>
+#include "mem/vhmemblk.hpp"
 
 #include "vhrect.hpp"
 
 #include "vhsvg.hpp"
 
 #include "global.hpp"
-#include "draw.hpp"
+#include "draw/draw.hpp"
 
 #include "widerange/widerange.hpp"
 
@@ -24,6 +23,31 @@
 
 // Command Line Parsing
 #include "cmdline/cmdline.hpp"
+
+// ----------------------------------------------------------------------------
+verr LoadSource(std::string fname, int minsize, VHMemBlock *r)
+{
+
+    VHFile f(fname);
+
+    int fsize = f.flen();
+    if (fsize < minsize)
+    {
+        std::string msg = "Minimal size less than " + std::to_string(minsize);
+        dbg.txtnl(msg.c_str());
+        return verror(3);
+    }
+
+    if (!r->LoadFromFile(fname.c_str()))
+    {
+        std::string msg = "Cant read file " + std::to_string(minsize);
+        dbg.txtnl(msg.c_str());
+        return verror(4);
+    }
+
+    return vok;
+}
+
 
 /**
  *

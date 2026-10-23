@@ -1,12 +1,16 @@
 #pragma once
 
 #include "vhplatform.hpp"
+
+#include "structs/blockprops.hpp"
+
+
 #include "vhrect.hpp"
-#include "vhmemblk.hpp"
+
+#include "mem/vhmemblk.hpp"
 
 #include "vhsvg.hpp"
 
-#include "blockprops.hpp"
 
 
 
