@@ -4,7 +4,9 @@
 
 #include "structs/blockprops.hpp"
 
-uint32_t arrcolors[4] = {0xFFFFFF, 0x80E080, 0xFFFF00, 0xFF8080};
+#include "vhstrtools.hpp"
+
+static uint32_t arrcolors[4] = {0xFFFFFF, 0x80E080, 0xFFFF00, 0xFF8080};
 
 // ----------------------------------------------------------------------------
 void rgb_to_compo(uint32_t v, uint8_t *r, uint8_t *g, uint8_t *b)
@@ -27,8 +29,8 @@ uint8_t scaleval(uint8_t v1, uint8_t v2, uint8_t pos, uint8_t range)
 std::string hexval(int v)
 {
     char sss[3] = {
-        szhex()[(v >> 4) & 0xF],
-        szhex()[(v >> 0) & 0xF], 0};
+        VHSVGTextTools::szhex()[(v >> 4) & 0xF],
+        VHSVGTextTools::szhex()[(v >> 0) & 0xF], 0};
     return std::string(sss);
 }
 

@@ -7,3 +7,6 @@
 [submodule "src/extmods/vhlibfsys"]
 	path = src/extmods/vhlibfsys
 	url = https://github.com/vigatron/vhlibfsys
+[submodule "src/extmods/vhlibsvg"]
+	path = src/extmods/vhlibsvg
+	url = https://github.com/vigatron/vhlibsvg

@@ -75,12 +75,4 @@ target_link_libraries(${PROJECT_NAME}
     vhlib_args
     vhlib_fsys
     vhlib_svg
-
-    # vhlib_bitptr
-    # vhlib_metacrc
-    # vhlib_timerstamp
-    # vhlib_log
 )
-
-# add_custom_command(TARGET ${PRJNAME} POST_BUILD COMMAND
-#     cp "${PROJECT_BINARY_DIR}/${PRJNAME}"     "$ENV{HOME}/bin/${PRJNAME}"        )
