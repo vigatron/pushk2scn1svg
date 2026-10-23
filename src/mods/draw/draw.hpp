@@ -4,9 +4,6 @@
 
 #include "structs/blockprops.hpp"
 
-
-#include "vhrect.hpp"
-
 #include "mem/vhmemblk.hpp"
 
 #include "vhsvg.hpp"
@@ -14,21 +11,21 @@
 
 
 
-void DrawCenterLine(const VHRect &rect);
+void DrawCenterLine(const VHSVGRect &rect);
 
-void DrawShadowBox(const VHRect &rect);
+void DrawShadowBox(const VHSVGRect &rect);
 
-void DrawScale(const VHRect &rect, int size);
+void DrawScale(const VHSVGRect &rect, int size);
 
 void DrawSection(
-    const VHRect &rect,
+    const VHSVGRect &rect,
     const std::vector<BlockProps> &arr,
     int blksize, int ws);
 
 void DrawDensity(
-    const VHRect &rect,
+    const VHSVGRect &rect,
     const std::vector<BlockProps> &arr,
     int blksize, int ws);
 
-void DrawTypes(const VHRect &rect);
+void DrawTypes(const VHSVGRect &rect);
 

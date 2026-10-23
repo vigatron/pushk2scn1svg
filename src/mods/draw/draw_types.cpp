@@ -47,7 +47,7 @@ std::string gettype(int i, int j) {
 	int n = i * 4 + j;
 	return arrtypes[n]; }
 
-void DrawTypes( const VHRect & rect ) {
+void DrawTypes( const VHSVGRect & rect ) {
 
 	int fnsize = 18;
 	std::string fnfam = "noto";
@@ -63,7 +63,7 @@ void DrawTypes( const VHRect & rect ) {
 
 	for(int j = 0; j < rows; j++) {
 
-		VHRect rect_bck( rect.sx, rect.sy + j*hh, rect.w, hh );
+		VHSVGRect rect_bck( rect.sx, rect.sy + j*hh, rect.w, hh );
 		std::string col = !(j&1) ? Colors::clrbck1 : Colors::clrbck2;
 		svg.rect(rect_bck, 0, col, col);
 

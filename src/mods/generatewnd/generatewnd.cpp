@@ -19,26 +19,26 @@ verr VHDocWnd::GenerateDocument(
     const std::string &fnamewnd)
 {
 
-    VHRect rect_full_area(0, 0, SVG_Paper_Width, SVG_Paper_Height);
+    VHSVGRect rect_full_area(0, 0, SVG_Paper_Width, SVG_Paper_Height);
 
 
     // SVG Paper area (including border)
-    VHRect rect_paper_area = rect_full_area;
+    VHSVGRect rect_paper_area = rect_full_area;
     rect_paper_area.shrink(SVG_Paper_Border_X, SVG_Paper_Border_Y);
 
     int hh_hdr = 200;
     int hh_ftr = 200;
 
-    VHRect rect_2X4 = rect_paper_area;
+    VHSVGRect rect_2X4 = rect_paper_area;
     rect_2X4.shrink(0, (hh_hdr + hh_ftr) / 2);
     rect_2X4.setpos(rect_paper_area.sx, rect_paper_area.sy + hh_hdr);
 
     // Data types ( left )
-    VHRect rect_types(rect_2X4.sx, rect_2X4.ey, rect_2X4.w / 2, hh_ftr);
+    VHSVGRect rect_types(rect_2X4.sx, rect_2X4.ey, rect_2X4.w / 2, hh_ftr);
     rect_types.shrink(64, 16);
 
     // Draw props ( right ) empty
-    VHRect rect_props = rect_types;
+    VHSVGRect rect_props = rect_types;
     rect_props.move(rect_2X4.w / 2, 0);
 
     // SVG Generation
@@ -61,7 +61,7 @@ verr VHDocWnd::GenerateDocument(
 /**
  *
  */
-void VHDocWnd::Draw2X4Content(const std::vector<uint8_t> &arrsrc, const VHRect &rect)
+void VHDocWnd::Draw2X4Content(const std::vector<uint8_t> &arrsrc, const VHSVGRect &rect)
 {
 
     int ww = rect.w / 2;
@@ -75,7 +75,7 @@ void VHDocWnd::Draw2X4Content(const std::vector<uint8_t> &arrsrc, const VHRect &
             int chunksize = 64 << j;
             const std::vector<BlockProps> &arrprops = GenSamplesArray(arrsrc, chunksize);
 
-            VHRect rects(rect.sx + i * ww, rect.sy + j * hh, ww, hh);
+            VHSVGRect rects(rect.sx + i * ww, rect.sy + j * hh, ww, hh);
             rects.shrink(64, 64);
 
             DrawShadowBox(rects);

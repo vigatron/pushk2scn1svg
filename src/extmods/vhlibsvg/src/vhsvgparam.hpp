@@ -17,12 +17,14 @@ public:
         set(pn, std::to_string(pv));
     }
 
+    /** */
     void set(std::string pn, std::string pv)
     {
         key = pn;
         val = pv;
     }
 
+    /** */
     operator std::string() const
     {
         return key + "=" + quotes(val) + " ";
@@ -33,6 +35,7 @@ private:
     std::string val;
     std::string result;
 
+    /** */
     std::string quotes(const std::string &str) const
     {
         return "\"" + str + "\"";

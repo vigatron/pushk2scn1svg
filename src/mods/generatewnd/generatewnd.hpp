@@ -5,7 +5,7 @@
 #include "structs/blockprops.hpp"
 #include "draw/draw.hpp"
 
-#include "vhrect.hpp"
+#include "vhsvg.hpp"
 
 class VHDocWnd
 {
@@ -18,7 +18,7 @@ public:
     /**
      *
      */
-    void Draw2X4Content(const std::vector<uint8_t> &arrsrc, const VHRect &rect);
+    void Draw2X4Content(const std::vector<uint8_t> &arrsrc, const VHSVGRect &rect);
 
     /**
      *

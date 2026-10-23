@@ -11,15 +11,16 @@ configure_file(
 
 #
 add_library(vhlib_svg STATIC
-    src/vhrect.hpp
+    src/vhsvgrect.hpp
+    src/vhsvgrect.cpp
+
+    src/vhstrtools.hpp
+    src/vhstrtools.cpp
 
     src/vhsvg.hpp
     src/vhsvg.cpp
-
-    src/strtools.hpp
-    src/strtools.cpp
 )
-
+ 
 # target_sources(vhlib_svg STATIC
 #     ${CMAKE_CURRENT_SOURCE_DIR}/src/vhlibbitptr.hpp
 # )

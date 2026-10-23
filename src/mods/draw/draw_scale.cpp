@@ -4,17 +4,17 @@
 #include "draw/colors.hpp"
 
 // ----------------------------------------------------------------------------
-void DrawShadowBox( const VHRect & rect ) {
+void DrawShadowBox( const VHSVGRect & rect ) {
 
 	int dx = 16, dy = 24;
 
-	VHRect rect_shadow = rect;
+	VHSVGRect rect_shadow = rect;
 	rect_shadow.move(dx, dy);
 	svg.rect(rect_shadow,	1, Colors::clrshd_f, Colors::clrshd_b  );
 	svg.rect(rect,			1, Colors::clrshd_w, Colors::clrshd_bb ); }
 
 // ----------------------------------------------------------------------------
-void DrawScale( const VHRect & rect , int size) {
+void DrawScale( const VHSVGRect & rect , int size) {
 
 	int n 		= 0;
 	int s 		= size;
@@ -25,7 +25,7 @@ void DrawScale( const VHRect & rect , int size) {
 		int dx 	= s * rect.w / size;
 		int dxt	= dx + ( (s == size) ? - 64 : 6 );
 		int dy = rect.h;
-		VHRect r(rect.sx, rect.sy, dx, rect.h + 1);
+		VHSVGRect r(rect.sx, rect.sy, dx, rect.h + 1);
 		
 		std::string colf = "#AAAAAA";
 		std::string colb = (n++ & 1) ? "#D0D0D0" : "#E0E0E0";

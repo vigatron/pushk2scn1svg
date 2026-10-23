@@ -5,7 +5,7 @@
 /**
  *
  */
-void DrawCenterLine(const VHRect &rect)
+void DrawCenterLine(const VHSVGRect &rect)
 {
 
     int ymid = rect.sy + rect.h / 2;

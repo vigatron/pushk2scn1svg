@@ -8,8 +8,6 @@
 
 #include "mem/vhmemblk.hpp"
 
-#include "vhrect.hpp"
-
 #include "vhsvg.hpp"
 
 #include "global.hpp"
@@ -23,7 +21,7 @@
 // Command Line Parsing
 #include "cmdline/cmdline.hpp"
 
-// ----------------------------------------------------------------------------
+/** */
 verr LoadSource(std::string fname, int minsize, VHMemBlock *r)
 {
 

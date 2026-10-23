@@ -1,13 +1,8 @@
 #include "draw.hpp"
-#include "strtools.hpp"
+#include "vhstrtools.hpp"
 #include "global.hpp"
 
 #include "structs/blockprops.hpp"
-
-// white	#FFFFFF
-// green	#80E080
-// yellow	#FFFF80
-// red		#FFA0A0
 
 uint32_t arrcolors[4] = {0xFFFFFF, 0x80E080, 0xFFFF00, 0xFF8080};
 
@@ -75,7 +70,7 @@ std::string lincolor(uint8_t vv)
 }
 
 // ----------------------------------------------------------------------------
-static void draw_column_mask(int idx, const VHRect &rect, const std::vector<BlockProps> &arr)
+static void draw_column_mask(int idx, const VHSVGRect &rect, const std::vector<BlockProps> &arr)
 {
 
     int ww = rect.w;
@@ -116,22 +111,22 @@ static void draw_column_mask(int idx, const VHRect &rect, const std::vector<Bloc
 }
 
 // ----------------------------------------------------------------------------
-void DrawDensity(const VHRect &rect, const std::vector<BlockProps> &arr, int blksize, int ws)
+void DrawDensity(const VHSVGRect &rect, const std::vector<BlockProps> &arr, int blksize, int ws)
 {
 
     int ww = rect.w;
     int h1 = rect.h * 0.8, h2 = rect.h * 0.1, h3 = rect.h * 0.1;
     int y1 = rect.sy, y2 = y1 + h1, y3 = y2 + h2;
 
-    VHRect rectgfx(rect.sx, y1, ww, h1); // Quantization
-    VHRect rectdif(rect.sx, y2, ww, h2); // Delta
-    VHRect rectscl(rect.sx, y3, ww, h3); // Scale
+    VHSVGRect rectgfx(rect.sx, y1, ww, h1); // Quantization
+    VHSVGRect rectdif(rect.sx, y2, ww, h2); // Delta
+    VHSVGRect rectscl(rect.sx, y3, ww, h3); // Scale
 
     float unitw = rectgfx.w * 1.0f / arr.size();
 
     for (int i = 0; i < arr.size(); i++)
     {
-        VHRect rectcol(rect.sx + unitw * i, rect.sy, unitw, rectgfx.h);
+        VHSVGRect rectcol(rect.sx + unitw * i, rect.sy, unitw, rectgfx.h);
         draw_column_mask(i, rectcol, arr);
     }
 
@@ -139,7 +134,7 @@ void DrawDensity(const VHRect &rect, const std::vector<BlockProps> &arr, int blk
 
     for (int i = 0; i < arr.size(); i++)
     {
-        VHRect rectcol(rectdif.sx + unitw * i + 1, rectdif.sy, unitw, rectdif.h);
+        VHSVGRect rectcol(rectdif.sx + unitw * i + 1, rectdif.sy, unitw, rectdif.h);
         int color = i * 255 / arr.size();
 
         std::string clr = lincolor(color);
