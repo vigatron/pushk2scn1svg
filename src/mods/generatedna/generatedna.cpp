@@ -2,22 +2,22 @@
 
 #include "widerange/widerange.hpp"
 
+
+// TODO: Header / fname / size / MD5
+// TODO: Colors set
+
+//
 verr VHDocDNA::GenerateDocument(
-    std::vector<uint8_t> arrsrc,
+    const VHWideRangeScan & range,
     const std::string &fnamedna)
 {
 
-    // WideRange Scan
-    VHWideRangeScan wscan;
-
-    if (vok != wscan.scan(arrsrc))
-        return verrmsg(1, "Wide Range analisys failed");
-
-    VHSVGRect rectabs(0, 0, 4000, 6000);
+    // SVG Area
+    VHSVGRect rectabs(0, 0, doc_size_w, doc_size_h);
 
     // SVG Paper area (including border)
     VHSVGRect rect_paper_area(rectabs);
-    rect_paper_area.shrink(200, 200);
+    rect_paper_area.shrink(doc_content_dist_w, doc_content_dist_h);
 
     // === SVG GENERATION ===
     VHSVG svg;
@@ -29,7 +29,7 @@ verr VHDocDNA::GenerateDocument(
     svg.rect(rectabs, 1, "gray", "white");
 
     // Items
-    Gen256(svg, wscan);
+    Gen256(svg, range);
 
     // SVG Done
     svg.end();
@@ -40,6 +40,7 @@ verr VHDocDNA::GenerateDocument(
     return vok;
 }
 
+//
 void VHDocDNA::Gen256(VHSVG &svg, const VHWideRangeScan &wscan)
 {
 
@@ -48,26 +49,30 @@ void VHDocDNA::Gen256(VHSVG &svg, const VHWideRangeScan &wscan)
         return;
 
 
-    const uint16_t cellw = 3800;
-    const uint16_t cellh = 16;
+    const uint16_t cellw = 1600;
+    const uint16_t cellh = 6;
+    const uint16_t fonth = cellh - 2;
 
-    const uint16_t fonth = 14;
-    const uint16_t cellh_step = 4;
+    const uint16_t cellh_step = 1;
 
     VHSVGRect itemrect(100, 100, cellw, cellh);
 
     for (uint16_t s = 0; s < 256; s++)
     {
+        VHSVGRect itemrect_back(itemrect);
+        itemrect_back.shrink(0, 1);
+
         //
         const VHKeyFingerPrint & obj = wscan[s];
+        bool empty = obj.empty();
 
-        std::string color_frnt = obj.empty() ? "#CCCCCC" : "gray";
-        std::string color_back = obj.empty() ? "#F8F8F8" : "#EEEEEE";
+        std::string color_text = empty ? "#EEEEEE" : "gray";
+        std::string color_bord = empty ? "none" : "#EEEEEE";
+        std::string color_back = empty ? "none" : "#EEEEEE";
 
-        svg.rect(itemrect, 1, color_frnt, color_back);
+        svg.rect(itemrect_back, 1, color_bord, color_back);
 
         //
-
         for(uint16_t pos = obj.getStartPos(); pos < obj.getEndPos() + 1; pos++)
         {
             if(obj.status(pos))
@@ -80,9 +85,10 @@ void VHDocDNA::Gen256(VHSVG &svg, const VHWideRangeScan &wscan)
         }
 
         // Show number
-        int txtx = itemrect.startx() + 4;
+        std::string strnum = "#" + std::to_string(s);
+        int txtx = itemrect.startx() - cellh * 3;
         int txty = itemrect.starty() + cellh - (cellh - fonth + 1);
-        svg.text(txtx, txty, std::to_string(s), "verdna", fonth, color_frnt);
+        svg.text(txtx, txty, strnum, "verdna", fonth, color_text);
 
         // Move to the next
         itemrect.move(0, cellh + cellh_step);

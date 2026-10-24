@@ -9,7 +9,7 @@ using namespace VHArgsParser;
 /**
  *
  */
-verr ParseArgs(int argc, char *argv[], sAppCfg  & appcfg)
+verr ParseArgs(int argc, char *argv[], VHAppCore  & appcfg)
 {
 
     VHArgsParser::VHCmdLineParser cmdline;
@@ -49,7 +49,8 @@ verr ParseArgs(int argc, char *argv[], sAppCfg  & appcfg)
     std::string basefname = VHFSYS::ExtractFilename(strfname);
 
     appcfg.fnameWND = basefname + "_wnd.svg";
-    appcfg.fnameDNA = basefname + "_dna.svg";
+    appcfg.fnameDNAAbs = basefname + "_dna_abs.svg";
+    appcfg.fnameDNARel = basefname + "_dna_rel.svg";
 
     appcfg.subsize = cmdline.GetInt("-wndsz");
 

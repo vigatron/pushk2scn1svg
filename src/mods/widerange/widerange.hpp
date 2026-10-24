@@ -12,31 +12,50 @@
  */
 class VHWideRangeScan
 {
-    public:
+public:
+    //
+    VHWideRangeScan();
 
-        VHWideRangeScan();
+    //
+    verr scanabs(const std::vector<uint8_t> &arrsrc);
 
-        verr scan(const std::vector<uint8_t> & arrsrc);
+    //
+    verr scanrel(const std::vector<uint8_t> &arrsrc);
 
-        static const size_t MAX_ELMS = 256;
+    //
+    static const size_t MAX_ELMS = 256;
 
-        const VHKeyFingerPrint & operator[](size_t idx) const;
+    //
+    const VHKeyFingerPrint &operator[](size_t idx) const;
 
-        const size_t width() const { return arrwidth; }
+    //
+    const size_t width() const { return arrwidth; }
 
-    private:
+private:
+    //
+    std::vector<VHKeyFingerPrint> arrelms;
 
-        //
-        std::vector<VHKeyFingerPrint> arrelms;
+    //
+    size_t arrwidth;
 
-        //
-        size_t arrwidth;
+    void dump()
+    {
+        // Results
+        for (size_t sym = 0; sym < MAX_ELMS; sym++)
+        {
+            // const VHKeyFingerPrint &obj = wobj(sym);
 
+            printf("#%.3d : ", (uint8_t)sym);
+
+            if (arrelms[sym].valid())
+            {
+                arrelms[sym].dump();
+            }
+            else
+            {
+                printf("---");
+            }
+            printf("\n");
+        }
+    }
 };
-
-// Starting pos
-// static const size_t MAX_ELMS = F1K * 64;
-// std::array<uint8_t, MAX_ELMS> arrstart;
-
-// 64K-Bits = 8K-Bytes
-// static const size_t MAX_MEM_SIZE = 256 * MAX_ELMS;

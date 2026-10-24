@@ -51,33 +51,47 @@ verr LoadSource(std::string fname, int minsize, VHMemBlock *r)
  */
 int main(int argc, char *argv[])
 {
-    sAppCfg appcfg;
+    VHAppCore appcore;
 
-    if (vok != ParseArgs(argc, argv, appcfg))
+    if (vok != ParseArgs(argc, argv, appcore))
         return verror(1);
 
     // Load source
     VHMemBlock memblk;
-    if (vok != LoadSource(appcfg.fnameSource, appcfg.subsize, &memblk))
+    if (vok != LoadSource(appcore.fnameSource, appcore.subsize, &memblk))
         return verror(1);
 
     // Convert source to std::vector
     std::vector<uint8_t> arrsrc(memblk.ptr(), memblk.ptr() + memblk.sz());
 
+    if (vok != appcore.wscanabs.scanabs(arrsrc))
+        return verrmsg(1, "Wide Range (abs) analisys failed");
+
+    if (vok != appcore.wscanrel.scanrel(arrsrc))
+        return verrmsg(1, "Wide Range (rel) analisys failed");
+
     // Generate Wnd Doc / SVG
     {
         VHDocWnd docwnd;
-        verr r = docwnd.GenerateDocument(arrsrc, appcfg.fnameWND);
+        verr r = docwnd.GenerateDocument(arrsrc, appcore.fnameWND);
         if (vok != r)
             return verrmsg(1, "Error generating docwnd");
     }
 
-    // Generate DNA Doc / SVG
+    // Generate DNA Doc Abs / SVG
     {
         VHDocDNA docdna;
-        verr r = docdna.GenerateDocument(arrsrc, appcfg.fnameDNA);
+        verr r = docdna.GenerateDocument(appcore.wscanabs, appcore.fnameDNAAbs);
         if (vok != r)
-            return verrmsg(2, "Error generating docdna");
+            return verrmsg(2, "Error generating docdna abs");
+    }
+
+    // Generate DNA Doc Rel / SVG
+    {
+        VHDocDNA docdna;
+        verr r = docdna.GenerateDocument(appcore.wscanrel, appcore.fnameDNARel);
+        if (vok != r)
+            return verrmsg(2, "Error generating docdna rel");
     }
 
     return vok;

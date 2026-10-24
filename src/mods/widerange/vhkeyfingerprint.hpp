@@ -12,7 +12,10 @@ public:
     VHKeyFingerPrint();
 
     //
-    void put(uint8_t sym, uint16_t pos);
+    void putabs(uint8_t sym, uint16_t pos);
+
+    //
+    void putrel(uint8_t sym, uint16_t pos);
 
     //
     void mark(uint16_t pos);

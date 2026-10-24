@@ -11,7 +11,26 @@ VHKeyFingerPrint::VHKeyFingerPrint() : avail(false)
 /**
  *
  */
-void VHKeyFingerPrint::put(uint8_t sym, uint16_t pos)
+void VHKeyFingerPrint::putabs(uint8_t sym, uint16_t pos)
+{
+    if (!avail)
+    {
+        avail = true;
+        startpos = pos;
+        endpos = pos;
+    }
+    else
+    {
+        mark(pos);
+        if (pos > endpos)
+            endpos = pos;
+    }
+}
+
+/**
+ *
+ */
+void VHKeyFingerPrint::putrel(uint8_t sym, uint16_t pos)
 {
     if (!avail)
     {

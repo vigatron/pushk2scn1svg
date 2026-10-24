@@ -6,4 +6,4 @@
 
 #include "cfg/appcfgstruct.hpp"
 
-verr ParseArgs(int argc, char *argv[], sAppCfg  & appcfg);
+verr ParseArgs(int argc, char *argv[], VHAppCore  & appcfg);
