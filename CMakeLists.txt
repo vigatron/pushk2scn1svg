@@ -40,6 +40,7 @@ add_executable(vhpackv81scan
     src/mods/generatedna/generatedna.cpp
 
     src/mods/cmdline/cmdline.cpp
+    src/mods/datasource/vhsrcdataarray.cpp
 
     src/mods/draw/colors.cpp
     src/mods/draw/draw.cpp

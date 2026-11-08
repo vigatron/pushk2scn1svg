@@ -1,0 +1,34 @@
+#include "datasource/vhsrcdataarray.hpp"
+
+#include "global.hpp"
+#include "vhfile.hpp"
+
+/**
+ * @brief Loads a source file into a memory block with a minimum size check.
+ *
+ * @param fname Path to the source file.
+ * @param minsize Minimum required file size in bytes.
+ * @param r Destination memory block to fill.
+ * @return vok on success, or an error status on failure.
+ */
+verr VHSrcDataArray::LoadSource(const std::string &fname, int minsize, VHMemBlock *r)
+{
+    VHFile f(fname);
+
+    const int fsize = f.flen();
+    if (fsize < minsize)
+    {
+        const std::string msg = "Minimal size less than " + std::to_string(minsize);
+        dbg.txtnl(msg.c_str());
+        return verror(3);
+    }
+
+    if (!r->LoadFromFile(fname.c_str()))
+    {
+        const std::string msg = "Cant read file " + std::to_string(minsize);
+        dbg.txtnl(msg.c_str());
+        return verror(4);
+    }
+
+    return vok;
+}
