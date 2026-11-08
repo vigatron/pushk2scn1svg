@@ -38,7 +38,6 @@ public:
         const std::string &strsha256);
 
 private:
-    void Gen256(VHSVG &svg, const VHWideRangeScan &wscan);
 
     // DOC Size
     static const uint16_t doc_size_w = 2400;
@@ -56,4 +55,10 @@ private:
         VHSVGRect & recthdr,
         VHSVGRect & rectbody,
         VHSVGRect & rectftr );
+
+    void Gen256Stat(
+        VHSVG &svg,
+        const VHSVGRect &rect,
+        const VHWideRangeScan &wscan);
+
 };

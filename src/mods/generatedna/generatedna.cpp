@@ -2,7 +2,8 @@
 
 #include "widerange/widerange.hpp"
 
-// TODO: Header / fname / size / MD5
+#include <ctime>
+
 // TODO: Colors set
 
 // Abs Map / Rel Map
@@ -20,6 +21,7 @@ void VHDocDNA::GenerateHeader(
     int starty = rect.starty();
     int width = rect.width();
     int height = rect.height();
+    int stepdy = 20;
 
     //
     std::string colorhdr = "black";
@@ -37,17 +39,34 @@ void VHDocDNA::GenerateHeader(
     svg.text(startx, starty, "File Name", fonthdr, fontsize, colorhdr);
     svg.text(startxx, starty, filename, fonthdr, fontsize, colorhdr);
 
-    starty += 20;
+    starty += stepdy;
 
     // File Size
     svg.text(startx, starty, "File Size", fonthdr, fontsize, colorhdr);
     svg.text(startxx, starty, std::to_string(filesize), fonthdr, fontsize, colorhdr);
 
-    starty += 20;
+    starty += stepdy;
 
     // File SHA256
     svg.text(startx, starty, "SHA256", fonthdr, fontsize, colorhdr);
     svg.text(startxx, starty, strsha256, fonthdr, fontsize, colorhdr);
+
+    starty += stepdy;
+
+    // Date Time: DD-MMM-YYYY HH:MM (month as text)
+    std::time_t now = std::time(nullptr);
+    std::tm local_tm {};
+#if defined(_WIN32)
+    localtime_s(&local_tm, &now);
+#else
+    localtime_r(&now, &local_tm);
+#endif
+    char datetime_buf[32] = {};
+    std::strftime(datetime_buf, sizeof(datetime_buf), "%d-%b-%Y %H:%M", &local_tm);
+
+    svg.text(startx, starty, "DateTime", fonthdr, fontsize, colorhdr);
+    svg.text(startxx, starty, datetime_buf, fonthdr, fontsize, colorhdr);
+
 }
 
 //
@@ -72,7 +91,8 @@ verr VHDocDNA::GenerateDocument(
     // Visible area
     svg.rect(rectabs, 1, "gray", "white");
 
-    svg.rect(rect_paper_area, 1, "red");
+    svg.rect(rect_paper_area, 1, "gray");
+
 
 
     //
@@ -82,15 +102,15 @@ verr VHDocDNA::GenerateDocument(
 
     GenerateLayout(rect_paper_area, recthdr, rectbody, rectftr);
 
-    svg.rect(recthdr,  1, "orange");
-    svg.rect(rectbody, 1, "blue");
-    svg.rect(rectftr,  1, "green");
+    // svg.rect(recthdr,  1, "orange");
+    // svg.rect(rectbody, 1, "blue");
+    // svg.rect(rectftr,  1, "green", "#F0F0F0");
 
     //
     GenerateHeader(recthdr, fname, filesize, strsha256);
 
     // Items
-    Gen256(svg, range);
+    Gen256Stat(svg, rectbody, range);
 
     // SVG Done
     svg.end();
@@ -102,20 +122,26 @@ verr VHDocDNA::GenerateDocument(
 }
 
 //
-void VHDocDNA::Gen256(VHSVG &svg, const VHWideRangeScan &wscan)
+void VHDocDNA::Gen256Stat(
+    VHSVG &svg,
+    const VHSVGRect &rect,
+    const VHWideRangeScan &wscan)
 {
 
     // Nothing to generate
     if (!wscan.width())
         return;
 
-    const uint16_t cellw = 1600;
+    VHSVGRect innerrect(rect);
+    innerrect.shrink(64, 64);
+
+    const uint16_t cellw = innerrect.width();
     const uint16_t cellh = 6;
     const uint16_t fonth = cellh - 2;
 
     const uint16_t cellh_step = 1;
 
-    VHSVGRect itemrect(100, 400, cellw, cellh);
+    VHSVGRect itemrect(innerrect.startx(), innerrect.starty(), cellw, cellh);
 
     for (uint16_t s = 0; s < 256; s++)
     {
