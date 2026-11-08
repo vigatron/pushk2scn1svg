@@ -7,9 +7,14 @@
 // TODO: Colors set
 
 // Abs Map / Rel Map
-// Creation Date & Time
 
-void VHDocDNA::GenerateHeader(
+void VHDocDNA::GenerateHeader(const VHSVGRect &rect)
+{
+    (void)rect;
+}
+
+//
+void VHDocDNA::GenerateFooter(
     const VHSVGRect &rect,
     const std::string &filename,
     size_t filesize,
@@ -32,8 +37,8 @@ void VHDocDNA::GenerateHeader(
 
     svg.rect(startx, starty, width, height, 1, colorhdr, "#F0F0F0");
 
-    starty += 40;
     startx += 40;
+    starty += 32;
 
     // File Name
     svg.text(startx, starty, "File Name", fonthdr, fontsize, colorhdr);
@@ -53,7 +58,8 @@ void VHDocDNA::GenerateHeader(
 
     starty += stepdy;
 
-    // Date Time: DD-MMM-YYYY HH:MM (month as text)
+    // * Document creation Date Time *
+    // Date Time Format: DD-MMM-YYYY HH:MM (month as text)
     std::time_t now = std::time(nullptr);
     std::tm local_tm {};
 #if defined(_WIN32)
@@ -107,7 +113,8 @@ verr VHDocDNA::GenerateDocument(
     // svg.rect(rectftr,  1, "green", "#F0F0F0");
 
     //
-    GenerateHeader(recthdr, fname, filesize, strsha256);
+    GenerateHeader(recthdr);
+    GenerateFooter(rectftr, fname, filesize, strsha256);
 
     // Items
     Gen256Stat(svg, rectbody, range);

@@ -16,6 +16,7 @@ public:
      * @brief Generates a DNA document SVG from a wide range scan.
      *
      * @param range Wide range scan to visualize.
+     * @param fname Source file name.
      * @param fnamedna Output SVG file path.
      * @param strsha256 Source file SHA256 hash.
      * @param filesize Source file size in bytes.
@@ -27,15 +28,6 @@ public:
         const std::string &fnamedna,
         const std::string &strsha256,
         size_t filesize);
-
-    /**
-     *
-     */
-    void GenerateHeader(
-        const VHSVGRect &rect,
-        const std::string &filename,
-        size_t filesize,
-        const std::string &strsha256);
 
 private:
 
@@ -50,12 +42,48 @@ private:
     // === SVG GENERATION ===
     VHSVG svg;
 
+    /**
+     * @brief Calculates header, body, and footer layout rectangles.
+     *
+     * @param rect Content area rectangle.
+     * @param recthdr Output header rectangle.
+     * @param rectbody Output body rectangle.
+     * @param rectftr Output footer rectangle.
+     */
     void GenerateLayout(
         const VHSVGRect &rect,
-        VHSVGRect & recthdr,
-        VHSVGRect & rectbody,
-        VHSVGRect & rectftr );
+        VHSVGRect &recthdr,
+        VHSVGRect &rectbody,
+        VHSVGRect &rectftr);
 
+    /**
+     * @brief Generates the document header.
+     *
+     * @param rect Header area rectangle.
+     */
+    void GenerateHeader(const VHSVGRect &rect);
+
+    /**
+     * @brief Generates the document footer with file metadata and timestamp.
+     *
+     * @param rect Footer area rectangle.
+     * @param filename Source file name.
+     * @param filesize Source file size in bytes.
+     * @param strsha256 Source file SHA256 hash.
+     */
+    void GenerateFooter(
+        const VHSVGRect &rect,
+        const std::string &filename,
+        size_t filesize,
+        const std::string &strsha256);
+
+    /**
+     * @brief Generates 256-row byte fingerprint statistics visualization.
+     *
+     * @param svg SVG document to draw into.
+     * @param rect Drawing area rectangle.
+     * @param wscan Wide range scan data.
+     */
     void Gen256Stat(
         VHSVG &svg,
         const VHSVGRect &rect,
