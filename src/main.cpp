@@ -49,6 +49,7 @@ int main(int argc, char *argv[])
     {
         VHDocDNA docdna;
         verr r = docdna.GenerateDocument(
+            "DNA ABS",
             appcore.wscanabs,
             appcore.fnameSource,
             appcore.fnameDNAAbs,
@@ -62,6 +63,7 @@ int main(int argc, char *argv[])
     {
         VHDocDNA docdna;
         verr r = docdna.GenerateDocument(
+            "DNA REL",
             appcore.wscanrel,
             appcore.fnameSource,
             appcore.fnameDNARel,

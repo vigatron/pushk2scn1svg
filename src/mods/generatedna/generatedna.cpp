@@ -8,9 +8,11 @@
 
 // Abs Map / Rel Map
 
-void VHDocDNA::GenerateHeader(const VHSVGRect &rect)
+void VHDocDNA::GenerateHeader(const std::string &caption, const VHSVGRect &rect)
 {
-    (void)rect;
+    svg.text(rect.startx() + 64, rect.starty() + 72, caption, "Arial", 48, "black");
+
+    svg.rect(rect, 1, "gray");
 }
 
 //
@@ -61,7 +63,7 @@ void VHDocDNA::GenerateFooter(
     // * Document creation Date Time *
     // Date Time Format: DD-MMM-YYYY HH:MM (month as text)
     std::time_t now = std::time(nullptr);
-    std::tm local_tm {};
+    std::tm local_tm{};
 #if defined(_WIN32)
     localtime_s(&local_tm, &now);
 #else
@@ -72,17 +74,18 @@ void VHDocDNA::GenerateFooter(
 
     svg.text(startx, starty, "DateTime", fonthdr, fontsize, colorhdr);
     svg.text(startxx, starty, datetime_buf, fonthdr, fontsize, colorhdr);
-
 }
 
 //
 verr VHDocDNA::GenerateDocument(
+    const std::string &caption,
     const VHWideRangeScan &range,
     const std::string &fname,
     const std::string &fnamedna,
     const std::string &strsha256,
     size_t filesize)
 {
+    (void)caption;
 
     // SVG Area
     VHSVGRect rectabs(0, 0, doc_size_w, doc_size_h);
@@ -99,8 +102,6 @@ verr VHDocDNA::GenerateDocument(
 
     svg.rect(rect_paper_area, 1, "gray");
 
-
-
     //
     VHSVGRect recthdr;
     VHSVGRect rectbody;
@@ -108,12 +109,11 @@ verr VHDocDNA::GenerateDocument(
 
     GenerateLayout(rect_paper_area, recthdr, rectbody, rectftr);
 
-    // svg.rect(recthdr,  1, "orange");
     // svg.rect(rectbody, 1, "blue");
     // svg.rect(rectftr,  1, "green", "#F0F0F0");
 
     //
-    GenerateHeader(recthdr);
+    GenerateHeader(caption, recthdr);
     GenerateFooter(rectftr, fname, filesize, strsha256);
 
     // Items
@@ -193,20 +193,19 @@ void VHDocDNA::Gen256Stat(
  */
 void VHDocDNA::GenerateLayout(
     const VHSVGRect &rect,
-    VHSVGRect & recthdr,
-    VHSVGRect & rectbody,
-    VHSVGRect & rectftr)
+    VHSVGRect &recthdr,
+    VHSVGRect &rectbody,
+    VHSVGRect &rectftr)
 {
 
     recthdr = rect;
     recthdr.setsiz(rect.width(), 120);
 
     rectbody = rect;
-    rectbody.setsiz(rect.width(), rect.height() - 2*120);
+    rectbody.setsiz(rect.width(), rect.height() - 2 * 120);
     rectbody.move(0, 120);
 
     rectftr = rect;
     rectftr.setsiz(rect.width(), 120);
     rectftr.move(0, rect.height() - 120);
-
 }

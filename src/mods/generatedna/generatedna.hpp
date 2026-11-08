@@ -15,6 +15,7 @@ public:
     /**
      * @brief Generates a DNA document SVG from a wide range scan.
      *
+     * @param caption Document caption.
      * @param range Wide range scan to visualize.
      * @param fname Source file name.
      * @param fnamedna Output SVG file path.
@@ -23,6 +24,7 @@ public:
      * @return vok on success, or an error status on failure.
      */
     verr GenerateDocument(
+        const std::string &caption,
         const VHWideRangeScan &range,
         const std::string &fname,
         const std::string &fnamedna,
@@ -59,9 +61,10 @@ private:
     /**
      * @brief Generates the document header.
      *
+     * @param caption Document caption.
      * @param rect Header area rectangle.
      */
-    void GenerateHeader(const VHSVGRect &rect);
+    void GenerateHeader(const std::string &caption, const VHSVGRect &rect);
 
     /**
      * @brief Generates the document footer with file metadata and timestamp.
