@@ -6,18 +6,51 @@
 // TODO: Header / fname / size / MD5
 // TODO: Colors set
 
-// File Name :
-// File Size :
-// File MD5  :
 
 // Abs Map / Rel Map
 // Creation Date & Time
 
+void VHDocDNA::GenerateHeader(
+        int startx, int starty, int width, int height,
+        const std::string & filename,
+        size_t filesize,
+        const std::string & strsha256) {
+
+    std::string colorhdr = "black";
+    std::string fonthdr = "Arial";
+    int fontsize = 16;
+
+    int startxx = startx + 160;
+
+    svg.rect(startx, starty, width, height, 1, colorhdr, "#F0F0F0");
+
+    starty += 40;
+    startx += 40;
+
+    // File Name
+    svg.text(startx, starty, "File Name", fonthdr, fontsize, colorhdr);
+    svg.text(startxx, starty, filename, fonthdr, fontsize, colorhdr);
+
+    starty += 20;
+
+    // File Size
+    svg.text(startx, starty, "File Size", fonthdr, fontsize, colorhdr);
+    svg.text(startxx, starty, std::to_string(filesize), fonthdr, fontsize, colorhdr);
+
+    starty += 20;
+
+    // File SHA256
+    svg.text(startx, starty, "SHA256", fonthdr, fontsize, colorhdr);
+    svg.text(startxx, starty, strsha256, fonthdr, fontsize, colorhdr);
+
+}
 
 //
 verr VHDocDNA::GenerateDocument(
     const VHWideRangeScan & range,
-    const std::string &fnamedna)
+    const std::string &fnamedna,
+    const std::string &strsha256,
+    size_t filesize)
 {
 
     // SVG Area
@@ -27,17 +60,31 @@ verr VHDocDNA::GenerateDocument(
     VHSVGRect rect_paper_area(rectabs);
     rect_paper_area.shrink(doc_content_dist_w, doc_content_dist_h);
 
-    // === SVG GENERATION ===
-    VHSVG svg;
-
     // SVG Generation
     svg.begin(rectabs.width(), rectabs.height());
 
     // Visible area
     svg.rect(rectabs, 1, "gray", "white");
 
+    svg.rect(rect_paper_area, 1, "red");
+
+    //
+    int startx = 100;
+    int starty = 100;
+    int width = 1200;
+    int height = 120;
+    
+    GenerateHeader(
+        startx,
+        starty,
+        rect_paper_area.width(),
+        height,
+        fnamedna, filesize, strsha256);
+
+
     // Items
     Gen256(svg, range);
+
 
     // SVG Done
     svg.end();
@@ -56,14 +103,13 @@ void VHDocDNA::Gen256(VHSVG &svg, const VHWideRangeScan &wscan)
     if(!wscan.width())
         return;
 
-
     const uint16_t cellw = 1600;
     const uint16_t cellh = 6;
     const uint16_t fonth = cellh - 2;
 
     const uint16_t cellh_step = 1;
 
-    VHSVGRect itemrect(100, 100, cellw, cellh);
+    VHSVGRect itemrect(100, 400, cellw, cellh);
 
     for (uint16_t s = 0; s < 256; s++)
     {

@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
     // Generate Wnd Doc / SVG
     {
         VHDocWnd docwnd;
-        verr r = docwnd.GenerateDocument(arrsrc, appcore.fnameWND);
+        verr r = docwnd.GenerateDocument(arrsrc, appcore.fnameWND, datasource.strSHA256(), datasource.filesize());
         if (vok != r)
             return verrmsg(1, "Error generating docwnd");
     }
@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     // Generate DNA Doc Abs / SVG
     {
         VHDocDNA docdna;
-        verr r = docdna.GenerateDocument(appcore.wscanabs, appcore.fnameDNAAbs);
+        verr r = docdna.GenerateDocument(appcore.wscanabs, appcore.fnameDNAAbs, datasource.strSHA256(), datasource.filesize());
         if (vok != r)
             return verrmsg(2, "Error generating docdna abs");
     }
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     // Generate DNA Doc Rel / SVG
     {
         VHDocDNA docdna;
-        verr r = docdna.GenerateDocument(appcore.wscanrel, appcore.fnameDNARel);
+        verr r = docdna.GenerateDocument(appcore.wscanrel, appcore.fnameDNARel, datasource.strSHA256(), datasource.filesize());
         if (vok != r)
             return verrmsg(2, "Error generating docdna rel");
     }

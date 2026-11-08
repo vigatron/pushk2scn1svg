@@ -26,10 +26,24 @@ public:
      */
     const std::vector<uint8_t> &data() const { return arrsrc; }
 
+    /**
+     * @brief Returns the source file SHA256 hash as a hexadecimal string.
+     *
+     * @return SHA256 hash of the loaded source data.
+     */
+    const std::string &strSHA256() const { return strsha256; }
+
+    /**
+     * @brief Returns the loaded source file size in bytes.
+     *
+     * @return Source file size in bytes.
+     */
+    size_t filesize() const { return fsize; }
+
 private:
     std::vector<uint8_t> arrsrc;
 
     std::string strsha256;
 
-    size_t fsize;
+    size_t fsize = 0;
 };

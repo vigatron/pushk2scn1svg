@@ -53,9 +53,11 @@ public:
      *
      * @param arrsrc Source data buffer to analyze and visualize.
      * @param fnamewnd Output SVG file path.
+     * @param strsha256 Source file SHA256 hash.
+     * @param filesize Source file size in bytes.
      * @return vok on success, or an error status on failure.
      */
-    verr GenerateDocument(const std::vector<uint8_t> &arrsrc, const std::string &fnamewnd) const;
+    verr GenerateDocument(const std::vector<uint8_t> &arrsrc, const std::string &fnamewnd, const std::string &strsha256, size_t filesize) const;
 
 private:
     /**
