@@ -28,4 +28,8 @@ public:
 
 private:
     std::vector<uint8_t> arrsrc;
+
+    std::string strsha256;
+
+    size_t fsize;
 };

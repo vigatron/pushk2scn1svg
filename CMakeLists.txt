@@ -48,6 +48,8 @@ add_executable(vhpackv81scan
     src/mods/draw/draw_scale.cpp
     src/mods/draw/draw_section.cpp
     src/mods/draw/draw_types.cpp
+
+    src/mods/vhsha256/VHSHA256.cpp
 )
 
 #
@@ -60,7 +62,8 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     src/mods/global
 
     src/mods/widerange
-    
+    src/mods/vhsha256
+
     src/extmods
 )
 

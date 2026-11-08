@@ -1,5 +1,6 @@
 #include "datasource/vhsrcdataarray.hpp"
 
+#include "VHSHA256.hpp"
 #include "global.hpp"
 #include "vhfile.hpp"
 
@@ -16,11 +17,12 @@ const std::vector<uint8_t> &VHSrcDataArray::LoadSource(const std::string &fname,
 
     VHFile f(fname);
 
-    const int fsize = f.flen();
+    fsize = f.flen();
     if (fsize < minsize)
     {
         const std::string msg = "Minimal size less than " + std::to_string(minsize);
         dbg.txtnl(msg.c_str());
+        strsha256 = VHSHA256::hashHex(arrsrc);
         return arrsrc;
     }
 
@@ -30,8 +32,10 @@ const std::vector<uint8_t> &VHSrcDataArray::LoadSource(const std::string &fname,
         arrsrc.clear();
         const std::string msg = "Cant read file " + std::to_string(minsize);
         dbg.txtnl(msg.c_str());
+        strsha256 = VHSHA256::hashHex(arrsrc);
         return arrsrc;
     }
 
+    strsha256 = VHSHA256::hashHex(arrsrc);
     return arrsrc;
 }
