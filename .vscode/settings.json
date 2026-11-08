@@ -8,11 +8,13 @@
             // "../packv81/v81packlogs/step01recombo.bin", "-s", "64",
             // "../packv81/v81packlogs/step02cdrop.bin", "-s", "64",
             // /**/
+            
 
-            "-fname",
-            "../data/backobjs.recombo.cells", // "../data/backobjs.cells",
-            "-wndsz",
-            "128",
+            // "-fname", "../data/backobjs.cells",
+
+            "-fname", "../data/backobjs.recombo.cells",
+            "-wndsz", "128",
+
             /**/
             // "../packv81/data/chip_cut0.cells", "-s", "8"
             // "../packv81/data/chip_cut0.cells_stepRecombo_3.bin", "-s", "8"

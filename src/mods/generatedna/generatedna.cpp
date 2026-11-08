@@ -6,6 +6,14 @@
 // TODO: Header / fname / size / MD5
 // TODO: Colors set
 
+// File Name :
+// File Size :
+// File MD5  :
+
+// Abs Map / Rel Map
+// Creation Date & Time
+
+
 //
 verr VHDocDNA::GenerateDocument(
     const VHWideRangeScan & range,
