@@ -1,7 +1,5 @@
 #include "vhplatform.hpp"
 
-#include "mem/vhmemblk.hpp"
-
 #include "vhsvg.hpp"
 
 #include "global.hpp"

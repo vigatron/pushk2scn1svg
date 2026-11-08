@@ -4,8 +4,6 @@
 
 #include "structs/blockprops.hpp"
 
-#include "mem/vhmemblk.hpp"
-
 #include "vhsvg.hpp"
 
 /** */
