@@ -1,6 +1,5 @@
 #include "vhplatform.hpp"
 
-
 #include "mem/vhmemblk.hpp"
 
 #include "vhsvg.hpp"
@@ -17,7 +16,6 @@
 // Command Line Parsing
 #include "cmdline/cmdline.hpp"
 
-
 /**
  *
  */
@@ -29,12 +27,11 @@ int main(int argc, char *argv[])
         return verror(1);
 
     // Load source
-    VHMemBlock memblk;
-    if (vok != VHSrcDataArray::LoadSource(appcore.fnameSource, appcore.subsize, &memblk))
-        return verror(1);
+    VHSrcDataArray datasource;
+    const std::vector<uint8_t> & arrsrc = datasource.LoadSource(appcore.fnameSource, appcore.subsize);
 
-    // Convert source to std::vector
-    std::vector<uint8_t> arrsrc(memblk.ptr(), memblk.ptr() + memblk.sz());
+    if (arrsrc.size() < appcore.subsize)
+        return verror(1);
 
     if (vok != appcore.wscanabs.scanabs(arrsrc))
         return verrmsg(1, "Wide Range (abs) analisys failed");

@@ -19,5 +19,13 @@ public:
      * @param r Destination memory block to fill.
      * @return vok on success, or an error status on failure.
      */
-    static verr LoadSource(const std::string &fname, int minsize, VHMemBlock *r);
+    const std::vector<uint8_t> & LoadSource(const std::string &fname, int minsize);
+
+    /**
+     * 
+     */
+    const std::vector<uint8_t> & data() const { return arrsrc; }
+
+private:
+    std::vector<uint8_t> arrsrc;
 };

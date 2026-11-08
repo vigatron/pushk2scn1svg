@@ -11,8 +11,13 @@
  * @param r Destination memory block to fill.
  * @return vok on success, or an error status on failure.
  */
-verr VHSrcDataArray::LoadSource(const std::string &fname, int minsize, VHMemBlock *r)
+const std::vector<uint8_t> & VHSrcDataArray::LoadSource(const std::string &fname, int minsize)
 {
+    arrsrc.clear();
+    
+    VHMemBlock memblk;
+
+
     VHFile f(fname);
 
     const int fsize = f.flen();
@@ -20,15 +25,20 @@ verr VHSrcDataArray::LoadSource(const std::string &fname, int minsize, VHMemBloc
     {
         const std::string msg = "Minimal size less than " + std::to_string(minsize);
         dbg.txtnl(msg.c_str());
-        return verror(3);
+        return arrsrc;
     }
 
-    if (!r->LoadFromFile(fname.c_str()))
+    if (! memblk.LoadFromFile(fname.c_str()))
     {
         const std::string msg = "Cant read file " + std::to_string(minsize);
         dbg.txtnl(msg.c_str());
-        return verror(4);
+        return arrsrc;
     }
 
-    return vok;
+    // Convert source to std::vector
+    std::vector<uint8_t> newblock(memblk.ptr(), memblk.ptr() + memblk.sz());
+
+    arrsrc = newblock;
+
+    return arrsrc;
 }
