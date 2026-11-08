@@ -48,7 +48,12 @@ int main(int argc, char *argv[])
     // Generate DNA Doc Abs / SVG
     {
         VHDocDNA docdna;
-        verr r = docdna.GenerateDocument(appcore.wscanabs, appcore.fnameDNAAbs, datasource.strSHA256(), datasource.filesize());
+        verr r = docdna.GenerateDocument(
+            appcore.wscanabs,
+            appcore.fnameSource,
+            appcore.fnameDNAAbs,
+            datasource.strSHA256(),
+            datasource.filesize());
         if (vok != r)
             return verrmsg(2, "Error generating docdna abs");
     }
@@ -56,7 +61,12 @@ int main(int argc, char *argv[])
     // Generate DNA Doc Rel / SVG
     {
         VHDocDNA docdna;
-        verr r = docdna.GenerateDocument(appcore.wscanrel, appcore.fnameDNARel, datasource.strSHA256(), datasource.filesize());
+        verr r = docdna.GenerateDocument(
+            appcore.wscanrel,
+            appcore.fnameSource,
+            appcore.fnameDNARel,
+            datasource.strSHA256(),
+            datasource.filesize());
         if (vok != r)
             return verrmsg(2, "Error generating docdna rel");
     }

@@ -2,20 +2,26 @@
 
 #include "widerange/widerange.hpp"
 
-
 // TODO: Header / fname / size / MD5
 // TODO: Colors set
-
 
 // Abs Map / Rel Map
 // Creation Date & Time
 
 void VHDocDNA::GenerateHeader(
-        int startx, int starty, int width, int height,
-        const std::string & filename,
-        size_t filesize,
-        const std::string & strsha256) {
+    const VHSVGRect &rect,
+    const std::string &filename,
+    size_t filesize,
+    const std::string &strsha256)
+{
 
+    //
+    int startx = rect.startx();
+    int starty = rect.starty();
+    int width = rect.width();
+    int height = rect.height();
+
+    //
     std::string colorhdr = "black";
     std::string fonthdr = "Arial";
     int fontsize = 16;
@@ -42,12 +48,12 @@ void VHDocDNA::GenerateHeader(
     // File SHA256
     svg.text(startx, starty, "SHA256", fonthdr, fontsize, colorhdr);
     svg.text(startxx, starty, strsha256, fonthdr, fontsize, colorhdr);
-
 }
 
 //
 verr VHDocDNA::GenerateDocument(
-    const VHWideRangeScan & range,
+    const VHWideRangeScan &range,
+    const std::string &fname,
     const std::string &fnamedna,
     const std::string &strsha256,
     size_t filesize)
@@ -68,23 +74,23 @@ verr VHDocDNA::GenerateDocument(
 
     svg.rect(rect_paper_area, 1, "red");
 
-    //
-    int startx = 100;
-    int starty = 100;
-    int width = 1200;
-    int height = 120;
-    
-    GenerateHeader(
-        startx,
-        starty,
-        rect_paper_area.width(),
-        height,
-        fnamedna, filesize, strsha256);
 
+    //
+    VHSVGRect recthdr;
+    VHSVGRect rectbody;
+    VHSVGRect rectftr;
+
+    GenerateLayout(rect_paper_area, recthdr, rectbody, rectftr);
+
+    svg.rect(recthdr,  1, "orange");
+    svg.rect(rectbody, 1, "blue");
+    svg.rect(rectftr,  1, "green");
+
+    //
+    GenerateHeader(recthdr, fname, filesize, strsha256);
 
     // Items
     Gen256(svg, range);
-
 
     // SVG Done
     svg.end();
@@ -100,7 +106,7 @@ void VHDocDNA::Gen256(VHSVG &svg, const VHWideRangeScan &wscan)
 {
 
     // Nothing to generate
-    if(!wscan.width())
+    if (!wscan.width())
         return;
 
     const uint16_t cellw = 1600;
@@ -117,7 +123,7 @@ void VHDocDNA::Gen256(VHSVG &svg, const VHWideRangeScan &wscan)
         itemrect_back.shrink(0, 1);
 
         //
-        const VHKeyFingerPrint & obj = wscan[s];
+        const VHKeyFingerPrint &obj = wscan[s];
         bool empty = obj.empty();
 
         std::string color_text = empty ? "#EEEEEE" : "gray";
@@ -127,9 +133,9 @@ void VHDocDNA::Gen256(VHSVG &svg, const VHWideRangeScan &wscan)
         svg.rect(itemrect_back, 1, color_bord, color_back);
 
         //
-        for(uint16_t pos = obj.getStartPos(); pos < obj.getEndPos() + 1; pos++)
+        for (uint16_t pos = obj.getStartPos(); pos < obj.getEndPos() + 1; pos++)
         {
-            if(obj.status(pos))
+            if (obj.status(pos))
             {
                 size_t dx = pos * cellw / wscan.width();
                 uint16_t linex = itemrect.startx() + dx;
@@ -147,4 +153,27 @@ void VHDocDNA::Gen256(VHSVG &svg, const VHWideRangeScan &wscan)
         // Move to the next
         itemrect.move(0, cellh + cellh_step);
     }
+}
+
+/**
+ * Calculate Layout
+ */
+void VHDocDNA::GenerateLayout(
+    const VHSVGRect &rect,
+    VHSVGRect & recthdr,
+    VHSVGRect & rectbody,
+    VHSVGRect & rectftr)
+{
+
+    recthdr = rect;
+    recthdr.setsiz(rect.width(), 120);
+
+    rectbody = rect;
+    rectbody.setsiz(rect.width(), rect.height() - 2*120);
+    rectbody.move(0, 120);
+
+    rectftr = rect;
+    rectftr.setsiz(rect.width(), 120);
+    rectftr.move(0, rect.height() - 120);
+
 }
