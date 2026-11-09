@@ -6,7 +6,7 @@
 #include "draw/draw.hpp"
 
 // Application Core (command line parsing, source loading and SVG generation inside VHAppCore)
-#include "cfg/appcfgstruct.hpp"
+#include "cfg/vhappcore.hpp"
 
 /**
  *

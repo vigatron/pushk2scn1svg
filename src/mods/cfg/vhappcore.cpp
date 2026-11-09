@@ -1,4 +1,4 @@
-#include "cfg/appcfgstruct.hpp"
+#include "cfg/vhappcore.hpp"
 
 #include "argsparser.hpp"
 #include "generatedna/generatedna.hpp"

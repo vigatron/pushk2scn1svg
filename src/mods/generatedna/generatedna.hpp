@@ -7,7 +7,7 @@
 
 #include "widerange/widerange.hpp"
 
-#include "cfg/appcfgstruct.hpp"
+#include "cfg/vhappcore.hpp"
 
 class VHDocDNA
 {

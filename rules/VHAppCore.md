@@ -2,8 +2,8 @@
 
 ## Файл / Модуль
 
-- Заголовок: `src/mods/cfg/appcfgstruct.hpp`
-- Реализация метода парсинга: `src/mods/cfg/appcfg.cpp`
+- Заголовок: `src/mods/cfg/vhappcore.hpp`
+- Реализация методов: `src/mods/cfg/vhappcore.cpp`
 - Класс: `class VHAppCore`
 
 ## Назначение
@@ -81,12 +81,12 @@ if (vok != appcore.GenerateDNARel())
 
 До переноса генерации WND-документа внутрь класса блок с локальным
 `VHDocWnd docwnd;` жил в `main.cpp`. После переноса генерация —
-метод `VHAppCore::GenerateWnd()` (реализация в `cfg/appcfg.cpp`).
+метод `VHAppCore::GenerateWnd()` (реализация в `cfg/vhappcore.cpp`).
 
 До переноса генерации DNA-документов внутрь класса оба блока с локальным
 `VHDocDNA docdna;` жили в `main.cpp`. После переноса генерация —
 методы `VHAppCore::GenerateDNAAbs()` и `VHAppCore::GenerateDNARel()`
-(реализация в `cfg/appcfg.cpp`).
+(реализация в `cfg/vhappcore.cpp`).
 
 ## Ограничения / Замечания
 
