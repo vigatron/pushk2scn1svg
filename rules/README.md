@@ -1,0 +1,41 @@
+# Классы проекта vhpack81scansvg
+
+Индекс описаний классов. Каждому классу соответствует свой файл в этой папке.
+
+| Файл | Класс | Модуль | Назначение |
+|---|---|---|---|
+| [VHAppCore.md](VHAppCore.md) | `VHAppCore` | `src/mods/cfg/` | Конфигурация приложения и результаты сканирований; парсинг командной строки (`ParseArgs`). |
+| [VHSrcDataArray.md](VHSrcDataArray.md) | `VHSrcDataArray` | `src/mods/datasource/` | Загрузка исходного файла в память, SHA-256, размер файла. |
+| [BlockProps.md](BlockProps.md) | `BlockProps` | `src/mods/structs/` | Статистика одного блока данных: min/max/уникальные значения, гистограмма. |
+| [VHWideRangeScan.md](VHWideRangeScan.md) | `VHWideRangeScan` | `src/mods/widerange/` | Сканирование массива, отпечатки позиций 256 значений (abs/rel). |
+| [VHKeyFingerPrint.md](VHKeyFingerPrint.md) | `VHKeyFingerPrint` | `src/mods/widerange/` | Битовый отпечаток позиций одного значения байта. |
+| [DBG.md](DBG.md) | `DBG` | `src/mods/dbg/` | Глобальный отладочный вывод (текст, числа, hex-дампы памяти). |
+| [VHDocWnd.md](VHDocWnd.md) | `VHDocWnd` | `src/mods/generatewnd/` | Генерация SVG «оконного» документа (сетка 2×4: Section + Density). |
+| [VHDocDNA.md](VHDocDNA.md) | `VHDocDNA` | `src/mods/generatedna/` | Генерация SVG «DNA»-документа из wide-range сканирования (256 строк). |
+| [Colors.md](Colors.md) | `Colors` | `src/mods/draw/` | Палитра цветов SVG-генераторов. |
+| [VHSHA256.md](VHSHA256.md) | `VHSHA256` | `src/mods/vhsha256/` | Вычисление SHA-256 хеша массива байтов. |
+
+## Структура зависимостей
+
+```text
+main.cpp
+ └─ VHAppCore (ParseArgs)          ← cfg
+     ├─ VHWideRangeScan (×2)       ← widerange
+     │   └─ VHKeyFingerPrint (×256)
+     └─ (состояние для генераторов)
+ └─ VHSrcDataArray                 ← datasource
+     └─ VHSHA256
+ └─ VHDocWnd                       ← generatewnd
+     └─ BlockProps                 ← structs
+     └─ draw: DrawSection/DrawDensity/DrawTypes/Colors ← draw
+ └─ VHDocDNA                       ← generatedna
+     └─ VHWideRangeScan + VHKeyFingerPrint
+ └─ DBG (глобальный dbg)           ← dbg / global
+```
+
+## Замечания к документации
+
+- Классы из `src/extmods/` (submodule `vhlibplatform`, `vhlibargs`, `vhlibfsys`, `vhlibsvg` — `VHArgsParser`, `VHFile`, `VHSVG` и т.д.) **не документируются** в этой папке — они только для чтения.
+- Описания фиксируют фактическое поведение кода, включая ограничения
+  (неинициализированные поля, unchecked-индексы, глобальный `DBG`).
+  После исправления дефектов стоит обновить разделы «Ограничения / Замечания».

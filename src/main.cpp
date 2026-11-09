@@ -11,8 +11,8 @@
 #include "generatewnd/generatewnd.hpp"
 #include "generatedna/generatedna.hpp"
 
-// Command Line Parsing
-#include "cmdline/cmdline.hpp"
+// Application Core (command line parsing inside VHAppCore)
+#include "cfg/appcfgstruct.hpp"
 
 /**
  *
@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
 {
     VHAppCore appcore;
 
-    if (vok != ParseArgs(argc, argv, appcore))
+    if (vok != appcore.ParseArgs(argc, argv))
         return verror(1);
 
     // Load source

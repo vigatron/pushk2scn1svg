@@ -1,5 +1,6 @@
-#include "cmdline.hpp"
+#include "cfg/appcfgstruct.hpp"
 
+#include "argsparser.hpp"
 #include "vhfile.hpp"
 #include "vhfsys.hpp"
 
@@ -7,13 +8,16 @@
 using namespace VHArgsParser;
 
 /**
+ * @brief Parses command-line arguments and fills the core configuration.
  *
+ * @param argc Number of arguments passed to the program.
+ * @param argv Array of arguments passed to the program.
+ * @return vok on success, or an error status on failure.
  */
-verr ParseArgs(int argc, char *argv[], VHAppCore  & appcfg)
+verr VHAppCore::ParseArgs(int argc, char *argv[])
 {
 
     VHArgsParser::VHCmdLineParser cmdline;
-    verr parse_status;
 
     cmdline.setAppName("vhpackv81scan");
     cmdline.setAppDesc("PUSHK scan filter tool. V0.1.0");
@@ -44,15 +48,15 @@ verr ParseArgs(int argc, char *argv[], VHAppCore  & appcfg)
         return verrmsg(3, "Wrong input file " + strfname);
     }
 
-    appcfg.fnameSource = strfname;
+    fnameSource = strfname;
 
     std::string basefname = VHFSYS::ExtractFilename(strfname);
 
-    appcfg.fnameWND = basefname + "_wnd.svg";
-    appcfg.fnameDNAAbs = basefname + "_dna_abs.svg";
-    appcfg.fnameDNARel = basefname + "_dna_rel.svg";
+    fnameWND = basefname + "_wnd.svg";
+    fnameDNAAbs = basefname + "_dna_abs.svg";
+    fnameDNARel = basefname + "_dna_rel.svg";
 
-    appcfg.subsize = cmdline.GetInt("-wndsz");
+    subsize = cmdline.GetInt("-wndsz");
 
     return vok;
 }
