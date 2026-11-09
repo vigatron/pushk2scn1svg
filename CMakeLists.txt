@@ -39,7 +39,8 @@ add_executable(vhpackv81scan
     src/mods/generatewnd/generatewnd.cpp
     src/mods/generatedna/generatedna.cpp
 
-    src/mods/cfg/vhappcore.cpp
+    src/mods/vhappcore/vhappcore.cpp
+    src/mods/vhappcorecfg/vhappcorecfg.cpp
     src/mods/datasource/vhsrcdataarray.cpp
 
     src/mods/draw/colors.cpp

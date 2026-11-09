@@ -1,12 +1,7 @@
 #include "vhplatform.hpp"
 
-#include "vhsvg.hpp"
-
-#include "global.hpp"
-#include "draw/draw.hpp"
-
 // Application Core (command line parsing, source loading and SVG generation inside VHAppCore)
-#include "cfg/vhappcore.hpp"
+#include "vhappcore/vhappcore.hpp"
 
 /**
  *
@@ -15,7 +10,7 @@ int main(int argc, char *argv[])
 {
     VHAppCore appcore;
 
-    if (vok != appcore.ParseArgs(argc, argv))
+    if (vok != appcore.appcfg.ParseArgs(argc, argv))
         return verror(1);
 
     if (vok != appcore.LoadAndScan())

@@ -4,7 +4,8 @@
 
 | Файл | Класс | Модуль | Назначение |
 |---|---|---|---|
-| [VHAppCore.md](VHAppCore.md) | `VHAppCore` | `src/mods/cfg/` | Конфигурация приложения и результаты сканирований; парсинг командной строки (`ParseArgs`). |
+| [VHAppCore.md](VHAppCore.md) | `VHAppCore` | `src/mods/vhappcore/` | Состояние анализа: загрузка, сканирования, генерация SVG. Конфиг — в поле `appcfg`. |
+| [VHAppCoreCfg.md](VHAppCoreCfg.md) | `VHAppCoreCfg` | `src/mods/vhappcorecfg/` | Конфигурация приложения (имена файлов, `subsize`) и парсинг командной строки (`ParseArgs`). |
 | [VHSrcDataArray.md](VHSrcDataArray.md) | `VHSrcDataArray` | `src/mods/datasource/` | Загрузка исходного файла в память, SHA-256, размер файла. |
 | [BlockProps.md](BlockProps.md) | `BlockProps` | `src/mods/structs/` | Статистика одного блока данных: min/max/уникальные значения, гистограмма. |
 | [VHWideRangeScan.md](VHWideRangeScan.md) | `VHWideRangeScan` | `src/mods/widerange/` | Сканирование массива, отпечатки позиций 256 значений (abs/rel). |
@@ -19,12 +20,13 @@
 
 ```text
 main.cpp
- └─ VHAppCore (ParseArgs)          ← cfg
-     ├─ VHWideRangeScan (×2)       ← widerange
+ └─ VHAppCore (LoadAndScan, GenerateWnd, GenerateDNAAbs/Rel) ← vhappcore
+     ├─ VHAppCoreCfg appcfg (ParseArgs)    ← vhappcorecfg
+     ├─ VHSrcDataArray datasource          ← datasource
+     │   └─ VHSHA256
+     ├─ VHWideRangeScan (×2)               ← widerange
      │   └─ VHKeyFingerPrint (×256)
-     └─ (состояние для генераторов)
- └─ VHSrcDataArray                 ← datasource
-     └─ VHSHA256
+     └─ VHDocWnd / VHDocDNA                ← generatewnd / generatedna
  └─ VHDocWnd                       ← generatewnd
      └─ BlockProps                 ← structs
      └─ draw: DrawSection/DrawDensity/DrawTypes/Colors ← draw
