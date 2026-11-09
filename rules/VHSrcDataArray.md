@@ -39,18 +39,21 @@ SVG-документов.
 
 ## Связи / Зависимости
 
-- **Входящие:** `main.cpp` (создаёт объект, вызывает `LoadSource`, передаёт данные в сканирования и генераторы).
+- **Входящие:** `VHAppCore` (владеет объектом как поле `datasource`, вызывает `LoadSource` из метода `LoadAndScan`), `main.cpp` (косвенно, через `appcore.datasource.data()` / `strSHA256()` / `filesize()`).
 - **Исходящие:** `VHFile` (submodule `vhlibfsys`) — чтение файла; `VHSHA256` — хеширование; глобальный `dbg` — сообщения об ошибках.
 - Используется также как вход для `VHDocWnd::GenerateDocument` и `VHDocDNA::GenerateDocument` (через `strSHA256()` и `filesize()`).
 
 ## Использование
 
 ```cpp
-VHSrcDataArray datasource;
-const std::vector<uint8_t> &arrsrc =
-    datasource.LoadSource(appcore.fnameSource, appcore.subsize);
-if (arrsrc.size() < appcore.subsize)
+// Напрямую (вне VHAppCore) — не рекомендуется, VHAppCore владеет объектом:
+// VHSrcDataArray datasource;
+// const auto &arrsrc = datasource.LoadSource(appcore.fnameSource, appcore.subsize);
+
+// Через VHAppCore (основной путь):
+if (vok != appcore.LoadAndScan())
     return verror(1);
+const std::vector<uint8_t> &arrsrc = appcore.datasource.data();
 ```
 
 ## Ограничения / Замечания

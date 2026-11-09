@@ -5,13 +5,7 @@
 #include "global.hpp"
 #include "draw/draw.hpp"
 
-#include "datasource/vhsrcdataarray.hpp"
-
-// Generate SVG
-#include "generatewnd/generatewnd.hpp"
-#include "generatedna/generatedna.hpp"
-
-// Application Core (command line parsing inside VHAppCore)
+// Application Core (command line parsing, source loading and SVG generation inside VHAppCore)
 #include "cfg/appcfgstruct.hpp"
 
 /**
@@ -24,54 +18,17 @@ int main(int argc, char *argv[])
     if (vok != appcore.ParseArgs(argc, argv))
         return verror(1);
 
-    // Load source
-    VHSrcDataArray datasource;
-    const std::vector<uint8_t> & arrsrc = datasource.LoadSource(appcore.fnameSource, appcore.subsize);
-
-    if (arrsrc.size() < appcore.subsize)
+    if (vok != appcore.LoadAndScan())
         return verror(1);
 
-    if (vok != appcore.wscanabs.scanabs(arrsrc))
-        return verrmsg(1, "Wide Range (abs) analisys failed");
+    if (vok != appcore.GenerateWnd())
+        return verror(1);
 
-    if (vok != appcore.wscanrel.scanrel(arrsrc))
-        return verrmsg(1, "Wide Range (rel) analisys failed");
+    if (vok != appcore.GenerateDNAAbs())
+        return verror(1);
 
-    // Generate Wnd Doc / SVG
-    {
-        VHDocWnd docwnd;
-        verr r = docwnd.GenerateDocument(arrsrc, appcore.fnameWND, datasource.strSHA256(), datasource.filesize());
-        if (vok != r)
-            return verrmsg(1, "Error generating docwnd");
-    }
-
-    // Generate DNA Doc Abs / SVG
-    {
-        VHDocDNA docdna;
-        verr r = docdna.GenerateDocument(
-            "DNA ABS",
-            appcore.wscanabs,
-            appcore.fnameSource,
-            appcore.fnameDNAAbs,
-            datasource.strSHA256(),
-            datasource.filesize());
-        if (vok != r)
-            return verrmsg(2, "Error generating docdna abs");
-    }
-
-    // Generate DNA Doc Rel / SVG
-    {
-        VHDocDNA docdna;
-        verr r = docdna.GenerateDocument(
-            "DNA REL",
-            appcore.wscanrel,
-            appcore.fnameSource,
-            appcore.fnameDNARel,
-            datasource.strSHA256(),
-            datasource.filesize());
-        if (vok != r)
-            return verrmsg(2, "Error generating docdna rel");
-    }
+    if (vok != appcore.GenerateDNARel())
+        return verror(1);
 
     return vok;
 }

@@ -47,17 +47,21 @@
 
 ## Связи / Зависимости
 
-- **Входящие:** `main.cpp` (вызов `GenerateDocument` с данными и именем файла).
-- **Исходящие:** `VHSVG`/`VHSVGRect` (submodule `vhlibsvg`), `BlockProps`, свободные функции отрисовки `DrawSection`/`DrawDensity`/`DrawTypes`/`DrawShadowBox` (модуль `draw`), `VHAppCore`-константы не используются — только локальные константы макета.
+- **Входящие:** `VHAppCore` (вызывает `GenerateDocument` из метода `GenerateWnd` с данными из собственного поля `datasource` и именем файла `fnameWND`).
+- **Исходящие:** `VHSVG`/`VHSVGRect` (submodule `vhlibsvg`), `BlockProps`, свободные функции отрисовки `DrawSection`/`DrawDensity`/`DrawTypes`/`DrawShadowBox` (модуль `draw`).
 
 ## Использование
 
 ```cpp
-VHDocWnd docwnd;
-verr r = docwnd.GenerateDocument(arrsrc, appcore.fnameWND,
-                                 datasource.strSHA256(),
-                                 datasource.filesize());
+VHAppCore appcore;
+// ... ParseArgs, LoadAndScan ...
+if (vok != appcore.GenerateWnd())
+    return verror(1);
 ```
+
+Раньше `VHDocWnd` вызывался напрямую из `main.cpp` с локальным объектом
+`VHDocWnd docwnd;`. После переноса генерации внутрь `VHAppCore`
+вызов идёт через метод `GenerateWnd()`.
 
 ## Ограничения / Замечания
 

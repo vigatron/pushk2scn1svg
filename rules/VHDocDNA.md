@@ -41,18 +41,24 @@
 
 ## Связи / Зависимости
 
-- **Входящие:** `main.cpp` (два вызова — для `wscanabs` и `wscanrel`).
+- **Входящие:** `VHAppCore` (вызывает `GenerateDocument` из методов `GenerateDNAAbs` / `GenerateDNARel` с данными из собственных полей `datasource`, `wscanabs`/`wscanrel` и имён файлов `fnameSource`/`fnameDNAAbs`/`fnameDNARel`).
 - **Исходящие:** `VHSVG`/`VHSVGRect` (submodule `vhlibsvg`), `VHWideRangeScan`, `VHKeyFingerPrint`, `vhplatform` (`verr`/`vok`).
 
 ## Использование
 
 ```cpp
-VHDocDNA docdna;
-verr r = docdna.GenerateDocument(
-    "DNA ABS", appcore.wscanabs, appcore.fnameSource,
-    appcore.fnameDNAAbs, datasource.strSHA256(),
-    datasource.filesize());
+VHAppCore appcore;
+// ... ParseArgs, LoadAndScan ...
+if (vok != appcore.GenerateDNAAbs())
+    return verror(1);
+if (vok != appcore.GenerateDNARel())
+    return verror(1);
 ```
+
+Раньше `VHDocDNA` вызывался напрямую из `main.cpp` с локальным объектом
+`VHDocDNA docdna;` (дважды — для `wscanabs` и `wscanrel`). После переноса
+генерации внутрь `VHAppCore` вызовы идут через методы
+`GenerateDNAAbs()` / `GenerateDNARel()`.
 
 ## Ограничения / Замечания
 
