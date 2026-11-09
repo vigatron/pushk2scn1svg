@@ -10,7 +10,7 @@
 | [BlockProps.md](BlockProps.md) | `BlockProps` | `src/mods/structs/` | Статистика одного блока данных: min/max/уникальные значения, гистограмма. |
 | [VHWideRangeScan.md](VHWideRangeScan.md) | `VHWideRangeScan` | `src/mods/widerange/` | Сканирование массива, отпечатки позиций 256 значений (abs/rel). |
 | [VHKeyFingerPrint.md](VHKeyFingerPrint.md) | `VHKeyFingerPrint` | `src/mods/widerange/` | Битовый отпечаток позиций одного значения байта. |
-| [DBG.md](DBG.md) | `DBG` | `src/mods/dbg/` | Глобальный отладочный вывод (текст, числа, hex-дампы памяти). |
+| [VHLogger.md](VHLogger.md) | `VHLogger` | `src/mods/vhlogger/` | Глобальный отладочный вывод (текст, числа, hex-дампы памяти). |
 | [VHDocWnd.md](VHDocWnd.md) | `VHDocWnd` | `src/mods/generatewnd/` | Генерация SVG «оконного» документа (сетка 2×4: Section + Density). |
 | [VHDocDNA.md](VHDocDNA.md) | `VHDocDNA` | `src/mods/generatedna/` | Генерация SVG «DNA»-документа из wide-range сканирования (256 строк). |
 | [Colors.md](Colors.md) | `Colors` | `src/mods/draw/` | Палитра цветов SVG-генераторов. |
@@ -32,12 +32,12 @@ main.cpp
      └─ draw: DrawSection/DrawDensity/DrawTypes/Colors ← draw
  └─ VHDocDNA                       ← generatedna
      └─ VHWideRangeScan + VHKeyFingerPrint
- └─ DBG (глобальный dbg)           ← dbg / global
+ └─ VHLogger (глобальный dbg)         ← vhlogger / global
 ```
 
 ## Замечания к документации
 
 - Классы из `src/extmods/` (submodule `vhlibplatform`, `vhlibargs`, `vhlibfsys`, `vhlibsvg` — `VHArgsParser`, `VHFile`, `VHSVG` и т.д.) **не документируются** в этой папке — они только для чтения.
 - Описания фиксируют фактическое поведение кода, включая ограничения
-  (неинициализированные поля, unchecked-индексы, глобальный `DBG`).
+  (неинициализированные поля, unchecked-индексы, глобальный `VHLogger`).
   После исправления дефектов стоит обновить разделы «Ограничения / Замечания».

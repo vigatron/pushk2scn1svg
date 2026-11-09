@@ -1,7 +1,7 @@
 #include "global.hpp"
 #include "structs/blockprops.hpp"
 
-DBG dbg;
+VHLogger dbg;
 
 // ----------------------------------------------------------------------------
 void DumpSamples(const std::vector<BlockProps> &arr)

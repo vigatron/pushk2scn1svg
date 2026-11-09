@@ -27,7 +27,7 @@ add_subdirectory(src/extmods/vhlibsvg)
 add_executable(vhpackv81scan
     src/main.cpp
 
-    src/mods/dbg/dbg.cpp
+    src/mods/vhlogger/vhlogger.cpp
     src/mods/global/global.cpp
  
     src/mods/widerange/vhkeyfingerprint.hpp
@@ -59,7 +59,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 
     src/mods
 
-    src/mods/dbg
+    src/mods/vhlogger
     src/mods/global
 
     src/mods/widerange

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "dbg.hpp"
+#include "vhlogger.hpp"
 #include "vhsvg.hpp"
 
-extern DBG     dbg;
+extern VHLogger dbg;
