@@ -1,28 +1,14 @@
 {
     "cmake.debugConfig": {
         "args": [
-            // "CMakeCache.txt", "-s", "16"
-            // "data/backobjs.cells", "-s", "256"
-            // "data/backobjs.cells", "-s", "32",
-            // "../packv81/v81packlogs/step01recombo.bin", "-s", "32",
-            // "../packv81/v81packlogs/step01recombo.bin", "-s", "64",
-            // "../packv81/v81packlogs/step02cdrop.bin", "-s", "64",
-            // /**/
-            
 
+            "-fname", "../data/backobjs.cells",
             // "-fname", "../data/backobjs.recombo.cells",
+            // "-fname", "../data/planets.c16",
+            // "-fname", "../data/font1.cells",
 
-
-            "-fname", "../data/planets.c16",
             "-wndsz", "128",
             "-outfolder", ""
-
-            /**/
-            // "../packv81/data/chip_cut0.cells", "-s", "8"
-            // "../packv81/data/chip_cut0.cells_stepRecombo_3.bin", "-s", "8"
-            // "../packv81/data/stepRecombo4x4.bin", "-s", "8"
-            // 
-            // 
         ]
     }
 }
