@@ -49,6 +49,8 @@ add_executable(pushk2scn1svg
     src/mods/datasource/vhsrcdataarray.cpp
 
     src/mods/colors/colors.cpp
+    src/mods/svgtools/svgtools.hpp
+    src/mods/svgtools/svgtools.cpp
     src/mods/vhsvgdraw/vhsvgdraw.cpp
 
     src/mods/vhsha256/VHSHA256.cpp

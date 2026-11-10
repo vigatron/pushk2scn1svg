@@ -33,16 +33,18 @@
 
 | Сигнатура | Описание |
 |---|---|
-| `verr GenerateDocument(const std::string &caption, const VHWideRangeScan &range, const std::string &fname, const std::string &fnamedna, const std::string &strsha256, size_t filesize)` | Публичная точка входа. Создаёт области листа/бумаги, вычисляет макет, рисует заголовок и подвал, вызывает `Gen256Stat`, завершает SVG и сохраняет. Возвращает `vok`. |
+| `verr GenerateDocument(const std::string &caption, const VHWideRangeScan &range, const std::string &fname, const std::string &fnamedna, const std::string &strsha256, size_t filesize)` | Публичная точка входа. Создаёт области листа/бумаги, вычисляет макет, рисует заголовок и подвал, вызывает `Gen256Stat`, завершает SVG и сохраняет через `VHSvgTools::Save()`. Возвращает `vok` или ошибку сохранения. |
 | `void GenerateLayout(const VHSVGRect &rect, VHSVGRect &recthdr, VHSVGRect &rectbody, VHSVGRect &rectftr)` (private) | Рассчитывает прямоугольники заголовка (высота 120), тела и подвала (высота 120). |
 | `void GenerateHeader(const std::string &caption, const VHSVGRect &rect)` (private) | Рисует заголовок: текст подписи (Arial 48) и рамку. |
-| `void GenerateFooter(const VHSVGRect &rect, const std::string &filename, size_t filesize, const std::string &strsha256)` (private) | Рисует подвал: имя файла, размер, SHA-256, дату/время (`%d-%b-%Y %H:%M`, `localtime_r`/`localtime_s`). Имя файла (`filename`) отображается без пути — только имя файла. |
+| `void GenerateFooter(const VHSVGRect &rect, const std::string &filename, size_t filesize, const std::string &strsha256)` (private) | Рисует подвал: имя файла, размер, SHA-256, дату/время (`%d-%b-%Y %H:%M`, `localtime_r`/`localtime_s`). Имя файла (`filename`) отображается без пути и XML-экранируется через `VHSvgTools::EscapeXml()`. |
 | `void Gen256Stat(VHSVG &svg, const VHSVGRect &rect, const VHWideRangeScan &wscan)` (private) | Рисует 256 строк (по одной на значение байта): фон строки, вертикальные линии для установленных битов отпечатка (`obj.status()`), номер `#N` слева. Координатное пространство выбирается по `wscan.relative()`: для ABS перебираются абсолютные позиции `startpos..endpos`, для REL — относительные смещения `0..getSpan()`; биты опрашиваются в том же пространстве. При пустом скане (`width()==0`) ничего не рисует. |
 
 ## Связи / Зависимости
 
 - **Входящие:** `VHAppCore` (вызывает `GenerateDocument` из методов `GenerateDNAAbs` / `GenerateDNARel` с данными из собственных полей `datasource`, `wscanabs`/`wscanrel` и имён файлов `fnameSource`/`fnameDNAAbs`/`fnameDNARel`).
-- **Исходящие:** `VHSVG`/`VHSVGRect` (submodule `vhlibsvg`), `VHWideRangeScan`, `VHKeyFingerPrint`, `Colors` (`src/mods/colors/`), `vhplatform` (`verr`/`vok`).
+- **Исходящие:** `VHSVG`/`VHSVGRect` (submodule `vhlibsvg`), `VHWideRangeScan`, `VHKeyFingerPrint`, `Colors` (`src/mods/colors/`), `VHSvgTools` (`src/mods/svgtools/`), `vhplatform` (`verr`/`vok`).
+- `generatedna.hpp` не включает `vhappcore.hpp`: обратная зависимость
+  от ядра приложения устранена.
 
 ## Использование
 
@@ -65,4 +67,8 @@ if (vok != appcore.GenerateDNARel())
 - `svg` — член класса: объект одноразовый, повторный вызов перезапишет документ.
 - Горизонтальная шкала общая для ABS и REL (`idx * cellw / width`), поэтому
   REL-строки с поздним первым вхождением занимают только левую часть строки.
-- Ошибка сохранения SVG не проверяется.
+- Сохранение проверяется пост-фактум через `VHSvgTools::Save()` (файл
+  непустой и заканчивается `</svg>`); `VHSVG::savetosvg()` по-прежнему
+  печатает собственное сообщение об успехе до этой проверки.
+- Подпись документа и имя файла экранируются; остальные строки (номера,
+  SHA-256, дата) формируются из безопасных символов.

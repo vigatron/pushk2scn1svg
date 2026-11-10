@@ -66,7 +66,8 @@ class VHAppCore
      * Builds the WND document via VHDocWnd using the loaded source data
      * (datasource) and the output file name (appcfg.fnameWND) set by
      * appcfg.ParseArgs. Requires a prior successful LoadSource call; no
-     * wide-range scan is needed.
+     * wide-range scan is needed. Returns an error when no source data is
+     * loaded.
      *
      * @return vok on success, or an error status on failure.
      */
@@ -78,7 +79,7 @@ class VHAppCore
      * Builds the DNA document via VHDocDNA using the absolute wide-range
      * scan (wscanabs) and the output file name (appcfg.fnameDNAAbs) set by
      * appcfg.ParseArgs. Requires prior successful LoadSource and ScanAbs
-     * calls.
+     * calls; the scan width must match the loaded source size.
      *
      * @return vok on success, or an error status on failure.
      */
@@ -90,7 +91,7 @@ class VHAppCore
      * Builds the DNA document via VHDocDNA using the relative wide-range
      * scan (wscanrel) and the output file name (appcfg.fnameDNARel) set by
      * appcfg.ParseArgs. Requires prior successful LoadSource and ScanRel
-     * calls.
+     * calls; the scan width must match the loaded source size.
      *
      * @return vok on success, or an error status on failure.
      */

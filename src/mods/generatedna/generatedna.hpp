@@ -1,12 +1,9 @@
 #pragma once
 
 #include "vhplatform.hpp"
-#include "structs/blockprops.hpp"
 #include "vhsvg.hpp"
 
 #include "widerange/widerange.hpp"
-
-#include "vhappcore/vhappcore.hpp"
 
 class VHDocDNA
 {

@@ -119,7 +119,9 @@ distinct non-zero codes: `1` command line, `3` source load, `4` ABS scan,
 ## 4. Output documents
 
 All three files are plain SVG with absolute coordinates, no external assets and
-no embedded fonts.
+no embedded fonts. User-visible strings (source file name and captions) are
+XML-escaped before insertion, so names containing `&`, `<`, `>` or quotes
+produce valid XML.
 
 ### 4.1 `<base>_wnd.svg` — window sheet
 
@@ -180,7 +182,10 @@ The pipeline is short and single-threaded:
    each block is reduced to `BlockProps`, and both columns are drawn.
 7. **Render DNA ABS / DNA REL.** One row per byte value; every set bit becomes
    a vertical line.
-8. **Save.** Each document is accumulated in memory and written in one pass.
+8. **Save.** Each document is accumulated in memory and written in one pass
+   through `VHSvgTools::Save()`, which checks that the output file exists and
+   ends with `</svg>`. Failed writes now produce exit codes `6`/`7`/`8`
+   instead of a silent success.
 
 **Fingerprint storage.** `VHKeyFingerPrint` owns a 4096-byte bit set
 (`32 768 / 8`) plus first and last position. One `VHWideRangeScan` holds 256 of
@@ -212,10 +217,12 @@ main.cpp
      ├─ VHDocWnd                    src/mods/generatewnd
      │   ├─ BlockProps              src/mods/structs
      │   ├─ VHSVGDraw               src/mods/vhsvgdraw
-     │   └─ Colors                  src/mods/colors
+     │   ├─ Colors                  src/mods/colors
+     │   └─ VHSvgTools              src/mods/svgtools
      └─ VHDocDNA x2                 src/mods/generatedna
          ├─ VHWideRangeScan, VHKeyFingerPrint
-         └─ Colors                  src/mods/colors
+         ├─ Colors                  src/mods/colors
+         └─ VHSvgTools              src/mods/svgtools
 ```
 
 `VHSVG` and `VHSVGRect` come from `extmods/vhlibsvg` and are used by both
@@ -224,7 +231,8 @@ generators. `VHLogger` (`dbg`) is a global diagnostic sink declared in
 
 Layering rules: `datasource` and `widerange` know nothing about SVG;
 `generatewnd` knows `VHSVGDraw` and `Colors`, `generatedna` knows `Colors`,
-and the two generators do not know each other; `vhappcore` knows all of them.
+and the two generators do not know each other. Both use `VHSvgTools` for
+XML-safe text and verified saving; `vhappcore` knows all of them.
 
 ## 7. Class reference
 
@@ -300,8 +308,10 @@ The code is a working prototype; the following items are known.
 
 **Robustness**
 
-- `VHSVG::savetosvg()` returns `void`; write errors cannot be detected or
-  reported by the application.
+- `VHSVG::savetosvg()` returns `void` and prints its own success message; the
+  application can only verify the result afterwards via `VHSvgTools::Save()`
+  (file exists, is non-empty and ends with `</svg>`), not detect the exact
+  write error or suppress the library message.
 - `VHSVG::begin()` does not clear appended content. Re-using a `VHSVG` instance
   (for example `VHDocDNA::svg`) would nest two documents.
 - `VHWideRangeScan::operator[]` performs no bounds check.
@@ -318,8 +328,6 @@ The code is a working prototype; the following items are known.
 - Every mark in the DNA map produces its own `<line>` element: a 16 384-byte
   input already produces a 1.3 MB document; identical x positions are not
   merged.
-- `generatedna.hpp` includes `vhappcore.hpp`, a reverse dependency that is not
-  needed.
 - The window sheet header is empty; source name, size and hash are not printed.
 - The types legend requests the `noto` font family, which may be unavailable
   and fall back to a default font. The only localised string is
@@ -330,13 +338,13 @@ The code is a working prototype; the following items are known.
 - No unit tests, no golden-file/SVG regression tests, no CI configuration.
 - No compiler warning flags in `CMakeLists.txt`; a strict build with
   `-Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wunused -Wnon-virtual-dtor`
-  emits 78 warnings in first-party code, mostly
+  emits 76 warnings in first-party code, mostly
   `int`/`float` conversions in `vhsvgdraw.cpp`.
 - Doxygen coverage is partial: `BlockProps`, `Colors`, `VHWideRangeScan` and
   `VHKeyFingerPrint` methods have few or empty comments.
 - The per-class folder rule from `AGENTS.md` is not followed by `datasource`,
-  `structs`, `widerange`, `generatewnd` and `generatedna`; `colors` and
-  `vhsvgdraw` already follow it.
+  `structs`, `widerange`, `generatewnd` and `generatedna`; `colors`,
+  `vhsvgdraw` and `svgtools` already follow it.
 - `tmp/` still contains early drafts that duplicate submodule headers.
 
 ## 11. Performance
@@ -367,6 +375,9 @@ See [docs/preformance.md](docs/preformance.md) for details.
 | `Can't create output folder <path>` | `-outfolder` could not be created — check permissions or whether the path is occupied by a file. |
 | `key passed without param` | An option was supplied without a value, e.g. `-fname` as the last argument. |
 | No SVG although the source exists | Output goes to the CWD (or to `-outfolder`) — check the exit code and that the output folder is writable. |
+| `Error generating docwnd` (exit `6`) | The output folder is not writable or the SVG file could not be written. Check permissions and free space. |
+| `Error generating docdna abs` / `rel` (exit `7` / `8`) | Same as above for the DNA sheets; make sure the output folder did not become read-only between phases. |
+| `Data successfully saved ...` but the file is empty | `VHSVG::savetosvg()` prints its message before `VHSvgTools::Save()` verifies the file; the following `Error generating ...` line and the non-zero exit code indicate the real result. |
 | Everything renders in a generic font | Fonts are not embedded; the types legend requests `noto`, which may fall back. Install Noto or change the family in `src/mods/vhsvgdraw/vhsvgdraw.cpp`. |
 | The REL sheet looks almost empty | REL uses the same x scale as ABS: rows with a late first occurrence occupy only the left part of the row. |
 
@@ -374,8 +385,9 @@ See [docs/preformance.md](docs/preformance.md) for details.
 
 1. Pass the block size, not the file size, to `DrawScale`; use the histogram in
    the density view.
-2. Make `VHSVG::savetosvg` report failures and stop printing to `stdout` from
-   the library layer.
+2. Upstream `vhlibsvg`: make `savetosvg` return a status and stop printing to
+   `stdout` from the library layer; once available, replace the post-factum
+   check in `VHSvgTools::Save()`.
 3. Stream SVG to the output file instead of accumulating strings in memory.
 4. Add real `-wndsz` semantics and `--version` driven by the CMake
    `PROJECT_VERSION`.

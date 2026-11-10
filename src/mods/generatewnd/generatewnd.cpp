@@ -2,6 +2,7 @@
 
 #include "colors/colors.hpp"
 #include "global.hpp"
+#include "svgtools/svgtools.hpp"
 
 /**
  * @brief Builds the document layout, renders content, and saves the SVG file.
@@ -49,9 +50,8 @@ verr VHDocWnd::GenerateDocument(
     VHSVGDraw::DrawTypes(svg, rect_types);
 
     svg.end();
-    svg.savetosvg(fnamewnd);
 
-    return vok;
+    return VHSvgTools::Save(svg, fnamewnd);
 }
 
 /**

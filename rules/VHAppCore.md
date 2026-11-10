@@ -43,9 +43,9 @@
 | `verr ScanAbs()` | Проверяет, что данные загружены, и выполняет `wscanabs.scanabs(datasource.data())`. Возвращает `vok`, `verrmsg(4, "Source data is not loaded")` или `verrmsg(4, "Wide Range (abs) analisys failed")`. |
 | `verr ScanRel()` | Проверяет, что данные загружены, и выполняет `wscanrel.scanrel(datasource.data())`. Возвращает `vok`, `verrmsg(5, "Source data is not loaded")` или `verrmsg(5, "Wide Range (rel) analisys failed")`. |
 | `verr ScanAll()` | Удобная обёртка: вызывает `ScanAbs()`, затем `ScanRel()`. Если ABS-скан не удался, REL не запускается. Возвращает первый полученный код ошибки. |
-| `verr GenerateWnd()` | Генерирует WND SVG-документ через `VHDocWnd::GenerateDocument(datasource.data(), appcfg.fnameWND, datasource.strSHA256(), datasource.filesize())` (требуется предварительный вызов `LoadSource`; сканирования не нужны). Возвращает `vok` или ошибку (`verrmsg(1, "Error generating docwnd")`). |
-| `verr GenerateDNAAbs()` | Генерирует DNA ABS SVG-документ через `VHDocDNA::GenerateDocument("DNA ABS", wscanabs, appcfg.fnameSource, appcfg.fnameDNAAbs, datasource.strSHA256(), datasource.filesize())` (требуются `LoadSource` и `ScanAbs`). Возвращает `vok` или ошибку (`verrmsg(2, "Error generating docdna abs")`). |
-| `verr GenerateDNARel()` | Генерирует DNA REL SVG-документ через `VHDocDNA::GenerateDocument("DNA REL", wscanrel, appcfg.fnameSource, appcfg.fnameDNARel, datasource.strSHA256(), datasource.filesize())` (требуются `LoadSource` и `ScanRel`). Возвращает `vok` или ошибку (`verrmsg(2, "Error generating docdna rel")`). |
+| `verr GenerateWnd()` | Проверяет, что данные загружены (`datasource.data()` непустой), затем генерирует WND SVG-документ через `VHDocWnd::GenerateDocument(datasource.data(), appcfg.fnameWND, datasource.strSHA256(), datasource.filesize())` (сканирования не нужны). Возвращает `vok`, `verrmsg(6, "Source data is not loaded")` или `verrmsg(6, "Error generating docwnd")`. |
+| `verr GenerateDNAAbs()` | Проверяет, что ABS-скан выполнен и его ширина совпадает с размером загруженного файла (`wscanabs.width() != 0 && wscanabs.width() == datasource.filesize()`), затем генерирует DNA ABS SVG-документ через `VHDocDNA::GenerateDocument(...)`. Возвращает `vok`, `verrmsg(7, "ABS scan is not available")` или `verrmsg(7, "Error generating docdna abs")`. |
+| `verr GenerateDNARel()` | Проверяет, что REL-скан выполнен и его ширина совпадает с размером загруженного файла (`wscanrel.width() != 0 && wscanrel.width() == datasource.filesize()`), затем генерирует DNA REL SVG-документ через `VHDocDNA::GenerateDocument(...)`. Возвращает `vok`, `verrmsg(8, "REL scan is not available")` или `verrmsg(8, "Error generating docdna rel")`. |
 
 ## Связи / Зависимости
 
@@ -103,7 +103,11 @@ if (vok != appcore.GenerateDNARel())
 ## Ограничения / Замечания
 
 - Класс-классификация соблюдает правило `AGENTS.md`: файлы класса находятся в собственной папке `src/mods/vhappcore/`.
-- Класс не хранит флаги успешности фаз. Порядок вызовов (`LoadSource` → `ScanAbs`/`ScanRel` → `Generate*`) остаётся ответственностью вызывающего кода; проверки неверного порядка пока нет.
+- Класс не хранит отдельные флаги успешности фаз. Вместо них проверяются
+  фактические данные: `GenerateWnd` требует непустой `datasource.data()`,
+  `GenerateDNAAbs`/`GenerateDNARel` — скан с шириной, равной размеру файла.
+  Порядок `LoadSource` → `ScanAbs`/`ScanRel` → `Generate*` остаётся
+  ответственностью вызывающего кода.
 - `appcfg.subsize` в текущей логике используется только как минимальный размер
   загрузки источника (`VHSrcDataArray::LoadSource`); размеры чанков при
   генерации WND-документа задаются константами `VHDocWnd` (`kBaseChunkSize << row`).

@@ -41,14 +41,14 @@
 
 | Сигнатура | Описание |
 |---|---|
-| `verr GenerateDocument(const std::vector<uint8_t> &arrsrc, const std::string &fnamewnd, const std::string &strsha256, size_t filesize) const` | Публичная точка входа. Строит макет (полный лист → область бумаги → область 2×4 → легенда/пропсы), создаёт `VHSVG`, рисует сетку и легенду, завершает документ и сохраняет в `fnamewnd`. Параметры `strsha256`/`filesize` в текущей реализации не используются. Возвращает `vok`. |
+| `verr GenerateDocument(const std::vector<uint8_t> &arrsrc, const std::string &fnamewnd, const std::string &strsha256, size_t filesize) const` | Публичная точка входа. Строит макет (полный лист → область бумаги → область 2×4 → легенда/пропсы), создаёт `VHSVG`, рисует сетку и легенду, завершает документ и сохраняет в `fnamewnd` через `VHSvgTools::Save()`. Параметры `strsha256`/`filesize` в текущей реализации не используются. Возвращает `vok` или ошибку сохранения. |
 | `void Draw2X4Content(VHSVG &svg, const std::vector<uint8_t> &arrsrc, const VHSVGRect &rect) const` (private) | Рисует сетку 2×4: для каждой строки вычисляет `chunksize`, строит массив `BlockProps` и для каждой колонки рисует `DrawShadowBox` + `DrawSection` (кол. 0) или `DrawDensity` (кол. 1). |
 | `static std::vector<BlockProps> GenSamplesArray(const std::vector<uint8_t> &arrsrc, size_t subsize)` (private) | Разбивает `arrsrc` на блоки по `subsize`, для каждого вызывает `BlockProps::scan()`. При `subsize == 0` или данных меньше одного блока возвращает пустой вектор. |
 
 ## Связи / Зависимости
 
 - **Входящие:** `VHAppCore` (вызывает `GenerateDocument` из метода `GenerateWnd` с данными из собственного поля `datasource` и именем файла `fnameWND`).
-- **Исходящие:** `VHSVG`/`VHSVGRect` (submodule `vhlibsvg`), `BlockProps`, класс `VHSVGDraw` (модуль `vhsvgdraw`, статические методы `DrawSection`/`DrawDensity`/`DrawTypes`/`DrawShadowBox`), `Colors` (`src/mods/colors/`).
+- **Исходящие:** `VHSVG`/`VHSVGRect` (submodule `vhlibsvg`), `BlockProps`, класс `VHSVGDraw` (модуль `vhsvgdraw`, статические методы `DrawSection`/`DrawDensity`/`DrawTypes`/`DrawShadowBox`), `Colors` (`src/mods/colors/`), `VHSvgTools` (`src/mods/svgtools/`).
 
 ## Использование
 
@@ -67,5 +67,7 @@ if (vok != appcore.GenerateWnd())
 
 - Размеры чанков жёстко зашиты (`64 << row`); пользовательский `-wndsz`
   на генерацию WND-документа не влияет (см. [CMDLine.md](CMDLine.md)).
-- Ошибка сохранения SVG не проверяется (`svg.savetosvg()` без возврата).
+- Сохранение проверяется пост-фактум через `VHSvgTools::Save()` (файл
+  непустой и заканчивается `</svg>`); `VHSVG::savetosvg()` по-прежнему
+  печатает собственное сообщение об успехе до этой проверки.
 - Область `rect_props` (правая половина подвала) зарезервирована, но не рисуется (`(void)rect_props`).

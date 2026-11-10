@@ -73,11 +73,14 @@ verr VHAppCore::ScanAll()
  */
 verr VHAppCore::GenerateWnd()
 {
+    if (datasource.data().empty())
+        return verrmsg(6, "Source data is not loaded");
+
     // Generate Wnd Doc / SVG
     VHDocWnd docwnd;
     verr r = docwnd.GenerateDocument(datasource.data(), appcfg.fnameWND, datasource.strSHA256(), datasource.filesize());
     if (vok != r)
-        return verrmsg(1, "Error generating docwnd");
+        return verrmsg(6, "Error generating docwnd");
 
     return vok;
 }
@@ -89,6 +92,9 @@ verr VHAppCore::GenerateWnd()
  */
 verr VHAppCore::GenerateDNAAbs()
 {
+    if (wscanabs.width() == 0 || wscanabs.width() != datasource.filesize())
+        return verrmsg(7, "ABS scan is not available");
+
     // Generate DNA Doc Abs / SVG
     VHDocDNA docdna;
     verr r = docdna.GenerateDocument(
@@ -99,7 +105,7 @@ verr VHAppCore::GenerateDNAAbs()
         datasource.strSHA256(),
         datasource.filesize());
     if (vok != r)
-        return verrmsg(2, "Error generating docdna abs");
+        return verrmsg(7, "Error generating docdna abs");
 
     return vok;
 }
@@ -111,6 +117,9 @@ verr VHAppCore::GenerateDNAAbs()
  */
 verr VHAppCore::GenerateDNARel()
 {
+    if (wscanrel.width() == 0 || wscanrel.width() != datasource.filesize())
+        return verrmsg(8, "REL scan is not available");
+
     // Generate DNA Doc Rel / SVG
     VHDocDNA docdna;
     verr r = docdna.GenerateDocument(
@@ -121,7 +130,7 @@ verr VHAppCore::GenerateDNARel()
         datasource.strSHA256(),
         datasource.filesize());
     if (vok != r)
-        return verrmsg(2, "Error generating docdna rel");
+        return verrmsg(8, "Error generating docdna rel");
 
     return vok;
 }

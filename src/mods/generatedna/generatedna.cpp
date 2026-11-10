@@ -1,6 +1,7 @@
 #include "generatedna.hpp"
 
 #include "colors/colors.hpp"
+#include "svgtools/svgtools.hpp"
 #include "widerange/widerange.hpp"
 
 #include "vhfsys.hpp"
@@ -13,7 +14,13 @@
 //
 void VHDocDNA::GenerateHeader(const std::string &caption, const VHSVGRect &rect)
 {
-    svg.text(rect.startx() + 64, rect.starty() + 72, caption, "Arial", 48, Colors::clrheadertxt);
+    svg.text(
+        rect.startx() + 64,
+        rect.starty() + 72,
+        VHSvgTools::EscapeXml(caption),
+        "Arial",
+        48,
+        Colors::clrheadertxt);
 
     svg.rect(rect, 1, Colors::clrline);
 }
@@ -34,7 +41,7 @@ void VHDocDNA::GenerateFooter(
     const std::string &strsha256)
 {
     // File Name (display only the file name without path)
-    const std::string strfname = VHFSYS::ExtractFilename(filename);
+    const std::string strfname = VHSvgTools::EscapeXml(VHFSYS::ExtractFilename(filename));
 
     //
     int startx = rect.startx();
@@ -131,9 +138,7 @@ verr VHDocDNA::GenerateDocument(
     svg.end();
 
     // Save results
-    svg.savetosvg(fnamedna);
-
-    return vok;
+    return VHSvgTools::Save(svg, fnamedna);
 }
 
 //
