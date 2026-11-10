@@ -125,7 +125,7 @@ Canvas 3200 x 2400 px, 100 px border. Between a 200 px empty header and a
 box. Rows use block sizes 64, 128, 256 and 512 bytes; the left column is a
 Section view, the right column a Density view. A cell is split vertically into
 graphics (80 %), delta strip (10 %) and scale strip (10 %). One horizontal band
-exists per block of the given size, so a 16 KB file yields 256 bands on row 0
+exists per block of the given size, so a 16 384-byte file yields 256 bands on row 0
 and 32 bands on row 3.
 
 The footer contains the data-type legend: 7 columns x 4 rows, 28 type names
@@ -162,7 +162,7 @@ The pipeline is short and single-threaded:
 2. **Load.** `VHAppCore::LoadSource()` delegates to
    `VHSrcDataArray::LoadSource()`, which reads the whole file into
    `std::vector<uint8_t>`, records the size and computes SHA-256.
-3. **Validate.** The buffer must be at least `-wndsz` bytes and at most 32 768.
+3. **Validate.** The buffer must be at least `-wndsz` bytes and at most 32 768 bytes (32 KiB).
 4. **Scan ABS.** `VHAppCore::ScanAbs()` runs the absolute scan: for each index
    `i`, `wscanabs[src[i]].putabs(i)`.
 5. **Scan REL.** `VHAppCore::ScanRel()` runs the relative scan:
@@ -267,9 +267,9 @@ src/extmods/                read-only git submodules
 | DNA sheet canvas | 2800 x 2600 px | `VHDocDNA` |
 | DNA rows | 256 | `VHDocDNA::Gen256Stat` |
 
-The 32 KB cap follows directly from storing positions as `uint16_t` bit
-indices. Larger files are rejected with
-`Wide Range (abs) analisys failed`.
+The maximum source size for processing is 32 768 bytes (32 KiB). The cap
+follows directly from storing positions as `uint16_t` bit indices. Larger
+files are rejected with `Wide Range (abs) analisys failed`.
 
 ## 10. Known limitations
 
@@ -304,11 +304,11 @@ The code is a working prototype; the following items are known.
 
 - `-wndsz` doubles as a minimum file size and has no effect on the window
   sheets.
-- Input is limited to 32 KB, which is small for a "wide range" scanner.
 - Reports are written to the current working directory by default, never next
   to the source; use `-outfolder` to select another folder (created if missing).
-- Every mark in the DNA map produces its own `<line>` element: a 16 KB input
-  already produces a 1.3 MB document; identical x positions are not merged.
+- Every mark in the DNA map produces its own `<line>` element: a 16 384-byte
+  input already produces a 1.3 MB document; identical x positions are not
+  merged.
 - `generatedna.hpp` includes `vhappcore.hpp`, a reverse dependency that is not
   needed.
 - The window sheet header is empty; source name, size and hash are not printed.
@@ -361,18 +361,16 @@ See [docs/preformance.md](docs/preformance.md) for details.
 
 ## 14. Roadmap
 
-1. Replace the 32 KB `uint16_t` bit index with a scalable representation
-   (64-bit index or per-block summaries) to support megabyte files.
-2. Pass the block size, not the file size, to `DrawScale`; use the histogram in
+1. Pass the block size, not the file size, to `DrawScale`; use the histogram in
    the density view.
-3. Make `VHSVG::savetosvg` report failures and stop printing to `stdout` from
+2. Make `VHSVG::savetosvg` report failures and stop printing to `stdout` from
    the library layer.
-4. Stream SVG to the output file instead of accumulating strings in memory.
-5. Add real `-wndsz` semantics and `--version` driven by the CMake
+3. Stream SVG to the output file instead of accumulating strings in memory.
+4. Add real `-wndsz` semantics and `--version` driven by the CMake
    `PROJECT_VERSION`.
-6. Add unit tests for SHA-256, fingerprints and both coordinate modes, plus
+5. Add unit tests for SHA-256, fingerprints and both coordinate modes, plus
    golden-file tests for the three SVG documents.
-7. Enable `-Wall -Wextra -Wconversion` for project sources and a default
+6. Enable `-Wall -Wextra -Wconversion` for project sources and a default
    `Release` build type.
 
 **Glossary.** *Wide range scan* — a pass recording, for all 256 byte values,
