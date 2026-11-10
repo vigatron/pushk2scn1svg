@@ -54,9 +54,9 @@
 
 ```cpp
 VHAppCore appcore;
-// ... ParseArgs, LoadAndScan ...
+// ... ParseArgs, LoadSource ...
 if (vok != appcore.GenerateWnd())
-    return verror(1);
+    return verror(6);
 ```
 
 Раньше `VHDocWnd` вызывался напрямую из `main.cpp` с локальным объектом

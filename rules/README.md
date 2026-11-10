@@ -20,7 +20,7 @@
 
 ```text
 main.cpp
- └─ VHAppCore (LoadAndScan, GenerateWnd, GenerateDNAAbs/Rel) ← vhappcore
+ └─ VHAppCore (LoadSource, ScanAbs/Rel, GenerateWnd, GenerateDNAAbs/Rel) ← vhappcore
      ├─ VHAppCoreCfg appcfg (ParseArgs)    ← vhappcorecfg
      ├─ VHSrcDataArray datasource          ← datasource
      │   └─ VHSHA256

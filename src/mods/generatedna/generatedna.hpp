@@ -39,9 +39,11 @@ private:
     // DOC Size: Height
     static const uint16_t doc_size_h = 2600;
 
-    // Content area
-    static const uint16_t doc_content_dist_w = 240;
-    static const uint16_t doc_content_dist_h = 200;
+    // Content area margin: Width
+    static const uint16_t doc_content_margin_w = 240;
+
+    // Content area margin: Height
+    static const uint16_t doc_content_margin_h = 200;
 
     // === SVG GENERATION ===
     VHSVG svg;

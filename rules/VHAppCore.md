@@ -13,15 +13,16 @@
 (через `VHSrcDataArray`) и результаты двух сканирований
 (абсолютного и относительного) wide-range анализа.
 Объект создаётся в `main.cpp`, заполняется методом
-`appcfg.ParseArgs()` из `VHAppCoreCfg` и методами `LoadAndScan()`,
-`GenerateWnd()`, `GenerateDNAAbs()` и `GenerateDNARel()`.
+`appcfg.ParseArgs()` из `VHAppCoreCfg`, затем методами `LoadSource()`,
+`ScanAbs()` / `ScanRel()` и методами `GenerateWnd()`, `GenerateDNAAbs()`,
+`GenerateDNARel()`.
 
 ## Ответственность
 
 - Хранение конфигурации приложения (`appcfg` — см. `VHAppCoreCfg`).
-- Загрузка исходного файла в память (`datasource`) и проверка минимального размера.
-- Выполнение двух wide-range сканирований (`wscanabs`, `wscanrel`) над загруженными данными.
-- Генерация WND-документа (`GenerateWnd` через `VHDocWnd`).
+- Загрузка исходного файла в память (`LoadSource`, поле `datasource`) и проверка минимального размера.
+- Выполнение абсолютного (`ScanAbs`) и относительного (`ScanRel`) wide-range сканирований; `ScanAll` — удобная обёртка над обоими.
+- Генерация WND-документа (`GenerateWnd` через `VHDocWnd`) — требует только загруженных данных, без сканирований.
 - Генерация DNA-документов (`GenerateDNAAbs` / `GenerateDNARel` через `VHDocDNA`).
 - Хранение результатов сканирований до генерации документов.
 
@@ -38,10 +39,13 @@
 
 | Сигнатура | Описание |
 |---|---|
-| `verr LoadAndScan()` | Загружает исходный файл в `datasource` через `datasource.LoadSource(appcfg.fnameSource, appcfg.subsize)` (требуется предварительный вызов `appcfg.ParseArgs`). Проверяет размер загруженных данных (`>= appcfg.subsize`), затем выполняет `wscanabs.scanabs(arrsrc)` и `wscanrel.scanrel(arrsrc)`. Возвращает `vok` или ошибку (`verror(1)` — файл слишком мал, `verrmsg(1, ...)` — ошибка abs/rel сканирования). |
-| `verr GenerateWnd()` | Генерирует WND SVG-документ через `VHDocWnd::GenerateDocument(datasource.data(), appcfg.fnameWND, datasource.strSHA256(), datasource.filesize())` (требуется предварительный вызов `LoadAndScan`). Возвращает `vok` или ошибку (`verrmsg(1, "Error generating docwnd")`). |
-| `verr GenerateDNAAbs()` | Генерирует DNA ABS SVG-документ через `VHDocDNA::GenerateDocument("DNA ABS", wscanabs, appcfg.fnameSource, appcfg.fnameDNAAbs, datasource.strSHA256(), datasource.filesize())` (требуется предварительный вызов `LoadAndScan`). Возвращает `vok` или ошибку (`verrmsg(2, "Error generating docdna abs")`). |
-| `verr GenerateDNARel()` | Генерирует DNA REL SVG-документ через `VHDocDNA::GenerateDocument("DNA REL", wscanrel, appcfg.fnameSource, appcfg.fnameDNARel, datasource.strSHA256(), datasource.filesize())` (требуется предварительный вызов `LoadAndScan`). Возвращает `vok` или ошибку (`verrmsg(2, "Error generating docdna rel")`). |
+| `verr LoadSource()` | Загружает исходный файл в `datasource` через `datasource.LoadSource(appcfg.fnameSource, appcfg.subsize)` (требуется предварительный вызов `appcfg.ParseArgs`). Проверяет размер загруженных данных (`>= appcfg.subsize`). Возвращает `vok`, `verror(3)` — файл не загружен или слишком мал. |
+| `verr ScanAbs()` | Проверяет, что данные загружены, и выполняет `wscanabs.scanabs(datasource.data())`. Возвращает `vok`, `verrmsg(4, "Source data is not loaded")` или `verrmsg(4, "Wide Range (abs) analisys failed")`. |
+| `verr ScanRel()` | Проверяет, что данные загружены, и выполняет `wscanrel.scanrel(datasource.data())`. Возвращает `vok`, `verrmsg(5, "Source data is not loaded")` или `verrmsg(5, "Wide Range (rel) analisys failed")`. |
+| `verr ScanAll()` | Удобная обёртка: вызывает `ScanAbs()`, затем `ScanRel()`. Если ABS-скан не удался, REL не запускается. Возвращает первый полученный код ошибки. |
+| `verr GenerateWnd()` | Генерирует WND SVG-документ через `VHDocWnd::GenerateDocument(datasource.data(), appcfg.fnameWND, datasource.strSHA256(), datasource.filesize())` (требуется предварительный вызов `LoadSource`; сканирования не нужны). Возвращает `vok` или ошибку (`verrmsg(1, "Error generating docwnd")`). |
+| `verr GenerateDNAAbs()` | Генерирует DNA ABS SVG-документ через `VHDocDNA::GenerateDocument("DNA ABS", wscanabs, appcfg.fnameSource, appcfg.fnameDNAAbs, datasource.strSHA256(), datasource.filesize())` (требуются `LoadSource` и `ScanAbs`). Возвращает `vok` или ошибку (`verrmsg(2, "Error generating docdna abs")`). |
+| `verr GenerateDNARel()` | Генерирует DNA REL SVG-документ через `VHDocDNA::GenerateDocument("DNA REL", wscanrel, appcfg.fnameSource, appcfg.fnameDNARel, datasource.strSHA256(), datasource.filesize())` (требуются `LoadSource` и `ScanRel`). Возвращает `vok` или ошибку (`verrmsg(2, "Error generating docdna rel")`). |
 
 ## Связи / Зависимости
 
@@ -55,14 +59,18 @@
 VHAppCore appcore;
 if (vok != appcore.appcfg.ParseArgs(argc, argv))
     return verror(1);
-if (vok != appcore.LoadAndScan())
-    return verror(1);
+if (vok != appcore.LoadSource())
+    return verror(3);
+if (vok != appcore.ScanAbs())
+    return verror(4);
+if (vok != appcore.ScanRel())
+    return verror(5);
 if (vok != appcore.GenerateWnd())
-    return verror(1);
+    return verror(6);
 if (vok != appcore.GenerateDNAAbs())
-    return verror(1);
+    return verror(7);
 if (vok != appcore.GenerateDNARel())
-    return verror(1);
+    return verror(8);
 ```
 
 До переноса `ParseArgs` внутрь класса это была свободная функция
@@ -71,7 +79,11 @@ if (vok != appcore.GenerateDNARel())
 
 До переноса загрузки и сканирования внутрь класса этот блок жил в `main.cpp`
 с локальным `VHSrcDataArray datasource;`. После переноса `datasource` —
-поле `VHAppCore`, а загрузка и сканирования — метод `LoadAndScan()`.
+поле `VHAppCore`. Изначально загрузка и оба сканирования выполнялись одним
+методом `LoadAndScan()`; затем он разделён на `LoadSource()`, `ScanAbs()`
+и `ScanRel()` (плюс обёртка `ScanAll()`), чтобы фазы можно было вызывать
+и диагностировать независимо. `GenerateWnd()` теперь требует только
+`LoadSource()` и не зависит от результатов сканирований.
 
 До переноса генерации WND-документа внутрь класса блок с локальным
 `VHDocWnd docwnd;` жил в `main.cpp`. После переноса генерация —
@@ -90,6 +102,7 @@ if (vok != appcore.GenerateDNARel())
 ## Ограничения / Замечания
 
 - Класс-классификация соблюдает правило `AGENTS.md`: файлы класса находятся в собственной папке `src/mods/vhappcore/`.
+- Класс не хранит флаги успешности фаз. Порядок вызовов (`LoadSource` → `ScanAbs`/`ScanRel` → `Generate*`) остаётся ответственностью вызывающего кода; проверки неверного порядка пока нет.
 - `appcfg.subsize` в текущей логике используется только как минимальный размер
   загрузки источника (`VHSrcDataArray::LoadSource`); размеры чанков при
   генерации WND-документа задаются константами `VHDocWnd` (`kBaseChunkSize << row`).

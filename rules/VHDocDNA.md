@@ -25,8 +25,8 @@
 |---|---|---|
 | `doc_size_w` | `static const uint16_t = 2800` | Ширина документа SVG. |
 | `doc_size_h` | `static const uint16_t = 2600` | Высота документа SVG. |
-| `doc_content_dist_w` | `static const uint16_t = 240` | Горизонтальный отступ области контента. |
-| `doc_content_dist_h` | `static const uint16_t = 200` | Вертикальный отступ области контента. |
+| `doc_content_margin_w` | `static const uint16_t = 240` | Горизонтальный отступ области контента. |
+| `doc_content_margin_h` | `static const uint16_t = 200` | Вертикальный отступ области контента. |
 | `svg` | `VHSVG` | Внутренний объект генерации SVG (состояние на время генерации). |
 
 ## Методы
@@ -48,11 +48,11 @@
 
 ```cpp
 VHAppCore appcore;
-// ... ParseArgs, LoadAndScan ...
+// ... ParseArgs, LoadSource, ScanAbs/ScanRel ...
 if (vok != appcore.GenerateDNAAbs())
-    return verror(1);
+    return verror(7);
 if (vok != appcore.GenerateDNARel())
-    return verror(1);
+    return verror(8);
 ```
 
 Раньше `VHDocDNA` вызывался напрямую из `main.cpp` с локальным объектом

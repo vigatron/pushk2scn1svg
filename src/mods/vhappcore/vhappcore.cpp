@@ -4,26 +4,66 @@
 #include "generatewnd/generatewnd.hpp"
 
 /**
- * @brief Loads the source file and runs both wide-range scans.
+ * @brief Loads the source file into the internal data source.
  *
- * @return vok on success, or an error status on failure (source too
- * small, absolute or relative scan failed).
+ * @return vok on success, or an error status on failure.
  */
-verr VHAppCore::LoadAndScan()
+verr VHAppCore::LoadSource()
 {
     // Load source
-    const std::vector<uint8_t> &arrsrc = datasource.LoadSource(appcfg.fnameSource, appcfg.subsize);
+    const std::vector<uint8_t> &arrsrc =
+        datasource.LoadSource(appcfg.fnameSource, appcfg.subsize);
 
     if (arrsrc.size() < appcfg.subsize)
-        return verror(1);
-
-    if (vok != wscanabs.scanabs(arrsrc))
-        return verrmsg(1, "Wide Range (abs) analisys failed");
-
-    if (vok != wscanrel.scanrel(arrsrc))
-        return verrmsg(1, "Wide Range (rel) analisys failed");
+        return verror(3);
 
     return vok;
+}
+
+/**
+ * @brief Runs the absolute wide-range scan over the loaded source.
+ *
+ * @return vok on success, or an error status on failure.
+ */
+verr VHAppCore::ScanAbs()
+{
+    if (datasource.data().empty())
+        return verrmsg(4, "Source data is not loaded");
+
+    if (vok != wscanabs.scanabs(datasource.data()))
+        return verrmsg(4, "Wide Range (abs) analisys failed");
+
+    return vok;
+}
+
+/**
+ * @brief Runs the relative wide-range scan over the loaded source.
+ *
+ * @return vok on success, or an error status on failure.
+ */
+verr VHAppCore::ScanRel()
+{
+    if (datasource.data().empty())
+        return verrmsg(5, "Source data is not loaded");
+
+    if (vok != wscanrel.scanrel(datasource.data()))
+        return verrmsg(5, "Wide Range (rel) analisys failed");
+
+    return vok;
+}
+
+/**
+ * @brief Runs both wide-range scans over the loaded source.
+ *
+ * @return vok if both scans succeed, otherwise the first error status.
+ */
+verr VHAppCore::ScanAll()
+{
+    const verr r = ScanAbs();
+    if (vok != r)
+        return r;
+
+    return ScanRel();
 }
 
 /**

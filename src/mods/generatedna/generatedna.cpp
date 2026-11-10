@@ -103,7 +103,7 @@ verr VHDocDNA::GenerateDocument(
 
     // SVG Paper area (including border)
     VHSVGRect rect_paper_area(rectabs);
-    rect_paper_area.shrink(doc_content_dist_w, doc_content_dist_h);
+    rect_paper_area.shrink(doc_content_margin_w, doc_content_margin_h);
 
     // SVG Generation
     svg.begin(rectabs.width(), rectabs.height());

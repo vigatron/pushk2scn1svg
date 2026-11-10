@@ -85,7 +85,9 @@ Data successfully saved to backobjs.recombo.cells_dna_abs.svg
 Data successfully saved to backobjs.recombo.cells_dna_rel.svg
 ```
 
-Exit code `0` means all three documents were produced; any failure returns `1`.
+Exit code `0` means all three documents were produced. Phase failures return
+distinct non-zero codes: `1` command line, `3` source load, `4` ABS scan,
+`5` REL scan, `6` WND render, `7` DNA ABS render, `8` DNA REL render.
 
 ### What `-wndsz` controls today
 
@@ -140,12 +142,16 @@ The pipeline is short and single-threaded:
 
 1. **Parse CLI.** `VHAppCoreCfg::ParseArgs()` validates `-fname` and `-wndsz`,
    checks that the file exists, derives the three output names.
-2. **Load.** `VHSrcDataArray::LoadSource()` reads the whole file into
+2. **Load.** `VHAppCore::LoadSource()` delegates to
+   `VHSrcDataArray::LoadSource()`, which reads the whole file into
    `std::vector<uint8_t>`, records the size and computes SHA-256.
 3. **Validate.** The buffer must be at least `-wndsz` bytes and at most 32 768.
-4. **Scan ABS.** For each index `i`, `wscanabs[src[i]].putabs(src[i], i)`.
-5. **Scan REL.** `wscanrel[src[i]].putrel(i)` marks
+4. **Scan ABS.** `VHAppCore::ScanAbs()` runs the absolute scan: for each index
+   `i`, `wscanabs[src[i]].putabs(i)`.
+5. **Scan REL.** `VHAppCore::ScanRel()` runs the relative scan:
+   `wscanrel[src[i]].putrel(i)` marks
    `i - firstPositionOf(src[i])`, including offset 0 for the first occurrence.
+   `ScanAll()` is a convenience wrapper for both scans.
 6. **Render window sheet.** For each block size the buffer is cut into blocks,
    each block is reduced to `BlockProps`, and both columns are drawn.
 7. **Render DNA ABS / DNA REL.** One row per byte value; every set bit becomes
@@ -197,7 +203,7 @@ Layering rules: `datasource` and `widerange` know nothing about SVG;
 
 | Class | Folder | Role |
 |---|---|---|
-| `VHAppCore` | `vhappcore` | Owns configuration, source data and both scans; exposes `LoadAndScan`, `GenerateWnd`, `GenerateDNAAbs`, `GenerateDNARel`. |
+| `VHAppCore` | `vhappcore` | Owns configuration, source data and both scans; exposes `LoadSource`, `ScanAbs`, `ScanRel`, `ScanAll`, `GenerateWnd`, `GenerateDNAAbs`, `GenerateDNARel`. |
 | `VHAppCoreCfg` | `vhappcorecfg` | Command-line parsing, output-name derivation, `subsize`. |
 | `VHSrcDataArray` | `datasource` | Whole-file load, SHA-256, size. |
 | `VHWideRangeScan` | `widerange` | 256 fingerprints plus `scanabs` / `scanrel`. |
@@ -285,8 +291,9 @@ The code is a working prototype; the following items are known.
 - `VHAppCoreCfg::subsize` and all `BlockProps` fields are uninitialised until
   their first use.
 - `VHWideRangeScan::operator[]` performs no bounds check.
-- `main()` collapses every error to exit code `1`; the detailed code produced
-  by `verrmsg()` is lost. Error text goes to `stdout`, not `stderr`.
+- `main()` maps failures to phase-level exit codes (3..8), but the detailed
+  code produced by `verrmsg()` is still discarded. Error text goes to
+  `stdout`, not `stderr`.
 
 **Design / product**
 
