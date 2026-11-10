@@ -67,13 +67,21 @@ verr VHAppCoreCfg::ParseArgs(int argc, char *argv[])
     VHArgsParser::VHCmdLineParser cmdline;
 
     cmdline.setAppName("pushk2scn1svg");
-    cmdline.setAppDesc(std::string("pushk2scn1svg scan filter tool. V") + APP_VERSION);
+    cmdline.setAppDesc(std::string("scan filter tool. V") + APP_VERSION + "\n");
 
     std::vector<VHArgTypeBase> arrcmd;
 
     arrcmd.push_back(VHArgTypeFileName("-fname", "", "Source file"));
     arrcmd.push_back(VHArgTypeInteger("-wndsz", "Window size", 128, 2, 256));
     arrcmd.push_back(VHArgTypeString("-outfolder", "", "Output Files folder"));
+
+    // No arguments: show usage once and fail. VHCmdLineParser would also
+    // print usage and return vok, which would make ParseArgs print it again.
+    if (argc < 2)
+    {
+        cmdline.ShowUsage(arrcmd);
+        return verror(1);
+    }
 
     // Wrong args or syntax error ?
     if (vok != cmdline.ParseCommandLine(arrcmd, argc, argv))

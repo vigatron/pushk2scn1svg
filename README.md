@@ -192,9 +192,11 @@ main.cpp
      │   └─ VHKeyFingerPrint x256
      ├─ VHDocWnd                    src/mods/generatewnd
      │   ├─ BlockProps              src/mods/structs
-     │   └─ VHSVGDraw               src/mods/vhsvgdraw
+     │   ├─ VHSVGDraw               src/mods/vhsvgdraw
+     │   └─ Colors                  src/mods/colors
      └─ VHDocDNA x2                 src/mods/generatedna
-         └─ VHWideRangeScan, VHKeyFingerPrint
+         ├─ VHWideRangeScan, VHKeyFingerPrint
+         └─ Colors                  src/mods/colors
 ```
 
 `VHSVG` and `VHSVGRect` come from `extmods/vhlibsvg` and are used by both
@@ -202,8 +204,8 @@ generators. `VHLogger` (`dbg`) is a global diagnostic sink declared in
 `src/mods/global`.
 
 Layering rules: `datasource` and `widerange` know nothing about SVG;
-`generatewnd` / `generatedna` know `widerange` and `VHSVGDraw`, not each other;
-`vhappcore` knows all of them.
+`generatewnd` knows `VHSVGDraw` and `Colors`, `generatedna` knows `Colors`,
+and the two generators do not know each other; `vhappcore` knows all of them.
 
 ## 7. Class reference
 
@@ -315,21 +317,22 @@ The code is a working prototype; the following items are known.
 - `generatedna.hpp` includes `vhappcore.hpp`, a reverse dependency that is not
   needed.
 - The window sheet header is empty; source name, size and hash are not printed.
-- Font families are misspelled (`verdna`, `noto`), so viewers fall back to a
-  default font. The only localised string is `"Размер окна: N байт"` in
-  `draw_section.cpp`.
+- The types legend requests the `noto` font family, which may be unavailable
+  and fall back to a default font. The only localised string is
+  `"Размер окна: N байт"` in `src/mods/vhsvgdraw/vhsvgdraw.cpp`.
 
 **Quality gates**
 
 - No unit tests, no golden-file/SVG regression tests, no CI configuration.
-- No compiler warning flags in `CMakeLists.txt`; a `-Wall -Wextra` build emits
-  10 warnings, `-Wall -Wextra -Wconversion` about 86 (mostly `int` to
-  `uint16_t`/`int16_t`).
+- No compiler warning flags in `CMakeLists.txt`; a strict build with
+  `-Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wunused -Wnon-virtual-dtor`
+  emits 79 warnings in first-party code, mostly
+  `int`/`float` conversions in `vhsvgdraw.cpp`.
 - Doxygen coverage is partial: `BlockProps`, `Colors`, `VHWideRangeScan` and
   `VHKeyFingerPrint` methods have few or empty comments.
 - The per-class folder rule from `AGENTS.md` is not followed by `datasource`,
-  `structs`, `widerange`, `generatewnd`, `generatedna` and `draw`; the mapping
-  is documented in `rules/README.md` instead.
+  `structs`, `widerange`, `generatewnd` and `generatedna`; `colors` and
+  `vhsvgdraw` already follow it.
 - `tmp/` still contains early drafts that duplicate submodule headers.
 
 ## 11. Performance
@@ -374,7 +377,7 @@ coordinate deduplication, and two independent full passes for ABS and REL.
 | `Can't create output folder <path>` | `-outfolder` could not be created — check permissions or whether the path is occupied by a file. |
 | `key passed without param` | An option was supplied without a value, e.g. `-fname` as the last argument. |
 | No SVG although the source exists | Output goes to the CWD (or to `-outfolder`) — check the exit code and that the output folder is writable. |
-| Everything renders in a generic font | Fonts are not embedded and family names are misspelled; fix `draw_*.cpp`. |
+| Everything renders in a generic font | Fonts are not embedded; the types legend requests `noto`, which may fall back. Install Noto or change the family in `src/mods/vhsvgdraw/vhsvgdraw.cpp`. |
 | The REL sheet looks almost empty | REL uses the same x scale as ABS: rows with a late first occurrence occupy only the left part of the row. |
 
 ## 14. Roadmap
@@ -401,5 +404,6 @@ occurrence. *Window* — a 64..512 byte slice reduced to `BlockProps`.
 
 ---
 
-*This README documents version 0.1.0. Keep the version in `CMakeLists.txt`, the
-`setAppDesc()` string in `vhappcorecfg.cpp` and this file in sync.*
+*This README documents version 0.1.0. The version is defined in
+`CMakeLists.txt` and exported as `APP_VERSION` through the generated
+`app_version.hpp`; keep this file in sync.*

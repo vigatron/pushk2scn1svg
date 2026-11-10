@@ -42,7 +42,7 @@
 ## Связи / Зависимости
 
 - **Входящие:** `VHAppCore` (вызывает `GenerateDocument` из методов `GenerateDNAAbs` / `GenerateDNARel` с данными из собственных полей `datasource`, `wscanabs`/`wscanrel` и имён файлов `fnameSource`/`fnameDNAAbs`/`fnameDNARel`).
-- **Исходящие:** `VHSVG`/`VHSVGRect` (submodule `vhlibsvg`), `VHWideRangeScan`, `VHKeyFingerPrint`, `vhplatform` (`verr`/`vok`).
+- **Исходящие:** `VHSVG`/`VHSVGRect` (submodule `vhlibsvg`), `VHWideRangeScan`, `VHKeyFingerPrint`, `Colors` (`src/mods/colors/`), `vhplatform` (`verr`/`vok`).
 
 ## Использование
 

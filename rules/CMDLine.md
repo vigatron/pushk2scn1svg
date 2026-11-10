@@ -32,7 +32,11 @@ pushk2scn1svg -fname <source-file> [-wndsz <2..256>] [-outfolder <folder>]
 | `-outfolder` | `VHArgTypeString` | нет | пусто = текущая рабочая папка | `Output Files folder` | `dirOutput` |
 
 Имя приложения в usage: `pushk2scn1svg`; описание:
+`scan filter tool. V0.1.0`. Полная первая строка usage:
 `pushk2scn1svg scan filter tool. V0.1.0`.
+Версия `V0.1.0` берётся из `APP_VERSION`, который генерируется из
+`PROJECT_VERSION` в `CMakeLists.txt` (шаблон
+`src/mods/vhappcorecfg/app_version.hpp.in`).
 
 ### `-fname`
 
@@ -71,9 +75,9 @@ WND-документа не влияет — они жёстко заданы в
 - Ключ без значения в конце строки → `key passed without param` (код `1`).
 - Аргументы без префикса `-` (позиционные) собираются парсером, но
   `ParseArgs` их не читает и не отвергает.
-- Если аргументов нет вообще (`argc < 2`), `ParseCommandLine` печатает usage
-  и возвращает `vok`; далее `ParseArgs` видит пустой `-fname` и завершается
-  ошибкой (код `1`).
+- Если аргументов нет вообще (`argc < 2`), `ParseArgs` сам печатает usage
+  один раз и завершается ошибкой (код `1`); `ParseCommandLine` в этом случае
+  не вызывается.
 - Для целочисленных параметров значение преобразуется через `std::stoi`:
   нечисловое значение приводит к необработанному исключению
   `std::invalid_argument`, слишком большое — к `std::out_of_range`,

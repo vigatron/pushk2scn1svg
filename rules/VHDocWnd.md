@@ -48,7 +48,7 @@
 ## Связи / Зависимости
 
 - **Входящие:** `VHAppCore` (вызывает `GenerateDocument` из метода `GenerateWnd` с данными из собственного поля `datasource` и именем файла `fnameWND`).
-- **Исходящие:** `VHSVG`/`VHSVGRect` (submodule `vhlibsvg`), `BlockProps`, класс `VHSVGDraw` (модуль `vhsvgdraw`, статические методы `DrawSection`/`DrawDensity`/`DrawTypes`/`DrawShadowBox`).
+- **Исходящие:** `VHSVG`/`VHSVGRect` (submodule `vhlibsvg`), `BlockProps`, класс `VHSVGDraw` (модуль `vhsvgdraw`, статические методы `DrawSection`/`DrawDensity`/`DrawTypes`/`DrawShadowBox`), `Colors` (`src/mods/colors/`).
 
 ## Использование
 
