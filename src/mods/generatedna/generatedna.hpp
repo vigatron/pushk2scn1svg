@@ -33,8 +33,10 @@ public:
 
 private:
 
-    // DOC Size
+    // DOC Size: Width
     static const uint16_t doc_size_w = 2800;
+
+    // DOC Size: Height
     static const uint16_t doc_size_h = 2600;
 
     // Content area

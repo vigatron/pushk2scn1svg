@@ -4,7 +4,18 @@
 
 #include <ctime>
 
-// TODO: Colors set
+// Color constants for SVG generation
+const std::string COLOR_HEADER_TEXT = "black";
+const std::string COLOR_HEADER_RECT = "gray";
+const std::string COLOR_SVG_BG = "gray";
+const std::string COLOR_SVG_PAPER = "white";
+const std::string COLOR_PAPER_RECT = "gray";
+const std::string COLOR_EMPTY_CELL = "#EEEEEE";
+const std::string COLOR_EMPTY_BORDER = "none";
+const std::string COLOR_EMPTY_BACK = "#EEEEEE";
+const std::string COLOR_CELL_ALT1 = "#8888FF";
+const std::string COLOR_CELL_ALT2 = "#6666FF";
+
 // Abs Map / Rel Map
 // svg.rect(rectbody, 1, "blue");
 // svg.rect(rectftr,  1, "green", "#F0F0F0");
@@ -12,9 +23,9 @@
 //
 void VHDocDNA::GenerateHeader(const std::string &caption, const VHSVGRect &rect)
 {
-    svg.text(rect.startx() + 64, rect.starty() + 72, caption, "Arial", 48, "black");
+    svg.text(rect.startx() + 64, rect.starty() + 72, caption, "Arial", 48, COLOR_HEADER_TEXT);
 
-    svg.rect(rect, 1, "gray");
+    svg.rect(rect, 1, COLOR_HEADER_RECT);
 }
 
 //
@@ -33,7 +44,7 @@ void VHDocDNA::GenerateFooter(
     int stepdy = 20;
 
     //
-    std::string colorhdr = "black";
+    std::string colorhdr = COLOR_HEADER_TEXT;
     std::string fonthdr = "Arial";
     int fontsize = 16;
 
@@ -98,9 +109,9 @@ verr VHDocDNA::GenerateDocument(
     svg.begin(rectabs.width(), rectabs.height());
 
     // Visible area
-    svg.rect(rectabs, 1, "gray", "white");
+    svg.rect(rectabs, 1, COLOR_SVG_BG, COLOR_SVG_PAPER);
 
-    svg.rect(rect_paper_area, 1, "gray");
+    svg.rect(rect_paper_area, 1, COLOR_PAPER_RECT);
 
     //
     VHSVGRect recthdr;
@@ -160,9 +171,9 @@ void VHDocDNA::Gen256Stat(
         const VHKeyFingerPrint &obj = wscan[s];
         const bool empty = obj.empty();
 
-        std::string color_text = empty ? "#EEEEEE" : "gray";
-        std::string color_bord = empty ? "none" : "#EEEEEE";
-        std::string color_back = empty ? "none" : "#EEEEEE";
+        std::string color_text = empty ? COLOR_EMPTY_CELL : COLOR_HEADER_RECT;
+        std::string color_bord = empty ? COLOR_EMPTY_BORDER : COLOR_EMPTY_CELL;
+        std::string color_back = empty ? COLOR_EMPTY_BACK : COLOR_EMPTY_CELL;
 
         svg.rect(itemrect_back, 1, color_bord, color_back);
 
@@ -180,7 +191,7 @@ void VHDocDNA::Gen256Stat(
 
                 const size_t dx = idx * cellw / wscan.width();
                 const int linex = itemrect.startx() + static_cast<int>(dx);
-                const std::string color = (dx % 2) ? "#8888FF" : "#6666FF";
+                const std::string color = (dx % 2) ? COLOR_CELL_ALT1 : COLOR_CELL_ALT2;
                 svg.line(linex, itemrect.starty() + 1, linex, itemrect.endy() - 1, 1, color);
             }
         }
