@@ -13,7 +13,8 @@
 | [VHLogger.md](VHLogger.md) | `VHLogger` | `src/mods/vhlogger/` | Глобальный отладочный вывод (текст, числа, hex-дампы памяти). |
 | [VHDocWnd.md](VHDocWnd.md) | `VHDocWnd` | `src/mods/generatewnd/` | Генерация SVG «оконного» документа (сетка 2×4: Section + Density). |
 | [VHDocDNA.md](VHDocDNA.md) | `VHDocDNA` | `src/mods/generatedna/` | Генерация SVG «DNA»-документа из wide-range сканирования (256 строк). |
-| [Colors.md](Colors.md) | `Colors` | `src/mods/draw/` | Палитра цветов SVG-генераторов. |
+| [VHSVGDraw.md](VHSVGDraw.md) | `VHSVGDraw` | `src/mods/vhsvgdraw/` | Статические помощники отрисовки элементов WND-документа (Section, Density, Scale, Types и др.). |
+| [Colors.md](Colors.md) | `Colors` | `src/mods/colors/` | Палитра цветов SVG-генераторов. |
 | [VHSHA256.md](VHSHA256.md) | `VHSHA256` | `src/mods/vhsha256/` | Вычисление SHA-256 хеша массива байтов. |
 
 ## Прочие документы
@@ -35,7 +36,7 @@ main.cpp
      └─ VHDocWnd / VHDocDNA                ← generatewnd / generatedna
  └─ VHDocWnd                       ← generatewnd
      └─ BlockProps                 ← structs
-     └─ draw: DrawSection/DrawDensity/DrawTypes/Colors ← draw
+     └─ VHSVGDraw                   ← vhsvgdraw
  └─ VHDocDNA                       ← generatedna
      └─ VHWideRangeScan + VHKeyFingerPrint
  └─ VHLogger (глобальный dbg)         ← vhlogger / global

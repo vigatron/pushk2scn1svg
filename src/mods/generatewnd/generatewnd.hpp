@@ -2,7 +2,7 @@
 
 #include "vhplatform.hpp"
 #include "structs/blockprops.hpp"
-#include "draw/draw.hpp"
+#include "vhsvgdraw/vhsvgdraw.hpp"
 #include "vhsvg.hpp"
 
 #include <cstddef>

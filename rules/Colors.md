@@ -2,15 +2,15 @@
 
 ## Файл / Модуль
 
-- Заголовок: `src/mods/draw/colors.hpp`
-- Реализация: `src/mods/draw/colors.cpp`
+- Заголовок: `src/mods/colors/colors.hpp`
+- Реализация: `src/mods/colors/colors.cpp`
 - Класс: `class Colors`
 
 ## Назначение
 
 Палитра SVG-генераторов: набор именованных цветов (в формате hex-строк `#RRGGBB`)
 для фона колонок, распространения, ширины, теней и текста. Используется
-функциями отрисовки `draw_section.cpp` и `draw_types.cpp` (модуль `draw`).
+классом `VHSVGDraw` (модуль `vhsvgdraw`) в методах отрисовки Section/Scale/Types.
 
 ## Ответственность
 
@@ -45,10 +45,9 @@
 
 ## Связи / Зависимости
 
-- **Входящие:** `draw/draw_section.cpp` (`clrspr`, `clrwdt`, `clrbck*`, `colortxt*`),
-  `draw/draw_types.cpp` (`clrbck*`, `colortxt`), `draw/draw_scale.cpp` (`clrshd_*`, `colortxt`).
+- **Входящие:** `vhsvgdraw/vhsvgdraw.cpp` (`VHSVGDraw`: Section/Types/Scale используют `clrspr`, `clrwdt`, `clrbck*`, `clrshd_*`, `colortxt*`).
 - **Исходящие:** только `std::string`.
-- Отдельная таблица `arrcolors` в `draw_density.cpp` (`0xFFFFFF, 0x80E080, 0xFFFF00, 0xFF8080`) **не** использует `Colors` — две независимые палитры в модуле `draw`.
+- Отдельная таблица `arrcolors` в реализации `VHSVGDraw::DrawDensity` (`0xFFFFFF, 0x80E080, 0xFFFF00, 0xFF8080`) **не** использует `Colors` — две независимые палитры.
 
 ## Использование
 

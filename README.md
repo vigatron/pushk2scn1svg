@@ -192,7 +192,7 @@ main.cpp
      │   └─ VHKeyFingerPrint x256
      ├─ VHDocWnd                    src/mods/generatewnd
      │   ├─ BlockProps              src/mods/structs
-     │   └─ draw (free functions)   src/mods/draw
+     │   └─ VHSVGDraw               src/mods/vhsvgdraw
      └─ VHDocDNA x2                 src/mods/generatedna
          └─ VHWideRangeScan, VHKeyFingerPrint
 ```
@@ -202,7 +202,7 @@ generators. `VHLogger` (`dbg`) is a global diagnostic sink declared in
 `src/mods/global`.
 
 Layering rules: `datasource` and `widerange` know nothing about SVG;
-`generatewnd` / `generatedna` know `widerange` and `draw`, not each other;
+`generatewnd` / `generatedna` know `widerange` and `VHSVGDraw`, not each other;
 `vhappcore` knows all of them.
 
 ## 7. Class reference
@@ -217,7 +217,8 @@ Layering rules: `datasource` and `widerange` know nothing about SVG;
 | `BlockProps` | `structs` | Per-block min/max/histogram/width. |
 | `VHDocWnd` | `generatewnd` | Builds the window sheet. |
 | `VHDocDNA` | `generatedna` | Builds the DNA sheet. |
-| `Colors` | `draw` | Named palette used by the drawing helpers. |
+| `VHSVGDraw` | `vhsvgdraw` | Stateless drawing helpers for window sheet elements (sections, density, scale, types). |
+| `Colors` | `colors` | Named palette used by the drawing helpers. |
 | `VHLogger` | `vhlogger` | Diagnostic output (stdout or file). |
 | `VHSHA256` | `vhsha256` | SHA-256 of a byte vector. |
 
@@ -242,7 +243,8 @@ src/mods/                   first-party modules
   structs/                  BlockProps
   generatewnd/              window sheet generator
   generatedna/              DNA sheet generator
-  draw/                     drawing helpers and palette
+  vhsvgdraw/                drawing helpers for window sheet
+  colors/                   SVG color palette
   vhlogger/                 logger
   vhsha256/                 SHA-256 implementation
   global/                   global `dbg` and debug helpers

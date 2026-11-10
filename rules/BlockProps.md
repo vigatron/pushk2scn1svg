@@ -36,7 +36,7 @@
 
 ## Связи / Зависимости
 
-- **Входящие:** `VHDocWnd::GenSamplesArray()` создаёт вектор `BlockProps` для каждого размера чанка; поля читаются в `draw/draw_section.cpp`, `draw/draw_density.cpp` и функции `DumpSamples()` (`global/global.cpp`).
+- **Входящие:** `VHDocWnd::GenSamplesArray()` создаёт вектор `BlockProps` для каждого размера чанка; поля читаются в `VHSVGDraw` (`vhsvgdraw/vhsvgdraw.cpp`, методы Section/Density) и функции `DumpSamples()` (`global/global.cpp`).
 - **Исходящие:** `vhplatform.hpp` (для `memset`/`uint8_t`).
 
 ## Использование

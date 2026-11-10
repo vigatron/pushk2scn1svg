@@ -2,7 +2,6 @@
 
 #include "vhplatform.hpp"
 #include "structs/blockprops.hpp"
-#include "draw/draw.hpp"
 #include "vhsvg.hpp"
 
 #include "widerange/widerange.hpp"

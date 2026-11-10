@@ -1,6 +1,5 @@
 #include "generatewnd.hpp"
 
-#include "draw/draw.hpp"
 #include "global.hpp"
 
 /**
@@ -46,7 +45,7 @@ verr VHDocWnd::GenerateDocument(
     svg.rect(0, 0, rect_full_area.width(), rect_full_area.height(), 0, "gray", "white");
 
     Draw2X4Content(svg, arrsrc, rect_2X4);
-    DrawTypes(svg, rect_types);
+    VHSVGDraw::DrawTypes(svg, rect_types);
 
     svg.end();
     svg.savetosvg(fnamewnd);
@@ -76,12 +75,12 @@ void VHDocWnd::Draw2X4Content(VHSVG &svg, const std::vector<uint8_t> &arrsrc, co
             VHSVGRect rects(rect.startx() + i * ww, rect.starty() + j * hh, ww, hh);
             rects.shrink(kCellPadding, kCellPadding);
 
-            DrawShadowBox(svg, rects);
+            VHSVGDraw::DrawShadowBox(svg, rects);
 
             if (i == 0)
-                DrawSection(svg, rects, arrprops, arrsrc.size(), static_cast<int>(chunksize));
+                VHSVGDraw::DrawSection(svg, rects, arrprops, arrsrc.size(), static_cast<int>(chunksize));
             else
-                DrawDensity(svg, rects, arrprops, arrsrc.size(), static_cast<int>(chunksize));
+                VHSVGDraw::DrawDensity(svg, rects, arrprops, arrsrc.size(), static_cast<int>(chunksize));
         }
     }
 }

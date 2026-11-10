@@ -48,12 +48,8 @@ add_executable(pushk2scn1svg
     src/mods/vhappcorecfg/vhappcorecfg.cpp
     src/mods/datasource/vhsrcdataarray.cpp
 
-    src/mods/draw/colors.cpp
-    src/mods/draw/draw.cpp
-    src/mods/draw/draw_density.cpp
-    src/mods/draw/draw_scale.cpp
-    src/mods/draw/draw_section.cpp
-    src/mods/draw/draw_types.cpp
+    src/mods/colors/colors.cpp
+    src/mods/vhsvgdraw/vhsvgdraw.cpp
 
     src/mods/vhsha256/VHSHA256.cpp
 )
