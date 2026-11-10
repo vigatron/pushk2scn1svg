@@ -1,54 +1,71 @@
 #include "vhkeyfingerprint.hpp"
 
+#include <cstdio>
+
 /**
- *
+ * @brief Creates an empty fingerprint with a zeroed bit set.
  */
-VHKeyFingerPrint::VHKeyFingerPrint() : avail(false)
+VHKeyFingerPrint::VHKeyFingerPrint()
+    : avail(false),
+      relmode(false),
+      startpos(0),
+      endpos(0),
+      arr(MAX_RANGE / 8, 0)
 {
-    arr.resize(MAX_RANGE/8, 0);
 }
 
 /**
+ * @brief Registers an absolute position of the value.
  *
+ * @param pos Absolute offset from the start of the scanned buffer.
  */
-void VHKeyFingerPrint::putabs(uint8_t sym, uint16_t pos)
+void VHKeyFingerPrint::putabs(uint16_t pos)
 {
     if (!avail)
     {
         avail = true;
+        relmode = false;
         startpos = pos;
         endpos = pos;
     }
     else
     {
-        mark(pos);
+        if (pos < startpos)
+            startpos = pos;
         if (pos > endpos)
             endpos = pos;
     }
+
+    mark(pos);
 }
 
 /**
+ * @brief Registers a relative position of the value.
  *
+ * @param pos Absolute offset of the occurrence in the scanned buffer.
  */
-void VHKeyFingerPrint::putrel(uint8_t sym, uint16_t pos)
+void VHKeyFingerPrint::putrel(uint16_t pos)
 {
     if (!avail)
     {
         avail = true;
+        relmode = true;
         startpos = pos;
         endpos = pos;
+        mark(0);
+        return;
     }
-    else
-    {
-        uint16_t dx = pos - startpos;
-        mark(dx);
-        if (pos > endpos)
-            endpos = pos;
-    }
+
+    mark(static_cast<uint16_t>(pos - startpos));
+
+    if (pos > endpos)
+        endpos = pos;
 }
 
 /**
- * 
+ * @brief Sets the bit at the given position in the scan coordinate space.
+ *
+ * @param pos Absolute position or relative offset depending on the mode.
  */
 void VHKeyFingerPrint::mark(uint16_t pos)
 {
@@ -56,16 +73,20 @@ void VHKeyFingerPrint::mark(uint16_t pos)
 }
 
 /**
+ * @brief Returns the bit at the given position in the scan coordinate space.
  *
+ * @param pos Absolute position or relative offset depending on the mode.
+ * @return true if the position is marked, false otherwise.
  */
 bool VHKeyFingerPrint::status(uint16_t pos) const
 {
     return VHBits::BitVal(arr.data(), pos);
 }
 
-
 /**
+ * @brief Returns true if at least one position was registered.
  *
+ * @return true if the fingerprint contains data.
  */
 bool VHKeyFingerPrint::valid() const
 {
@@ -73,7 +94,9 @@ bool VHKeyFingerPrint::valid() const
 }
 
 /**
+ * @brief Returns true if no position was registered.
  *
+ * @return true if the fingerprint is empty.
  */
 bool VHKeyFingerPrint::empty() const
 {
@@ -81,21 +104,7 @@ bool VHKeyFingerPrint::empty() const
 }
 
 /**
- *
-*/
-const uint16_t VHKeyFingerPrint::getStartPos() const {
-    return startpos;
-}
-
-/**
- *
-*/
-const uint16_t VHKeyFingerPrint::getEndPos() const {
-    return endpos; 
-}
-
-/**
- *
+ * @brief Prints the range and all marked positions to stdout.
  */
 void VHKeyFingerPrint::dump() const
 {
@@ -103,12 +112,16 @@ void VHKeyFingerPrint::dump() const
 
     const auto* bits = arr.data();
 
-    for (size_t idx = startpos; idx < endpos + 1; idx++)
+    // In relative mode the bit set holds offsets from startpos, in absolute
+    // mode it holds absolute positions; walk the matching range in both cases.
+    const size_t from = relmode ? 0u : startpos;
+    const size_t to = relmode ? getSpan() : endpos;
+
+    for (size_t idx = from; idx <= to; idx++)
     {
-        if (VHBits::BitVal(bits, idx))
+        if (VHBits::BitVal(bits, static_cast<int>(idx)))
         {
             printf("%zu ", idx);
         }
     }
-
 }

@@ -30,22 +30,24 @@
 |---|---|---|
 | `MAX_ELMS` | `static const size_t = 256` | Количество обрабатываемых символов. |
 | `arrelms` | `std::vector<VHKeyFingerPrint>` | Отпечатки размером `MAX_ELMS`. |
-| `arrwidth` | `size_t` | Размер исходного массива (устанавливается при сканировании). |
+| `arrwidth` | `size_t` | Размер исходного массива (устанавливается при сканировании; 0 до него). |
+| `isrel` | `bool` | Признак относительного координатного пространства последнего сканирования. |
 
 ## Методы
 
 | Сигнатура | Описание |
 |---|---|
 | `VHWideRangeScan()` | Создаёт вектор из `MAX_ELMS` отпечатков. |
-| `verr scanabs(const std::vector<uint8_t> &arrsrc)` | Проходит массив, для каждого байта вызывает `arrelms[sym].putabs(sym, idx)`. Проверяет размер: `>= 2` и `<= VHKeyFingerPrint::MAX_RANGE`, иначе ошибка. Сохраняет `arrwidth`. |
-| `verr scanrel(const std::vector<uint8_t> &arrsrc)` | Аналогично `scanabs`, но вызывает `putrel(sym, idx)` (смещения от первой позиции). |
+| `verr scanabs(const std::vector<uint8_t> &arrsrc)` | Проходит массив, для каждого байта вызывает `arrelms[sym].putabs(idx)`. Проверяет размер: `>= 2` и `<= VHKeyFingerPrint::MAX_RANGE`, иначе ошибка. Сохраняет `arrwidth` и переводит скан в абсолютный режим (`isrel = false`). |
+| `verr scanrel(const std::vector<uint8_t> &arrsrc)` | Аналогично `scanabs`, но вызывает `putrel(idx)` (смещения от первой позиции) и переводит скан в относительный режим (`isrel = true`). |
+| `bool relative() const` | Возвращает `isrel` — координатное пространство последнего сканирования. |
 | `const VHKeyFingerPrint &operator[](size_t idx) const` | Доступ к отпечатку символа по индексу (0..255). |
-| `const size_t width() const` | Возвращает ширину сканируемого массива. |
+| `const size_t width() const` | Возвращает ширину сканируемого массива (0 до первого сканирования). |
 | `void dump()` (private) | Печатает все отпечатки в stdout в формате `#N : ...`. |
 
 ## Связи / Зависимости
 
-- **Входящие:** `VHAppCore` хранит два объекта (`wscanabs`, `wscanrel`); `VHDocDNA::Gen256Stat()` читает отпечатки для отрисовки.
+- **Входящие:** `VHAppCore` хранит два объекта (`wscanabs`, `wscanrel`); `VHDocDNA::Gen256Stat()` читает отпечатки и `relative()` для выбора координатного пространства при отрисовке.
 - **Исходящие:** `VHKeyFingerPrint` (хранение битовых отпечатков), `vhplatform` (`verr`/`vok`, `F1K`).
 
 ## Использование
@@ -62,6 +64,6 @@ const VHKeyFingerPrint &fp = appcore.wscanabs[0xFF];
 ## Ограничения / Замечания
 
 - `operator[]` не проверяет границы индекса (UB при `idx >= 256`).
-- `arrwidth` не инициализируется в конструкторе — `width()` до сканирования возвращает мусорное значение.
+- `arrwidth` и `isrel` инициализируются в конструкторе (`0` / `false`).
 - `scanabs`/`scanrel` не очищают предыдущие результаты — повторный вызов накапливает данные в отпечатках.
 - Обработка только массивов размером `2 .. MAX_RANGE` (32768 байт).

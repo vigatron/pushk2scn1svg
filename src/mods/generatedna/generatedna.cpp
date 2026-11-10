@@ -136,6 +136,10 @@ void VHDocDNA::Gen256Stat(
     if (!wscan.width())
         return;
 
+    // Absolute scans store absolute positions, relative scans store offsets
+    // from the first occurrence; every query below must use the same space.
+    const bool relmode = wscan.relative();
+
     VHSVGRect innerrect(rect);
     innerrect.shrink(64, 64);
 
@@ -154,7 +158,7 @@ void VHDocDNA::Gen256Stat(
 
         //
         const VHKeyFingerPrint &obj = wscan[s];
-        bool empty = obj.empty();
+        const bool empty = obj.empty();
 
         std::string color_text = empty ? "#EEEEEE" : "gray";
         std::string color_bord = empty ? "none" : "#EEEEEE";
@@ -163,13 +167,20 @@ void VHDocDNA::Gen256Stat(
         svg.rect(itemrect_back, 1, color_bord, color_back);
 
         //
-        for (uint16_t pos = obj.getStartPos(); pos < obj.getEndPos() + 1; pos++)
+        if (!empty)
         {
-            if (obj.status(pos))
+            const size_t first = relmode ? 0u : static_cast<size_t>(obj.getStartPos());
+            const size_t last = relmode ? static_cast<size_t>(obj.getSpan())
+                                        : static_cast<size_t>(obj.getEndPos());
+
+            for (size_t idx = first; idx <= last; idx++)
             {
-                size_t dx = pos * cellw / wscan.width();
-                uint16_t linex = itemrect.startx() + dx;
-                std::string color = (dx % 2) ? "#8888FF" : "#6666FF";
+                if (!obj.status(static_cast<uint16_t>(idx)))
+                    continue;
+
+                const size_t dx = idx * cellw / wscan.width();
+                const int linex = itemrect.startx() + static_cast<int>(dx);
+                const std::string color = (dx % 2) ? "#8888FF" : "#6666FF";
                 svg.line(linex, itemrect.starty() + 1, linex, itemrect.endy() - 1, 1, color);
             }
         }

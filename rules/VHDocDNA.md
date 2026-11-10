@@ -23,7 +23,7 @@
 
 | Имя | Тип | Назначение |
 |---|---|---|
-| `doc_size_w` | `static const uint16_t = 2400` | Ширина документа SVG. |
+| `doc_size_w` | `static const uint16_t = 2800` | Ширина документа SVG. |
 | `doc_size_h` | `static const uint16_t = 2600` | Высота документа SVG. |
 | `doc_content_dist_w` | `static const uint16_t = 240` | Горизонтальный отступ области контента. |
 | `doc_content_dist_h` | `static const uint16_t = 200` | Вертикальный отступ области контента. |
@@ -37,7 +37,7 @@
 | `void GenerateLayout(const VHSVGRect &rect, VHSVGRect &recthdr, VHSVGRect &rectbody, VHSVGRect &rectftr)` (private) | Рассчитывает прямоугольники заголовка (высота 120), тела и подвала (высота 120). |
 | `void GenerateHeader(const std::string &caption, const VHSVGRect &rect)` (private) | Рисует заголовок: текст подписи (Arial 48) и рамку. |
 | `void GenerateFooter(const VHSVGRect &rect, const std::string &filename, size_t filesize, const std::string &strsha256)` (private) | Рисует подвал: имя файла, размер, SHA-256, дату/время (`%d-%b-%Y %H:%M`, `localtime_r`/`localtime_s`). |
-| `void Gen256Stat(VHSVG &svg, const VHSVGRect &rect, const VHWideRangeScan &wscan)` (private) | Рисует 256 строк (по одной на значение байта): фон строки, вертикальные линии для установленных битов отпечатка (`obj.status(pos)`), номер `#N` слева. При пустом скане (`width()==0`) ничего не рисует. |
+| `void Gen256Stat(VHSVG &svg, const VHSVGRect &rect, const VHWideRangeScan &wscan)` (private) | Рисует 256 строк (по одной на значение байта): фон строки, вертикальные линии для установленных битов отпечатка (`obj.status()`), номер `#N` слева. Координатное пространство выбирается по `wscan.relative()`: для ABS перебираются абсолютные позиции `startpos..endpos`, для REL — относительные смещения `0..getSpan()`; биты опрашиваются в том же пространстве. При пустом скане (`width()==0`) ничего не рисует. |
 
 ## Связи / Зависимости
 
@@ -63,5 +63,6 @@ if (vok != appcore.GenerateDNARel())
 ## Ограничения / Замечания
 
 - `svg` — член класса: объект одноразовый, повторный вызов перезапишет документ.
-- В `Gen256Stat` для каждого символа читаются `getStartPos()`/`getEndPos()` безусловна — для пустых отпечатков значения зависят от инициализации `VHKeyFingerPrint` (см. замечания в `VHKeyFingerPrint.md`).
+- Горизонтальная шкала общая для ABS и REL (`idx * cellw / width`), поэтому
+  REL-строки с поздним первым вхождением занимают только левую часть строки.
 - Ошибка сохранения SVG не проверяется.
