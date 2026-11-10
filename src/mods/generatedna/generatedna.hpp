@@ -74,9 +74,10 @@ private:
      * @brief Generates the document footer with file metadata and timestamp.
      *
      * @param rect Footer area rectangle.
-     * @param filename Source file name.
+     * @param filename Source file name (path is stripped for display).
      * @param filesize Source file size in bytes.
      * @param strsha256 Source file SHA256 hash.
+     * @return void
      */
     void GenerateFooter(
         const VHSVGRect &rect,

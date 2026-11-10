@@ -2,6 +2,8 @@
 
 #include "widerange/widerange.hpp"
 
+#include "vhfsys.hpp"
+
 #include <ctime>
 
 // Color constants for SVG generation
@@ -28,13 +30,23 @@ void VHDocDNA::GenerateHeader(const std::string &caption, const VHSVGRect &rect)
     svg.rect(rect, 1, COLOR_HEADER_RECT);
 }
 
-//
+/**
+ * @brief Generates the document footer with file metadata and timestamp.
+ *
+ * @param rect Footer area rectangle.
+ * @param filename Source file name (path is stripped for display).
+ * @param filesize Source file size in bytes.
+ * @param strsha256 Source file SHA256 hash.
+ * @return void
+ */
 void VHDocDNA::GenerateFooter(
     const VHSVGRect &rect,
     const std::string &filename,
     size_t filesize,
     const std::string &strsha256)
 {
+    // File Name (display only the file name without path)
+    const std::string strfname = VHFSYS::ExtractFilename(filename);
 
     //
     int startx = rect.startx();
@@ -57,7 +69,7 @@ void VHDocDNA::GenerateFooter(
 
     // File Name
     svg.text(startx, starty, "File Name", fonthdr, fontsize, colorhdr);
-    svg.text(startxx, starty, filename, fonthdr, fontsize, colorhdr);
+    svg.text(startxx, starty, strfname, fonthdr, fontsize, colorhdr);
 
     starty += stepdy;
 
