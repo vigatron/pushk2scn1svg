@@ -31,6 +31,11 @@ class VHAppCoreCfg
      */
     std::string dirOutput;
 
-    uint16_t subsize;
+    /**
+     * @brief Window size in bytes; also the minimum accepted source size.
+     *
+     * The default matches the `-wndsz` default in ParseArgs.
+     */
+    uint16_t subsize = 128;
 
 };

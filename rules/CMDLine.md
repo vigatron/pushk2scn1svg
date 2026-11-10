@@ -27,7 +27,7 @@ pushk2scn1svg -fname <source-file> [-wndsz <2..256>] [-outfolder <folder>]
 
 | Ключ | Тип `vhlibargs` | Обязательный | По умолчанию | Описание (`ShowUsage`) | Поле `VHAppCoreCfg` |
 |---|---|---|---|---|---|
-| `-fname` | `VHArgTypeFileName` | да | — (пусто) | `Source file` | `fnameSource` |
+| `-fname` | `VHArgTypeString` | да | — (пусто) | `Source file` | `fnameSource` |
 | `-wndsz` | `VHArgTypeInteger` | нет | `128`, диапазон `2..256` | `Window size` | `subsize` |
 | `-outfolder` | `VHArgTypeString` | нет | пусто = текущая рабочая папка | `Output Files folder` | `dirOutput` |
 
@@ -41,16 +41,28 @@ pushk2scn1svg -fname <source-file> [-wndsz <2..256>] [-outfolder <folder>]
 ### `-fname`
 
 Путь к исходному бинарному файлу. Должен быть непустым и указывать на
-существующий файл (`VHFSYS::FileExist`; каталоги не принимаются).
-Тип `VHArgTypeFileName` дополнительно отвергает значения, содержащие
-символы `< > % * ? :`.
+существующий **обычный файл**: проверка выполняется через
+`std::filesystem::is_regular_file`, поэтому каталоги и специальные файлы
+(устройства, FIFO и т.п.) не принимаются. Тип `VHArgTypeString`, а не
+`VHArgTypeFileName`: ограничение `vhlibargs` на символы `< > % * ? :`
+не применяется, допустимость пути определяет файловая система.
+
+Размер исходного файла ограничен сверху: не более
+`VHSrcDataArray::MAX_SOURCE_SIZE` = **32 768 байт (32 КиБ)**. Ограничение
+следует из хранения позиций в `uint16_t` (`VHKeyFingerPrint::MAX_RANGE`).
+Файл большего размера отвергается в `ParseArgs` до создания папки вывода;
+та же проверка повторяется в `VHSrcDataArray::LoadSource`.
 
 ### `-wndsz`
 
 Размер окна сканирования в байтах: целое число `2..256`, по умолчанию `128`.
-В текущей реализации используется как **минимальный допустимый размер
-исходного файла** (`VHSrcDataArray::LoadSource`); на размеры блоков
-WND-документа не влияет — они жёстко заданы в `VHDocWnd` (`64 << row`).
+Значение предварительно проверяется как обычное десятичное целое
+(`std::from_chars`, без завершающих символов); `abc`, `2x` и переполнение
+`int` отвергаются с сообщением `Invalid value for -wndsz: <value>` до
+вызова `vhlibargs`. В текущей реализации используется как **минимальный
+допустимый размер исходного файла** (`VHSrcDataArray::LoadSource`); на
+размеры блоков WND-документа не влияет — они жёстко заданы в `VHDocWnd`
+(`64 << row`).
 
 ### `-outfolder`
 
@@ -78,10 +90,13 @@ WND-документа не влияет — они жёстко заданы в
 - Если аргументов нет вообще (`argc < 2`), `ParseArgs` сам печатает usage
   один раз и завершается ошибкой (код `1`); `ParseCommandLine` в этом случае
   не вызывается.
-- Для целочисленных параметров значение преобразуется через `std::stoi`:
-  нечисловое значение приводит к необработанному исключению
-  `std::invalid_argument`, слишком большое — к `std::out_of_range`,
-  выход за диапазон (после успешного преобразования) — к ошибке парсера.
+- Для `-wndsz` значение сначала проверяется в `ParseArgs` через
+  `std::from_chars`: токен должен целиком быть десятичным целым. Нечисловое
+  значение (`abc`), завершающие символы (`2x`) и переполнение `int`
+  отвергаются сообщением `Invalid value for -wndsz: <value>` (код `1`) без
+  исключений. Затем `vhlibargs` преобразует значение через `std::stoi`;
+  выход за диапазон `2..256` — ошибка парсера. Исключения `std::stoi`
+  дополнительно перехватываются на случай будущих целочисленных ключей.
 
 ## Валидация и коды ошибок
 
@@ -90,18 +105,23 @@ WND-документа не влияет — они жёстко заданы в
 | Проверка | Сообщение | Код `ParseArgs` |
 |---|---|---|
 | Ошибка синтаксиса/разбора `vhlibargs` | `Error parsing command line` | `1` |
+| `-wndsz` не является десятичным целым или переполняет `int` | `Invalid value for -wndsz: <value> (expected integer 2..256)` | `1` |
 | Пустой `-fname` | `Parse args issue` + usage | `1` |
-| `-fname` не существует или это каталог | `Wrong input file <path>` | `3` |
+| `-fname` не существует, это каталог или специальный файл | `Wrong input file <path>` | `3` |
+| Размер `-fname` больше `MAX_SOURCE_SIZE` (32 768) | `Source file too large <path> (max 32768 bytes)` | `5` |
 | `-outfolder` не удалось создать (нет прав, путь занят файлом и т.п.) | `Can't create output folder <path>` | `4` |
 
 `main.cpp` на любую ошибку `ParseArgs` возвращает `verror(1)`, поэтому код
-завершения процесса для всех ошибок CLI — `1`; коды `3`/`4` доступны только
-как результат самого метода.
+завершения процесса для всех ошибок CLI — `1`; коды `3`/`4`/`5` доступны
+только как результат самого метода. Если файл вырос между `ParseArgs` и
+загрузкой, `VHSrcDataArray::LoadSource` повторно отвергает его с сообщением
+`File too large <path> (max 32768 bytes)`, и `main` завершается с кодом `3`.
 
 ## Формирование имён выходных файлов
 
 Базовое имя берётся из имени исходного файла без пути:
-`base = VHFSYS::ExtractFilename(fnameSource)` (расширение сохраняется).
+`base = std::filesystem::path(fnameSource).filename()` (расширение
+сохраняется).
 
 ```text
 <out>       = dirOutput пусто ? base : <dirOutput>/<base>
@@ -110,22 +130,22 @@ fnameDNAAbs = <out>_dna_abs.svg
 fnameDNARel = <out>_dna_rel.svg
 ```
 
-Пример: для `data/backobjs.recombo.cells` и `-outfolder out` получаются
-`out/backobjs.recombo.cells_wnd.svg`,
-`out/backobjs.recombo.cells_dna_abs.svg`,
-`out/backobjs.recombo.cells_dna_rel.svg`.
+Пример: для `data/backobjs_recombo.cells` и `-outfolder out` получаются
+`out/backobjs_recombo.cells_wnd.svg`,
+`out/backobjs_recombo.cells_dna_abs.svg`,
+`out/backobjs_recombo.cells_dna_rel.svg`.
 
 ## Примеры
 
 ```sh
 # Все три SVG в текущую рабочую папку (по умолчанию)
-./build/pushk2scn1svg -fname data/backobjs.recombo.cells
+./build/pushk2scn1svg -fname data/backobjs_recombo.cells
 
 # Другое окно сканирования
-./build/pushk2scn1svg -fname data/backobjs.recombo.cells -wndsz 64
+./build/pushk2scn1svg -fname data/backobjs_recombo.cells -wndsz 64
 
 # Выходные файлы в отдельную существующую папку
-./build/pushk2scn1svg -fname data/backobjs.recombo.cells -outfolder out
+./build/pushk2scn1svg -fname data/backobjs_recombo.cells -outfolder out
 ```
 
 ## Связь с классами и `main`

@@ -1,21 +1,24 @@
 #include "datasource/vhsrcdataarray.hpp"
 
-#include <climits>
+#include <filesystem>
+#include <fstream>
+#include <system_error>
 
 #include "VHSHA256.hpp"
 #include "global.hpp"
-#include "vhfile.hpp"
 
 /**
- * @brief Loads a source file into the internal buffer with a minimum size check.
+ * @brief Loads a source file into the internal buffer with size checks.
  *
  * On any failure the buffer and the SHA-256 string are left empty and the
  * stored file size is reset to 0, so the object never holds a partially
- * loaded state.
+ * loaded state. The file is opened in binary mode to avoid newline
+ * translation on platforms where text mode is not transparent.
  *
  * @param fname Path to the source file.
  * @param minsize Minimum required file size in bytes.
- * @return Reference to the loaded data buffer; empty if loading fails or the file is too small.
+ * @return Reference to the loaded data buffer; empty if loading fails,
+ * the file is too small or too large.
  */
 const std::vector<uint8_t> &VHSrcDataArray::LoadSource(const std::string &fname, int minsize)
 {
@@ -25,19 +28,24 @@ const std::vector<uint8_t> &VHSrcDataArray::LoadSource(const std::string &fname,
 
     const size_t minbytes = (minsize > 0) ? static_cast<size_t>(minsize) : 0u;
 
-    VHFile f(fname);
-
-    // VHFile::flen() returns -1 on failure; converting it to size_t directly
-    // would turn the error into a huge allocation request.
-    const int len = f.flen();
-    if (len < 0)
+    std::error_code ec;
+    const std::uintmax_t filelen = std::filesystem::file_size(fname, ec);
+    if (ec)
     {
         const std::string msg = "Cant read file " + fname;
         dbg.txtnl(msg.c_str());
         return arrsrc;
     }
 
-    fsize = static_cast<size_t>(len);
+    if (filelen > MAX_SOURCE_SIZE)
+    {
+        const std::string msg = "File too large " + fname + " (max " +
+            std::to_string(MAX_SOURCE_SIZE) + " bytes)";
+        dbg.txtnl(msg.c_str());
+        return arrsrc;
+    }
+
+    fsize = static_cast<size_t>(filelen);
 
     if (fsize < minbytes)
     {
@@ -47,23 +55,27 @@ const std::vector<uint8_t> &VHSrcDataArray::LoadSource(const std::string &fname,
         return arrsrc;
     }
 
-    // VHFile::read() takes an int length, so larger files cannot be loaded.
-    if (fsize > static_cast<size_t>(INT_MAX))
+    std::ifstream in(fname, std::ios::binary);
+    if (!in)
     {
-        const std::string msg = "File too large " + fname;
+        const std::string msg = "Cant read file " + fname;
         dbg.txtnl(msg.c_str());
         fsize = 0;
         return arrsrc;
     }
 
     arrsrc.resize(fsize);
-    if (fsize > 0 && !f.read(arrsrc.data(), static_cast<int>(fsize), 0))
+    if (fsize > 0)
     {
-        arrsrc.clear();
-        const std::string msg = "Cant read file " + fname;
-        dbg.txtnl(msg.c_str());
-        fsize = 0;
-        return arrsrc;
+        in.read(reinterpret_cast<char *>(arrsrc.data()), static_cast<std::streamsize>(fsize));
+        if (!in || static_cast<size_t>(in.gcount()) != fsize)
+        {
+            arrsrc.clear();
+            const std::string msg = "Cant read file " + fname;
+            dbg.txtnl(msg.c_str());
+            fsize = 0;
+            return arrsrc;
+        }
     }
 
     strsha256 = VHSHA256::hashHex(arrsrc);

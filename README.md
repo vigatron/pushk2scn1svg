@@ -82,23 +82,26 @@ pushk2scn1svg -fname <source-file> [-wndsz <2..256>] [-outfolder <folder>]
 | `-wndsz` | `128` | Window size in bytes, range `2..256`. |
 | `-outfolder` | current directory | Folder for the three output SVG files. Created automatically (including nested paths) if missing. |
 
-`-fname` must point to an existing regular file. Out-of-range `-wndsz` values
-are rejected by the argument parser. `-outfolder` is created automatically,
-including missing parent directories; if creation fails, the tool exits with
-code `1`. Full CLI rules are in [`rules/CMDLine.md`](rules/CMDLine.md).
+`-fname` must point to an existing regular file no larger than 32 768 bytes
+(32 KiB); larger files are rejected before the output folder is created.
+`-wndsz` must be a plain decimal integer: `abc`, `2x` and `int` overflow are
+rejected, and values outside `2..256` are rejected by the argument parser.
+`-outfolder` is created automatically, including missing parent directories;
+if creation fails, the tool exits with code `1`. Full CLI rules are in
+[`rules/CMDLine.md`](rules/CMDLine.md).
 
 ```sh
-./build/pushk2scn1svg -fname data/backobjs.recombo.cells -wndsz 128
-./build/pushk2scn1svg -fname data/backobjs.recombo.cells -outfolder out
+./build/pushk2scn1svg -fname data/backobjs_recombo.cells -wndsz 128
+./build/pushk2scn1svg -fname data/backobjs_recombo.cells -outfolder out
 ```
 
 Output (written to the current working directory by default, or to
 `-outfolder`):
 
 ```text
-Data successfully saved to backobjs.recombo.cells_wnd.svg
-Data successfully saved to backobjs.recombo.cells_dna_abs.svg
-Data successfully saved to backobjs.recombo.cells_dna_rel.svg
+Data successfully saved to backobjs_recombo.cells_wnd.svg
+Data successfully saved to backobjs_recombo.cells_dna_abs.svg
+Data successfully saved to backobjs_recombo.cells_dna_rel.svg
 ```
 
 Exit code `0` means all three documents were produced. Phase failures return
@@ -156,13 +159,17 @@ first occurrence occupies only the left part of the row.
 
 The pipeline is short and single-threaded:
 
-1. **Parse CLI.** `VHAppCoreCfg::ParseArgs()` validates `-fname`, `-wndsz`
-   and `-outfolder`, checks that the input file exists, creates the output
-   folder if needed, and derives the three output names.
+1. **Parse CLI.** `VHAppCoreCfg::ParseArgs()` strictly validates `-wndsz`,
+   checks that `-fname` is a regular file of at most 32 768 bytes, validates
+   `-outfolder`, creates the output folder if needed, and derives the three
+   output names.
 2. **Load.** `VHAppCore::LoadSource()` delegates to
-   `VHSrcDataArray::LoadSource()`, which reads the whole file into
-   `std::vector<uint8_t>`, records the size and computes SHA-256.
-3. **Validate.** The buffer must be at least `-wndsz` bytes and at most 32 768 bytes (32 KiB).
+   `VHSrcDataArray::LoadSource()`, which reads the whole file in binary mode
+   into `std::vector<uint8_t>`, records the size and computes SHA-256. The
+   same `[wndsz, 32 768]` size window is enforced here again.
+3. **Validate.** `VHAppCore::LoadSource()` checks that the buffer is at least
+   `-wndsz` bytes; the upper bound of 32 768 bytes (32 KiB) was enforced
+   during loading.
 4. **Scan ABS.** `VHAppCore::ScanAbs()` runs the absolute scan: for each index
    `i`, `wscanabs[src[i]].putabs(i)`.
 5. **Scan REL.** `VHAppCore::ScanRel()` runs the relative scan:
@@ -195,9 +202,10 @@ main.cpp
  └─ VHAppCore                       src/mods/vhappcore
      ├─ VHAppCoreCfg                src/mods/vhappcorecfg
      │   ├─ VHArgsParser            extmods/vhlibargs
-     │   └─ VHFSYS                  extmods/vhlibfsys
+     │   ├─ VHFSYS                  extmods/vhlibfsys
+     │   └─ MAX_SOURCE_SIZE         src/mods/datasource
      ├─ VHSrcDataArray              src/mods/datasource
-     │   ├─ VHFile                  extmods/vhlibfsys
+     │   ├─ std::filesystem, std::ifstream
      │   └─ VHSHA256                src/mods/vhsha256
      ├─ VHWideRangeScan x2          src/mods/widerange
      │   └─ VHKeyFingerPrint x256
@@ -257,6 +265,7 @@ src/extmods/                read-only git submodules
 | Limit | Value | Where |
 |---|---|---|
 | Minimum source size | `-wndsz` bytes (default 128) | `VHSrcDataArray::LoadSource` |
+| Maximum source size | 32 768 bytes (32 KiB) | `VHSrcDataArray::MAX_SOURCE_SIZE` |
 | Minimum scan size | 2 bytes | `VHWideRangeScan::scanabs/scanrel` |
 | Maximum scan size | 32 768 bytes | `VHKeyFingerPrint::MAX_RANGE` |
 | Position type | `uint16_t` | `VHKeyFingerPrint` |
@@ -269,7 +278,9 @@ src/extmods/                read-only git submodules
 
 The maximum source size for processing is 32 768 bytes (32 KiB). The cap
 follows directly from storing positions as `uint16_t` bit indices. Larger
-files are rejected with `Wide Range (abs) analisys failed`.
+files are rejected by `VHAppCoreCfg::ParseArgs()` before the output folder
+is created (exit code `1`) and re-checked by `VHSrcDataArray::LoadSource()`
+(exit code `3`) in case the file grows between the two phases.
 
 ## 10. Known limitations
 
@@ -293,8 +304,6 @@ The code is a working prototype; the following items are known.
   reported by the application.
 - `VHSVG::begin()` does not clear appended content. Re-using a `VHSVG` instance
   (for example `VHDocDNA::svg`) would nest two documents.
-- `VHAppCoreCfg::subsize` and all `BlockProps` fields are uninitialised until
-  their first use.
 - `VHWideRangeScan::operator[]` performs no bounds check.
 - `main()` maps failures to phase-level exit codes (3..8), but the detailed
   code produced by `verrmsg()` is still discarded. Error text goes to
@@ -321,7 +330,7 @@ The code is a working prototype; the following items are known.
 - No unit tests, no golden-file/SVG regression tests, no CI configuration.
 - No compiler warning flags in `CMakeLists.txt`; a strict build with
   `-Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wunused -Wnon-virtual-dtor`
-  emits 79 warnings in first-party code, mostly
+  emits 78 warnings in first-party code, mostly
   `int`/`float` conversions in `vhsvgdraw.cpp`.
 - Doxygen coverage is partial: `BlockProps`, `Colors`, `VHWideRangeScan` and
   `VHKeyFingerPrint` methods have few or empty comments.
@@ -350,9 +359,11 @@ See [docs/preformance.md](docs/preformance.md) for details.
 
 | Message / symptom | Cause and fix |
 |---|---|
-| `Wide Range (abs) analisys failed` | Input is larger than 32 768 bytes — a hard limit of the bit-index representation. |
+| `Source file too large <path> (max 32768 bytes)` | Input exceeds the 32 KiB limit of the `uint16_t` bit-index representation. Slice the file or analyse a smaller region. |
+| `File too large <path> (max 32768 bytes)` | The file grew after `ParseArgs` and was rejected again by `VHSrcDataArray::LoadSource` (exit code `3`). |
+| `Invalid value for -wndsz: <value>` | `-wndsz` is not a plain decimal integer (`abc`, `2x`) or overflows `int`. |
 | `Minimal size less than N` | Source is smaller than `-wndsz` (default 128). Lower `-wndsz`, minimum 2. |
-| `Wrong input file <path>` | `-fname` does not exist or points to a directory. |
+| `Wrong input file <path>` | `-fname` does not exist or is not a regular file (directory, device, FIFO, ...). |
 | `Can't create output folder <path>` | `-outfolder` could not be created — check permissions or whether the path is occupied by a file. |
 | `key passed without param` | An option was supplied without a value, e.g. `-fname` as the last argument. |
 | No SVG although the source exists | Output goes to the CWD (or to `-outfolder`) — check the exit code and that the output folder is writable. |

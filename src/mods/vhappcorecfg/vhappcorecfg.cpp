@@ -1,14 +1,63 @@
 #include "vhappcorecfg/vhappcorecfg.hpp"
 
+#include <charconv>
+#include <exception>
 #include <filesystem>
+#include <string_view>
+#include <system_error>
 
 #include "app_version.hpp"
 #include "argsparser.hpp"
-#include "vhfile.hpp"
+#include "datasource/vhsrcdataarray.hpp"
 #include "vhfsys.hpp"
 
 
 using namespace VHArgsParser;
+
+/**
+ * @brief Checks that a token is a plain decimal integer.
+ *
+ * The vhlibargs parser uses std::stoi(), which accepts trailing garbage
+ * ("2x" becomes 2) and throws on non-numeric input. This pre-check uses
+ * std::from_chars() so malformed values are rejected without exceptions.
+ *
+ * @param text Token to check.
+ * @return true if the whole token is a decimal integer.
+ */
+static bool IsStrictInteger(const std::string &text)
+{
+    if (text.empty())
+        return false;
+
+    int value = 0;
+    const char *begin = text.data();
+    const char *end = begin + text.size();
+    const std::from_chars_result res = std::from_chars(begin, end, value);
+    return res.ec == std::errc() && res.ptr == end;
+}
+
+/**
+ * @brief Validates the -wndsz value before the generic parser sees it.
+ *
+ * @param argc Number of command-line arguments.
+ * @param argv Command-line arguments.
+ * @param badvalue Receives the rejected token on failure.
+ * @return true if -wndsz is absent, has no value, or its value is a plain
+ * decimal integer; false otherwise.
+ */
+static bool ValidateWindowSize(int argc, char *argv[], std::string &badvalue)
+{
+    for (int i = 1; i + 1 < argc; ++i)
+    {
+        if (std::string_view(argv[i]) != "-wndsz")
+            continue;
+
+        badvalue = argv[i + 1];
+        return IsStrictInteger(badvalue);
+    }
+
+    return true;
+}
 
 /**
  * @brief Joins an output folder and an output file name.
@@ -71,7 +120,7 @@ verr VHAppCoreCfg::ParseArgs(int argc, char *argv[])
 
     std::vector<VHArgTypeBase> arrcmd;
 
-    arrcmd.push_back(VHArgTypeFileName("-fname", "", "Source file"));
+    arrcmd.push_back(VHArgTypeString("-fname", "", "Source file"));
     arrcmd.push_back(VHArgTypeInteger("-wndsz", "Window size", 128, 2, 256));
     arrcmd.push_back(VHArgTypeString("-outfolder", "", "Output Files folder"));
 
@@ -83,13 +132,30 @@ verr VHAppCoreCfg::ParseArgs(int argc, char *argv[])
         return verror(1);
     }
 
+    // std::stoi inside vhlibargs accepts trailing characters and throws on
+    // non-numeric input; validate the only integer option up front.
+    std::string badwndsz;
+    if (!ValidateWindowSize(argc, argv, badwndsz))
+    {
+        std::cout << "Invalid value for -wndsz: " << badwndsz
+                  << " (expected integer 2..256)" << std::endl;
+        return verror(1);
+    }
+
     // Wrong args or syntax error ?
-    if (vok != cmdline.ParseCommandLine(arrcmd, argc, argv))
+    try
+    {
+        if (vok != cmdline.ParseCommandLine(arrcmd, argc, argv))
+        {
+            return verrmsg(1, "Error parsing command line");
+        }
+    }
+    catch (const std::exception &)
     {
         return verrmsg(1, "Error parsing command line");
     }
 
-    std::string strfname = cmdline.GetFileName("-fname");
+    std::string strfname = cmdline.GetString("-fname");
 
     if (strfname.empty())
     {
@@ -98,10 +164,24 @@ verr VHAppCoreCfg::ParseArgs(int argc, char *argv[])
         return verror(1);
     }
 
-    //
-    if(!VHFSYS::FileExist(strfname))
+    // A source must be an existing regular file; directories, devices and
+    // other special files are rejected before any output folder is created.
+    std::error_code ec;
+    if (!std::filesystem::is_regular_file(strfname, ec) || ec)
     {
         return verrmsg(3, "Wrong input file " + strfname);
+    }
+
+    const std::uintmax_t srcsize = std::filesystem::file_size(strfname, ec);
+    if (ec)
+    {
+        return verrmsg(3, "Wrong input file " + strfname);
+    }
+
+    if (srcsize > VHSrcDataArray::MAX_SOURCE_SIZE)
+    {
+        return verrmsg(5, "Source file too large " + strfname + " (max " +
+            std::to_string(VHSrcDataArray::MAX_SOURCE_SIZE) + " bytes)");
     }
 
     std::string stroutfolder = cmdline.GetString("-outfolder");
@@ -114,13 +194,13 @@ verr VHAppCoreCfg::ParseArgs(int argc, char *argv[])
     fnameSource = strfname;
     dirOutput = stroutfolder;
 
-    std::string basefname = VHFSYS::ExtractFilename(strfname);
+    std::string basefname = std::filesystem::path(strfname).filename().string();
 
     fnameWND = MakeOutputPath(dirOutput, basefname + "_wnd.svg");
     fnameDNAAbs = MakeOutputPath(dirOutput, basefname + "_dna_abs.svg");
     fnameDNARel = MakeOutputPath(dirOutput, basefname + "_dna_rel.svg");
 
-    subsize = cmdline.GetInt("-wndsz");
+    subsize = static_cast<uint16_t>(cmdline.GetInt("-wndsz"));
 
     return vok;
 }

@@ -20,7 +20,7 @@
 ## Ответственность
 
 - Хранение конфигурации приложения (`appcfg` — см. `VHAppCoreCfg`).
-- Загрузка исходного файла в память (`LoadSource`, поле `datasource`) и проверка минимального размера.
+- Загрузка исходного файла в память (`LoadSource`, поле `datasource`) и проверка минимального и максимального размера.
 - Выполнение абсолютного (`ScanAbs`) и относительного (`ScanRel`) wide-range сканирований; `ScanAll` — удобная обёртка над обоими.
 - Генерация WND-документа (`GenerateWnd` через `VHDocWnd`) — требует только загруженных данных, без сканирований.
 - Генерация DNA-документов (`GenerateDNAAbs` / `GenerateDNARel` через `VHDocDNA`).
@@ -39,7 +39,7 @@
 
 | Сигнатура | Описание |
 |---|---|
-| `verr LoadSource()` | Загружает исходный файл в `datasource` через `datasource.LoadSource(appcfg.fnameSource, appcfg.subsize)` (требуется предварительный вызов `appcfg.ParseArgs`). Проверяет размер загруженных данных (`>= appcfg.subsize`). Возвращает `vok`, `verror(3)` — файл не загружен или слишком мал. |
+| `verr LoadSource()` | Загружает исходный файл в `datasource` через `datasource.LoadSource(appcfg.fnameSource, appcfg.subsize)` (требуется предварительный вызов `appcfg.ParseArgs`). Проверяет размер загруженных данных (`>= appcfg.subsize`); верхняя граница (`MAX_SOURCE_SIZE` = 32 768 байт) проверяется внутри `VHSrcDataArray::LoadSource`. Возвращает `vok`, `verror(3)` — файл не загружен, слишком мал или слишком велик. |
 | `verr ScanAbs()` | Проверяет, что данные загружены, и выполняет `wscanabs.scanabs(datasource.data())`. Возвращает `vok`, `verrmsg(4, "Source data is not loaded")` или `verrmsg(4, "Wide Range (abs) analisys failed")`. |
 | `verr ScanRel()` | Проверяет, что данные загружены, и выполняет `wscanrel.scanrel(datasource.data())`. Возвращает `vok`, `verrmsg(5, "Source data is not loaded")` или `verrmsg(5, "Wide Range (rel) analisys failed")`. |
 | `verr ScanAll()` | Удобная обёртка: вызывает `ScanAbs()`, затем `ScanRel()`. Если ABS-скан не удался, REL не запускается. Возвращает первый полученный код ошибки. |

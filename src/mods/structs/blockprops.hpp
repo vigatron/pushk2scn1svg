@@ -2,12 +2,24 @@
 
 #include "vhplatform.hpp"
 
+/**
+ * @brief Statistics of one fixed-size block of source bytes.
+ *
+ * The default constructor zeroes every field so an object that has not
+ * been scanned yet never exposes indeterminate values.
+ */
 class BlockProps
 {
 
 public:
-    BlockProps() {}
+    BlockProps() = default;
 
+    /**
+     * @brief Scans a block and fills the statistics.
+     *
+     * @param ptr Pointer to the first byte of the block.
+     * @param subsize Number of bytes in the block.
+     */
     void scan(const uint8_t *ptr, int subsize)
     {
 
@@ -40,9 +52,9 @@ public:
         _max = max;
     }
 
-    uint8_t _min;
-    uint8_t _max;
+    uint8_t _min = 0;
+    uint8_t _max = 0;
 
-    uint8_t spc[256];
-    uint8_t wght;
+    uint8_t spc[256] = {};
+    uint8_t wght = 0;
 };
