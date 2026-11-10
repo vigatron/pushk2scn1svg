@@ -1,7 +1,7 @@
 #pragma once
 
 #include "vhplatform.hpp"
-#include "structs/blockprops.hpp"
+#include "vhblockstat/vhblockstat.hpp"
 #include "vhsvgdraw/vhsvgdraw.hpp"
 #include "vhsvg.hpp"
 
@@ -76,5 +76,5 @@ private:
      * @param subsize Block size in bytes; must be greater than 0.
      * @return Vector of scanned block properties (may be empty if subsize is 0 or data is smaller than one block).
      */
-    static std::vector<BlockProps> GenSamplesArray(const std::vector<uint8_t> &arrsrc, size_t subsize);
+    static std::vector<VHBlockStat> GenSamplesArray(const std::vector<uint8_t> &arrsrc, size_t subsize);
 };

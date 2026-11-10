@@ -1,6 +1,6 @@
 #pragma once
 
-#include "structs/blockprops.hpp"
+#include "vhblockstat/vhblockstat.hpp"
 #include "vhsvg.hpp"
 
 #include <cstdint>
@@ -26,7 +26,7 @@ public:
     static void DrawSection(
         VHSVG &svg,
         const VHSVGRect &rect,
-        const std::vector<BlockProps> &arr,
+        const std::vector<VHBlockStat> &arr,
         int blksize,
         int ws);
 
@@ -34,7 +34,7 @@ public:
     static void DrawDensity(
         VHSVG &svg,
         const VHSVGRect &rect,
-        const std::vector<BlockProps> &arr,
+        const std::vector<VHBlockStat> &arr,
         int blksize,
         int ws);
 
@@ -47,7 +47,7 @@ private:
         VHSVG &svg,
         int idx,
         const VHSVGRect &rect,
-        const std::vector<BlockProps> &arr);
+        const std::vector<VHBlockStat> &arr);
     static void draw_col_bck(VHSVG &svg, int idx, const VHSVGRect &rect);
 
     // Density helpers
@@ -61,7 +61,7 @@ private:
         VHSVG &svg,
         int idx,
         const VHSVGRect &rect,
-        const std::vector<BlockProps> &arr);
+        const std::vector<VHBlockStat> &arr);
 
     // Types helpers
     static std::string gettype(int i, int j);

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "vhplatform.hpp"
+#include <vector>
 
 /**
  * @brief Statistics of one fixed-size block of source bytes.
@@ -8,19 +9,18 @@
  * The default constructor zeroes every field so an object that has not
  * been scanned yet never exposes indeterminate values.
  */
-class BlockProps
+class VHBlockStat
 {
 
 public:
-    BlockProps() = default;
+    VHBlockStat() = default;
 
     /**
      * @brief Scans a block and fills the statistics.
      *
-     * @param ptr Pointer to the first byte of the block.
-     * @param subsize Number of bytes in the block.
+     * @param arr Block bytes to analyze.
      */
-    void scan(const uint8_t *ptr, int subsize)
+    void scan(const std::vector<uint8_t> &arr)
     {
 
         int min = 256;
@@ -28,16 +28,15 @@ public:
 
         memset(spc, 0, sizeof(uint8_t) * 256);
 
-        for (int i = 0; i < subsize; i++)
+        for (int i = 0; i < static_cast<int>(arr.size()); i++)
         {
-            uint8_t v = *ptr;
+            uint8_t v = arr[i];
             if (v > max)
                 max = v;
             if (v < min)
                 min = v;
             if (spc[v] < 255)
                 spc[v]++;
-            ptr++;
         }
 
         wght = 0;

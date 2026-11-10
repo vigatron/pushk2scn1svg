@@ -7,7 +7,7 @@
 | `VHSrcDataArray` | `datasource` | Whole-file load, SHA-256, size. |
 | `VHWideRangeScan` | `widerange` | 256 fingerprints plus `scanabs` / `scanrel`. |
 | `VHKeyFingerPrint` | `widerange` | Bit set of positions for one byte value. |
-| `BlockProps` | `structs` | Per-block min/max/histogram/width. |
+| `VHBlockStat` | `vhblockstat` | Per-block min/max/histogram/width. |
 | `VHDocWnd` | `generatewnd` | Builds the window sheet. |
 | `VHDocDNA` | `generatedna` | Builds the DNA sheet. |
 | `VHSVGDraw` | `vhsvgdraw` | Stateless drawing helpers for window sheet elements (sections, density, scale, types). |

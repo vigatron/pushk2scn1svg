@@ -64,14 +64,14 @@ void VHSVGDraw::draw_column_spread(
     VHSVG &svg,
     int idx,
     const VHSVGRect &rect,
-    const std::vector<BlockProps> &arr)
+    const std::vector<VHBlockStat> &arr)
 {
     int ww = rect.width();
     int hh = rect.height();
     int sx = rect.startx();
     int ey = rect.endy();
 
-    const BlockProps &s = arr[idx];
+    const VHBlockStat &s = arr[idx];
 
     int gfx_hmin = s._min * hh / 255;
     int gfx_hmax = s._max * hh / 255;
@@ -97,7 +97,7 @@ void VHSVGDraw::draw_col_bck(VHSVG &svg, int idx, const VHSVGRect &rect)
 void VHSVGDraw::DrawSection(
     VHSVG &svg,
     const VHSVGRect &rect,
-    const std::vector<BlockProps> &arr,
+    const std::vector<VHBlockStat> &arr,
     int blksize,
     int ws)
 {
@@ -205,7 +205,7 @@ void VHSVGDraw::draw_column_mask(
     VHSVG &svg,
     int idx,
     const VHSVGRect &rect,
-    const std::vector<BlockProps> &arr)
+    const std::vector<VHBlockStat> &arr)
 {
 
     int ww = rect.width();
@@ -213,7 +213,7 @@ void VHSVGDraw::draw_column_mask(
     int sx = rect.startx();
     int ey = rect.endy();
 
-    const BlockProps &blk = arr[idx];
+    const VHBlockStat &blk = arr[idx];
 
     int gfx_hmin = blk._min * hh / 255;
     int gfx_hmax = blk._max * hh / 255;
@@ -248,7 +248,7 @@ void VHSVGDraw::draw_column_mask(
 void VHSVGDraw::DrawDensity(
     VHSVG &svg,
     const VHSVGRect &rect,
-    const std::vector<BlockProps> &arr,
+    const std::vector<VHBlockStat> &arr,
     int blksize,
     int ws)
 {

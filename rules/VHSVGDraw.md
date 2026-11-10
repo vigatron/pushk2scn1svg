@@ -26,8 +26,8 @@
 | `static void DrawCenterLine(VHSVG &svg, const VHSVGRect &rect)` | Рисует центральную и четвертные горизонтальные направляющие. |
 | `static void DrawShadowBox(VHSVG &svg, const VHSVGRect &rect)` | Рисует прямоугольник с тенью. |
 | `static void DrawScale(VHSVG &svg, const VHSVGRect &rect, int size)` | Рисует шкалу (полосы деления и подписи) в заданной области. |
-| `static void DrawSection(VHSVG &svg, const VHSVGRect &rect, const std::vector<BlockProps> &arr, int blksize, int ws)` | Рисует секционный вид: фон колонок, min/max-размах и «ширину» (`wght`), рамки, подпись окна, шкалу. |
-| `static void DrawDensity(VHSVG &svg, const VHSVGRect &rect, const std::vector<BlockProps> &arr, int blksize, int ws)` | Рисует плотностной вид: диапазон блока и отметки значений гистограммы, направляющие, дельта-полосы, шкалу. |
+| `static void DrawSection(VHSVG &svg, const VHSVGRect &rect, const std::vector<VHBlockStat> &arr, int blksize, int ws)` | Рисует секционный вид: фон колонок, min/max-размах и «ширину» (`wght`), рамки, подпись окна, шкалу. |
+| `static void DrawDensity(VHSVG &svg, const VHSVGRect &rect, const std::vector<VHBlockStat> &arr, int blksize, int ws)` | Рисует плотностной вид: диапазон блока и отметки значений гистограммы, направляющие, дельта-полосы, шкалу. |
 | `static void DrawTypes(VHSVG &svg, const VHSVGRect &rect)` | Рисует легенду типов данных (сетка 7×4, 28 наименований) с выделением выбранного элемента. |
 
 ## Внутренние (private static) элементы
@@ -39,7 +39,7 @@
 ## Связи / Зависимости
 
 - **Входящие:** `VHDocWnd` (`src/mods/generatewnd/`) — вызывает `DrawShadowBox`, `DrawSection`, `DrawDensity`, `DrawTypes`.
-- **Исходящие:** `VHSVG`/`VHSVGRect` (`vhlibsvg`, extmod), `BlockProps` (`src/mods/structs/`), `Colors` (`src/mods/colors/`), утилиты `VHSVGTextTools::szhex()` (`vhlibsvg`), `global.hpp`.
+- **Исходящие:** `VHSVG`/`VHSVGRect` (`vhlibsvg`, extmod), `VHBlockStat` (`src/mods/vhblockstat/`), `Colors` (`src/mods/colors/`), утилиты `VHSVGTextTools::szhex()` (`vhlibsvg`), `global.hpp`.
 
 ## Ограничения / Замечания
 

@@ -69,7 +69,7 @@ void VHDocWnd::Draw2X4Content(VHSVG &svg, const std::vector<uint8_t> &arrsrc, co
     for (int j = 0; j < kGridRows; ++j)
     {
         const size_t chunksize = kBaseChunkSize << static_cast<size_t>(j);
-        const std::vector<BlockProps> arrprops = GenSamplesArray(arrsrc, chunksize);
+        const std::vector<VHBlockStat> arrprops = GenSamplesArray(arrsrc, chunksize);
 
         for (int i = 0; i < kGridCols; ++i)
         {
@@ -93,9 +93,9 @@ void VHDocWnd::Draw2X4Content(VHSVG &svg, const std::vector<uint8_t> &arrsrc, co
  * @param subsize Block size in bytes; must be greater than 0.
  * @return Vector of scanned block properties (may be empty if subsize is 0 or data is smaller than one block).
  */
-std::vector<BlockProps> VHDocWnd::GenSamplesArray(const std::vector<uint8_t> &arrsrc, size_t subsize)
+std::vector<VHBlockStat> VHDocWnd::GenSamplesArray(const std::vector<uint8_t> &arrsrc, size_t subsize)
 {
-    std::vector<BlockProps> r;
+    std::vector<VHBlockStat> r;
     if (subsize == 0)
         return r;
 
@@ -104,8 +104,9 @@ std::vector<BlockProps> VHDocWnd::GenSamplesArray(const std::vector<uint8_t> &ar
 
     for (size_t i = 0; i < blkcnt; ++i)
     {
-        BlockProps blk;
-        blk.scan(arrsrc.data() + i * subsize, static_cast<int>(subsize));
+        VHBlockStat blk;
+        std::vector<uint8_t> blkdata(arrsrc.begin() + i * subsize, arrsrc.begin() + (i + 1) * subsize);
+        blk.scan(blkdata);
         r.push_back(std::move(blk));
     }
 

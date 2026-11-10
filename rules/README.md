@@ -7,7 +7,7 @@
 | [VHAppCore.md](VHAppCore.md) | `VHAppCore` | `src/mods/vhappcore/` | Состояние анализа: загрузка, сканирования, генерация SVG. Конфиг — в поле `appcfg`. |
 | [VHAppCoreCfg.md](VHAppCoreCfg.md) | `VHAppCoreCfg` | `src/mods/vhappcorecfg/` | Конфигурация приложения (имена файлов, `dirOutput`, `subsize`); требования к CLI — в `CMDLine.md`. |
 | [VHSrcDataArray.md](VHSrcDataArray.md) | `VHSrcDataArray` | `src/mods/datasource/` | Загрузка исходного файла в память, SHA-256, размер файла (не более 32 КиБ). |
-| [BlockProps.md](BlockProps.md) | `BlockProps` | `src/mods/structs/` | Статистика одного блока данных: min/max/уникальные значения, гистограмма. |
+| [VHBlockStat.md](VHBlockStat.md) | `VHBlockStat` | `src/mods/vhblockstat/` | Статистика одного блока данных: min/max/уникальные значения, гистограмма. |
 | [VHWideRangeScan.md](VHWideRangeScan.md) | `VHWideRangeScan` | `src/mods/widerange/` | Сканирование массива, отпечатки позиций 256 значений (abs/rel). |
 | [VHKeyFingerPrint.md](VHKeyFingerPrint.md) | `VHKeyFingerPrint` | `src/mods/widerange/` | Битовый отпечаток позиций одного значения байта. |
 | [VHLogger.md](VHLogger.md) | `VHLogger` | `src/mods/vhlogger/` | Глобальный отладочный вывод (текст, числа, hex-дампы памяти). |
@@ -36,7 +36,7 @@ main.cpp
      │   └─ VHKeyFingerPrint (×256)
      └─ VHDocWnd / VHDocDNA                ← generatewnd / generatedna
  └─ VHDocWnd                       ← generatewnd
-     ├─ BlockProps                 ← structs
+     ├─ VHBlockStat                 ← vhblockstat
      ├─ VHSVGDraw                  ← vhsvgdraw
      └─ VHSvgTools                 ← svgtools
  └─ VHDocDNA                       ← generatedna

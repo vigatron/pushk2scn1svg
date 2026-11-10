@@ -1,10 +1,10 @@
-# BlockProps
+# VHBlockStat
 
 ## Файл / Модуль
 
-- Заголовок: `src/mods/structs/blockprops.hpp`
+- Заголовок: `src/mods/vhblockstat/vhblockstat.hpp`
 - Реализация: полностью инлайн (метод `scan()` в заголовке)
-- Класс: `class BlockProps`
+- Класс: `class VHBlockStat`
 
 ## Назначение
 
@@ -15,7 +15,7 @@
 
 ## Ответственность
 
-- Сканирование блока байтов (`scan`) и вычисление статистики.
+- Сканирование блока байт (`scan`) и вычисление статистики.
 - Хранение гистограммы распределения значений 0..255.
 
 ## Поля / Данные
@@ -31,19 +31,19 @@
 
 | Сигнатура | Описание |
 |---|---|
-| `BlockProps()` | Конструктор по умолчанию; все поля инициализируются нулями (`_min = 0`, `_max = 0`, `spc[256] = {}`, `wght = 0`). |
-| `void scan(const uint8_t *ptr, int subsize)` | Проходит `subsize` байтов от `ptr`: обновляет `min`/`max`, заполняет `spc[]` (до 255 на значение), затем считает `wght` — количество ненулевых элементов `spc`. |
+| `VHBlockStat()` | Конструктор по умолчанию; все поля инициализируются нулями (`_min = 0`, `_max = 0`, `spc[256] = {}`, `wght = 0`). |
+| `void scan(const std::vector<uint8_t> &arr)` | Проходит по байтам блока из вектора `arr`: обновляет `min`/`max`, заполняет `spc[]` (до 255 на значение), затем считает `wght` — количество ненулевых элементов `spc`. |
 
 ## Связи / Зависимости
 
-- **Входящие:** `VHDocWnd::GenSamplesArray()` создаёт вектор `BlockProps` для каждого размера чанка; поля читаются в `VHSVGDraw` (`vhsvgdraw/vhsvgdraw.cpp`, методы Section/Density) и функции `DumpSamples()` (`global/global.cpp`).
-- **Исходящие:** `vhplatform.hpp` (для `memset`/`uint8_t`).
+- **Входящие:** `VHDocWnd::GenSamplesArray()` создаёт вектор `VHBlockStat` для каждого размера чанка; поля читаются в `VHSVGDraw` (`vhsvgdraw/vhsvgdraw.cpp`, методы Section/Density) и функции `DumpSamples()` (`global/global.cpp`).
+- **Исходящие:** `vhplatform.hpp` (для `memset`/`uint8_t`), `<vector>` (для передачи блока).
 
 ## Использование
 
 ```cpp
-BlockProps blk;
-blk.scan(arrsrc.data() + i * subsize, static_cast<int>(subsize));
+VHBlockStat blk;
+blk.scan(std::vector<uint8_t>(arrsrc.begin() + i * subsize, arrsrc.begin() + (i + 1) * subsize));
 // blk._min, blk._max, blk.wght, blk.spc[]
 ```
 
@@ -51,4 +51,4 @@ blk.scan(arrsrc.data() + i * subsize, static_cast<int>(subsize));
 
 - Поля `_min`, `_max`, `wght`, `spc` инициализируются нулями в конструкторе; статистически корректны только после вызова `scan()`.
 - `wght` — `uint8_t`, но максимальное количество уникальных значений 256: при блоке со всеми 256 значениями счётчик упрётся в защиту `wght < 255`.
-- `scan` не проверяет `ptr == nullptr` и `subsize <= 0`.
+- `scan` не проверяет `arr.empty()`.

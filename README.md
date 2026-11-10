@@ -179,7 +179,7 @@ The pipeline is short and single-threaded:
    `i - firstPositionOf(src[i])`, including offset 0 for the first occurrence.
    `ScanAll()` is a convenience wrapper for both scans.
 6. **Render window sheet.** For each block size the buffer is cut into blocks,
-   each block is reduced to `BlockProps`, and both columns are drawn.
+   each block is reduced to `VHBlockStat`, and both columns are drawn.
 7. **Render DNA ABS / DNA REL.** One row per byte value; every set bit becomes
    a vertical line.
 8. **Save.** Each document is accumulated in memory and written in one pass
@@ -192,7 +192,7 @@ The pipeline is short and single-threaded:
 them, about 1 MB of heap per scan; the application keeps two scans alive, so
 roughly 2 MB of scan state in total.
 
-**Block statistics.** `BlockProps::scan()` walks a block once and computes
+**Block statistics.** `VHBlockStat::scan()` walks a block once and computes
 `_min`, `_max`, a histogram `spc[256]` saturated at 255 and `wght` — the
 number of distinct values (capped at 255). Cost is linear in block size, so
 scanning the file at four block sizes costs about four linear passes.
@@ -215,7 +215,7 @@ main.cpp
      ├─ VHWideRangeScan x2          src/mods/widerange
      │   └─ VHKeyFingerPrint x256
      ├─ VHDocWnd                    src/mods/generatewnd
-     │   ├─ BlockProps              src/mods/structs
+     │   ├─ VHBlockStat              src/mods/vhblockstat
      │   ├─ VHSVGDraw               src/mods/vhsvgdraw
      │   ├─ Colors                  src/mods/colors
      │   └─ VHSvgTools              src/mods/svgtools
@@ -253,7 +253,7 @@ src/mods/                   first-party modules
   vhappcorecfg/             CLI configuration
   datasource/               source buffer, SHA-256, size
   widerange/                fingerprints and scans
-  structs/                  BlockProps
+  vhblockstat/               VHBlockStat
   generatewnd/              window sheet generator
   generatedna/              DNA sheet generator
   vhsvgdraw/                drawing helpers for window sheet
@@ -340,10 +340,10 @@ The code is a working prototype; the following items are known.
   `-Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wunused -Wnon-virtual-dtor`
   emits 76 warnings in first-party code, mostly
   `int`/`float` conversions in `vhsvgdraw.cpp`.
-- Doxygen coverage is partial: `BlockProps`, `Colors`, `VHWideRangeScan` and
+- Doxygen coverage is partial: `VHBlockStat`, `Colors`, `VHWideRangeScan` and
   `VHKeyFingerPrint` methods have few or empty comments.
 - The per-class folder rule from `AGENTS.md` is not followed by `datasource`,
-  `structs`, `widerange`, `generatewnd` and `generatedna`; `colors`,
+  `widerange`, `generatewnd` and `generatedna`; `colors`,
   `vhsvgdraw` and `svgtools` already follow it.
 - `tmp/` still contains early drafts that duplicate submodule headers.
 
@@ -400,7 +400,7 @@ See [docs/preformance.md](docs/preformance.md) for details.
 the positions where they occur. *Fingerprint* — the bit set plus first/last
 position of one byte value. *DNA map* — the 256-row visualisation of all
 fingerprints. *ABS / REL* — offsets from the file start / from the first
-occurrence. *Window* — a 64..512 byte slice reduced to `BlockProps`.
+occurrence. *Window* — a 64..512 byte slice reduced to `VHBlockStat`.
 
 ---
 
