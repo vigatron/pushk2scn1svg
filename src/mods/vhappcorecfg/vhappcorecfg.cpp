@@ -2,6 +2,7 @@
 
 #include <filesystem>
 
+#include "app_version.hpp"
 #include "argsparser.hpp"
 #include "vhfile.hpp"
 #include "vhfsys.hpp"
@@ -65,8 +66,8 @@ verr VHAppCoreCfg::ParseArgs(int argc, char *argv[])
 
     VHArgsParser::VHCmdLineParser cmdline;
 
-    cmdline.setAppName("vhpackv81scan");
-    cmdline.setAppDesc("PUSHK scan filter tool. V0.1.0");
+    cmdline.setAppName("pushk2scn1svg");
+    cmdline.setAppDesc(std::string("pushk2scn1svg scan filter tool. V") + APP_VERSION);
 
     std::vector<VHArgTypeBase> arrcmd;
 

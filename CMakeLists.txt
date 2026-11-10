@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(vhpackv81scan VERSION 0.1.0 LANGUAGES CXX)
+project(pushk2scn1svg VERSION 0.1.0 LANGUAGES CXX)
 
 # set(CMAKE_BUILD_TYPE "Release")
 # set(CMAKE_BUILD_TYPE "MinSizeRel")
@@ -22,9 +22,14 @@ add_subdirectory(src/extmods/vhlibfsys)
 # Подключаем папку с субмодулем
 add_subdirectory(src/extmods/vhlibsvg)
 
+configure_file(
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/mods/vhappcorecfg/app_version.hpp.in
+    ${CMAKE_CURRENT_BINARY_DIR}/generated/app_version.hpp
+    @ONLY
+)
 
 #
-add_executable(vhpackv81scan
+add_executable(pushk2scn1svg
     src/main.cpp
 
     src/mods/vhlogger/vhlogger.cpp
@@ -66,6 +71,10 @@ target_include_directories(${PROJECT_NAME} PUBLIC
     src/mods/vhsha256
 
     src/extmods
+)
+
+target_include_directories(${PROJECT_NAME} PRIVATE
+    ${CMAKE_CURRENT_BINARY_DIR}/generated
 )
 
 # Defines

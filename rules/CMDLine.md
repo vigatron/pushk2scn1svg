@@ -16,7 +16,7 @@
 ## Синтаксис
 
 ```text
-vhpackv81scan -fname <source-file> [-wndsz <2..256>] [-outfolder <folder>]
+pushk2scn1svg -fname <source-file> [-wndsz <2..256>] [-outfolder <folder>]
 ```
 
 Параметры передаются парами `-ключ значение`. Значение должно идти
@@ -31,8 +31,8 @@ vhpackv81scan -fname <source-file> [-wndsz <2..256>] [-outfolder <folder>]
 | `-wndsz` | `VHArgTypeInteger` | нет | `128`, диапазон `2..256` | `Window size` | `subsize` |
 | `-outfolder` | `VHArgTypeString` | нет | пусто = текущая рабочая папка | `Output Files folder` | `dirOutput` |
 
-Имя приложения в usage: `vhpackv81scan`; описание:
-`PUSHK scan filter tool. V0.1.0`.
+Имя приложения в usage: `pushk2scn1svg`; описание:
+`pushk2scn1svg scan filter tool. V0.1.0`.
 
 ### `-fname`
 
@@ -115,13 +115,13 @@ fnameDNARel = <out>_dna_rel.svg
 
 ```sh
 # Все три SVG в текущую рабочую папку (по умолчанию)
-./build/vhpackv81scan -fname data/backobjs.recombo.cells
+./build/pushk2scn1svg -fname data/backobjs.recombo.cells
 
 # Другое окно сканирования
-./build/vhpackv81scan -fname data/backobjs.recombo.cells -wndsz 64
+./build/pushk2scn1svg -fname data/backobjs.recombo.cells -wndsz 64
 
 # Выходные файлы в отдельную существующую папку
-./build/vhpackv81scan -fname data/backobjs.recombo.cells -outfolder out
+./build/pushk2scn1svg -fname data/backobjs.recombo.cells -outfolder out
 ```
 
 ## Связь с классами и `main`

@@ -1,8 +1,8 @@
-# vhpackv81scan
+# pushk2scn1svg
 
 **Binary structure scanner that renders SVG "DNA" fingerprints and windowed byte-statistics reports.**
 
-`vhpackv81scan` reads a raw binary file (sprite sheets, tile cells, ROM dumps,
+`pushk2scn1svg` reads a raw binary file (sprite sheets, tile cells, ROM dumps,
 packed blobs — anything) and produces three self-contained SVG documents that
 make the internal structure of the bytes visible to the human eye.
 
@@ -39,13 +39,13 @@ quick visual check of a packing or compression step.
 Requirements: a C++17 compiler, CMake >= 3.16, `git`.
 
 ```sh
-git clone --recurse-submodules <repo-url> vhpack81scansvg
-cd vhpack81scansvg
+git clone --recurse-submodules <repo-url> pushk2scn1svg
+cd pushk2scn1svg
 cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build -j
 ```
 
-The executable is `build/vhpackv81scan`. If submodules were not cloned:
+The executable is `build/pushk2scn1svg`. If submodules were not cloned:
 
 ```sh
 git submodule update --init --recursive
@@ -62,7 +62,7 @@ Notes:
 ## 3. Usage
 
 ```text
-vhpackv81scan -fname <source-file> [-wndsz <2..256>] [-outfolder <folder>]
+pushk2scn1svg -fname <source-file> [-wndsz <2..256>] [-outfolder <folder>]
 ```
 
 | Option | Default | Meaning |
@@ -77,8 +77,8 @@ including missing parent directories; if creation fails, the tool exits with
 code `1`. Full CLI rules are in [`rules/CMDLine.md`](rules/CMDLine.md).
 
 ```sh
-./build/vhpackv81scan -fname data/backobjs.recombo.cells -wndsz 128
-./build/vhpackv81scan -fname data/backobjs.recombo.cells -outfolder out
+./build/pushk2scn1svg -fname data/backobjs.recombo.cells -wndsz 128
+./build/pushk2scn1svg -fname data/backobjs.recombo.cells -outfolder out
 ```
 
 Output (written to the current working directory by default, or to
