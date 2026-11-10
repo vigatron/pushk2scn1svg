@@ -1,5 +1,6 @@
 #include "generatewnd.hpp"
 
+#include "colors/colors.hpp"
 #include "global.hpp"
 
 /**
@@ -42,7 +43,7 @@ verr VHDocWnd::GenerateDocument(
     VHSVG svg;
     svg.begin(rect_full_area.width(), rect_full_area.height());
 
-    svg.rect(0, 0, rect_full_area.width(), rect_full_area.height(), 0, "gray", "white");
+    svg.rect(0, 0, rect_full_area.width(), rect_full_area.height(), 0, Colors::clrline, Colors::clrpaper);
 
     Draw2X4Content(svg, arrsrc, rect_2X4);
     VHSVGDraw::DrawTypes(svg, rect_types);

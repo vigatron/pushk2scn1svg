@@ -7,11 +7,6 @@
 #include <string>
 #include <vector>
 
-namespace
-{
-uint32_t arrcolors[4] = {0xFFFFFF, 0x80E080, 0xFFFF00, 0xFF8080};
-} // namespace
-
 void VHSVGDraw::DrawCenterLine(VHSVG &svg, const VHSVGRect &rect)
 {
 
@@ -19,9 +14,9 @@ void VHSVGDraw::DrawCenterLine(VHSVG &svg, const VHSVGRect &rect)
     int ymidu = ymid1 - rect.height() / 4;
     int ymaxu = ymid1 + rect.height() / 4;
 
-    svg.line(rect.startx(), ymid1, rect.endx(), ymid1, 1, "gray", "10,10", "0.40");
-    svg.line(rect.startx(), ymidu, rect.endx(), ymidu, 1, "gray", "4,4", "0.25");
-    svg.line(rect.startx(), ymaxu, rect.endx(), ymaxu, 1, "gray", "4,4", "0.25");
+    svg.line(rect.startx(), ymid1, rect.endx(), ymid1, 1, Colors::clrline, "10,10", "0.40");
+    svg.line(rect.startx(), ymidu, rect.endx(), ymidu, 1, Colors::clrline, "4,4", "0.25");
+    svg.line(rect.startx(), ymaxu, rect.endx(), ymaxu, 1, Colors::clrline, "4,4", "0.25");
 }
 
 void VHSVGDraw::DrawShadowBox(VHSVG &svg, const VHSVGRect &rect)
@@ -50,8 +45,8 @@ void VHSVGDraw::DrawScale(VHSVG &svg, const VHSVGRect &rect, int size)
         int dy = rect.height();
         VHSVGRect r(rect.startx(), rect.starty(), dx, rect.height() + 1);
 
-        std::string colf = "#AAAAAA";
-        std::string colb = (n++ & 1) ? "#D0D0D0" : "#E0E0E0";
+        std::string colf = Colors::clrframe;
+        std::string colb = (n++ & 1) ? Colors::clrscalealt1 : Colors::clrscalealt2;
         std::string val = std::to_string(s);
 
         svg.rect(r, 1, colf, colb);
@@ -135,10 +130,10 @@ void VHSVGDraw::DrawSection(
 
     DrawCenterLine(svg, rectgfx);
 
-    svg.rect(rectgfx, 1, "#AAAAAA");
-    svg.rect(rectdif, 1, "#AAAAAA");
-    svg.rect(rectscl, 1, "#AAAAAA");
-    svg.rect(rect, 1, "#CCCCCC");
+    svg.rect(rectgfx, 1, Colors::clrframe);
+    svg.rect(rectdif, 1, Colors::clrframe);
+    svg.rect(rectscl, 1, Colors::clrframe);
+    svg.rect(rect, 1, Colors::clrouterframe);
 
     std::string txt = "Размер окна: " + std::to_string(ws) + " байт";
     svg.text(rect.startx() + 14, rect.starty() - 20, txt, "verdana", 32, Colors::colortxtsh2);
@@ -193,8 +188,8 @@ std::string VHSVGDraw::lincolor(uint8_t vv)
     uint8_t dv = val % 86;
     uint8_t rf, gf, bf;
     uint8_t rt, gt, bt;
-    uint32_t rgbf = arrcolors[pos];
-    uint32_t rgbt = arrcolors[pos + 1];
+    uint32_t rgbf = Colors::colordensity[pos];
+    uint32_t rgbt = Colors::colordensity[pos + 1];
 
     rgb_to_compo(rgbf, &rf, &gf, &bf);
     rgb_to_compo(rgbt, &rt, &gt, &bt);
@@ -234,7 +229,7 @@ void VHSVGDraw::draw_column_mask(
         {
             int val = blk.spc[i];
             int posy = rect.endy() - i * hh / 255;
-            svg.line(rect.startx(), posy, rect.endx(), posy, 1, "red");
+            svg.line(rect.startx(), posy, rect.endx(), posy, 1, Colors::clrmarker);
         }
     }
 
@@ -359,7 +354,7 @@ void VHSVGDraw::DrawTypes(VHSVG &svg, const VHSVGRect &rect)
 
     DrawShadowBox(svg, rect);
 
-    svg.rect(rect, 1, "gray");
+    svg.rect(rect, 1, Colors::clrline);
 
     for (int j = 0; j < rows; j++)
     {
@@ -377,11 +372,11 @@ void VHSVGDraw::DrawTypes(VHSVG &svg, const VHSVGRect &rect)
             bool sel = (!i) && (j == 1);
 
             std::string strt = gettype(i, j);
-            std::string colr = sel ? "green" : Colors::colortxt;
+            std::string colr = sel ? Colors::clrseltext : Colors::colortxt;
 
             if (sel)
             {
-                svg.rect(x, y, ww, hh, 1, "none", "#D0FFD0");
+                svg.rect(x, y, ww, hh, 1, "none", Colors::clrselfill);
                 svg.text(x + 10, yt, "[ X ]", fnfam, fnsize, colr);
             }
             else

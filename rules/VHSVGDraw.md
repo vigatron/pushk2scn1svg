@@ -33,7 +33,7 @@
 ## Внутренние (private static) элементы
 
 - **Section:** `draw_column_spread`, `draw_col_bck`.
-- **Density:** `rgb_to_compo`, `scaleval`, `hexval`, `strrgb` (перегрузки), `lincolor`, `draw_column_mask`; локальная палитра `arrcolors` (`0xFFFFFF, 0x80E080, 0xFFFF00, 0xFF8080`) в реализации.
+- **Density:** `rgb_to_compo`, `scaleval`, `hexval`, `strrgb` (перегрузки), `lincolor`, `draw_column_mask`; палитра — `Colors::colordensity` (`0xFFFFFF, 0x80E080, 0xFFFF00, 0xFF8080`).
 - **Types:** `types()` (список имён типов), `gettype(i, j)`.
 
 ## Связи / Зависимости
@@ -45,4 +45,4 @@
 
 - Класс не хранит состояние; все методы — `static` (вариант A объединения бывшего модуля `draw/`).
 - Поведение перенесено из прежних свободных функций без изменения алгоритмов; известные особенности рендеринга (параметры `blksize`/`ws` для шкалы и подписи, использование гистограммы в Density, порядок индексации типов 7×4, шрифты `verdana`/`noto`) сохранены и отслеживаются в [README.md](../README.md) (§10, §14).
-- Палитра Density (`arrcolors`/`lincolor`) независима от класса `Colors` (две палитры).
+- Палитра Density хранится в классе `Colors` (`colordensity`) и используется в `lincolor()`; независимых палитр больше нет.
