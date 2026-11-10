@@ -31,19 +31,15 @@ source buffer, in two coordinate spaces:
 - **REL** — offsets counted from the first occurrence of the same value.
 
 Positions are stored as one bit set per value (32 768 positions max) and
-rendered as one horizontal "chromosome" row per byte value. Repetition,
-periodic tables, padding, compressed versus uncompressed regions and small
-numeric ranges become visible as texture.
+rendered as one horizontal "chromosome" row per byte value.
 
 In addition a *window sheet* is produced: the data is split into blocks of
 64, 128, 256 and 512 bytes, and every block is reduced to a few statistics
-(min, max, range, number of distinct values, histogram). The sheet has one row
-per block size with a section view and a density view side by side.
+(min, max, range, number of distinct values, histogram).
 
 Typical uses: inspecting tile/sprite data (`data/*.cells`) before writing a
 decoder; comparing two versions of the same asset (SHA-256 is printed on the
-DNA sheets); finding padding, alignment and repetition in packed formats; a
-quick visual check of a packing or compression step.
+DNA sheets); finding padding, alignment and repetition in packed formats.
 
 ## 2. Build
 
@@ -105,57 +101,30 @@ Data successfully saved to backobjs_recombo.cells_dna_rel.svg
 ```
 
 Exit code `0` means all three documents were produced. Phase failures return
-distinct non-zero codes: `1` command line, `3` source load, `4` ABS scan,
-`5` REL scan, `6` WND render, `7` DNA ABS render, `8` DNA REL render.
+distinct non-zero codes: `1` command line, `3` source load, `4` ABS scan, `5`
+REL scan, `6` WND render, `7` DNA ABS render, `8` DNA REL render.
 
-### What `-wndsz` controls today
-
-- It is the **minimum accepted source size**: `size < wndsz` is an error.
-- It is **not** used by the window sheet: block sizes are hard-coded to
-  `64, 128, 256, 512`.
-- It is bounded to `2..256`, so files smaller than `-wndsz` cannot be analysed
-  with default settings. Use `-wndsz 2` for tiny samples.
+`-wndsz` doubles as a minimum accepted source size and has no effect on the
+window sheets: block sizes are hard-coded to `64, 128, 256, 512`.
 
 ## 4. Output documents
 
-All three files are plain SVG with absolute coordinates, no external assets and
-no embedded fonts. User-visible strings (source file name and captions) are
-XML-escaped before insertion, so names containing `&`, `<`, `>` or quotes
+All three files are plain SVG with absolute coordinates, no external assets
+and no embedded fonts. User-visible strings (source file name and captions)
+are XML-escaped before insertion, so names containing `&`, `<`, `>` or quotes
 produce valid XML.
 
-### 4.1 `<base>_wnd.svg` — window sheet
+- `<base>_wnd.svg` — window sheet: canvas 3200 x 2400 px, 100 px border, 2 x 4
+  grid of block-size rows (left column: Section view, right column: Density
+  view), data-type legend in the footer (7 columns x 4 rows, 28 type names).
+- `<base>_dna_abs.svg` — absolute DNA map: canvas 2800 x 2600 px, 256 rows (one
+  per byte value), each recorded position drawn as a 1 px vertical line at
+  `pos * innerWidth / fileSize`.
+- `<base>_dna_rel.svg` — relative DNA map: same layout, positions are offsets
+  from the first occurrence of the same value (first occurrence at offset 0).
 
-Canvas 3200 x 2400 px, 100 px border. Between a 200 px empty header and a
-200 px footer sits a 2 x 4 grid; each cell has 64 px inner padding and a shadow
-box. Rows use block sizes 64, 128, 256 and 512 bytes; the left column is a
-Section view, the right column a Density view. A cell is split vertically into
-graphics (80 %), delta strip (10 %) and scale strip (10 %). One horizontal band
-exists per block of the given size, so a 16 384-byte file yields 256 bands on row 0
-and 32 bands on row 3.
-
-The footer contains the data-type legend: 7 columns x 4 rows, 28 type names
-(8-bit, 16-bit BE/LE, 32-bit, float16/32/64, packed 5:6:5 and 4:4:4:4 layouts),
-with the selected type highlighted as `[ X ]`. The header area is reserved but
-empty: the sheet carries no title, file name or hash.
-
-### 4.2 `<base>_dna_abs.svg` — absolute DNA map
-
-Canvas 2800 x 2600 px, 240 x 200 px margins. The body holds 256 rows, one per
-byte value, each 6 px high with a 1 px gap, labelled `#0` .. `#255`.
-
-Every recorded position is drawn as a 1 px vertical line at
-`pos * innerWidth / fileSize`, so each row spans the whole file. Line colour
-alternates every 2 px to make density visible.
-
-Footer fields: source file name, size in bytes, SHA-256 (lower-case hex, 64
-characters) and local date/time in `%d-%b-%Y %H:%M` format.
-
-### 4.3 `<base>_dna_rel.svg` — relative DNA map
-
-Same layout, but positions are offsets from the first occurrence of the same
-byte value (the first occurrence itself is at offset 0). Both maps share the
-same horizontal scale (fraction of the file size), so a REL row with a late
-first occurrence occupies only the left part of the row.
+DNA sheet footers carry the source file name, size in bytes, SHA-256 (lower-case
+hex, 64 characters) and local date/time in `%d-%b-%Y %H:%M` format.
 
 ## 5. How it works
 
@@ -170,22 +139,22 @@ The pipeline is short and single-threaded:
    into `std::vector<uint8_t>`, records the size and computes SHA-256. The
    same `[wndsz, 32 768]` size window is enforced here again.
 3. **Validate.** `VHAppCore::LoadSource()` checks that the buffer is at least
-   `-wndsz` bytes; the upper bound of 32 768 bytes (32 KiB) was enforced
-   during loading.
+   `-wndsz` bytes; the upper bound of 32 768 bytes (32 KiB) was enforced during
+   loading.
 4. **Scan ABS.** `VHAppCore::ScanAbs()` runs the absolute scan: for each index
    `i`, `wscanabs[src[i]].putabs(i)`.
 5. **Scan REL.** `VHAppCore::ScanRel()` runs the relative scan:
-   `wscanrel[src[i]].putrel(i)` marks
-   `i - firstPositionOf(src[i])`, including offset 0 for the first occurrence.
-   `ScanAll()` is a convenience wrapper for both scans.
+   `wscanrel[src[i]].putrel(i)` marks `i - firstPositionOf(src[i])`, including
+   offset 0 for the first occurrence. `ScanAll()` is a convenience wrapper for
+   both scans.
 6. **Render window sheet.** For each block size the buffer is cut into blocks,
    each block is reduced to `VHBlockStat`, and both columns are drawn.
 7. **Render DNA ABS / DNA REL.** One row per byte value; every set bit becomes
    a vertical line.
 8. **Save.** Each document is accumulated in memory and written in one pass
    through `VHSvgTools::Save()`, which checks that the output file exists and
-   ends with `</svg>`. Failed writes now produce exit codes `6`/`7`/`8`
-   instead of a silent success.
+   ends with `</svg>`. Failed writes now produce exit codes `6`/`7`/`8` instead
+   of a silent success.
 
 **Fingerprint storage.** `VHKeyFingerPrint` owns a 4096-byte bit set
 (`32 768 / 8`) plus first and last position. One `VHWideRangeScan` holds 256 of
@@ -193,9 +162,9 @@ them, about 1 MB of heap per scan; the application keeps two scans alive, so
 roughly 2 MB of scan state in total.
 
 **Block statistics.** `VHBlockStat::scan()` walks a block once and computes
-`_min`, `_max`, a histogram `spc[256]` saturated at 255 and `wght` — the
-number of distinct values (capped at 255). Cost is linear in block size, so
-scanning the file at four block sizes costs about four linear passes.
+`_min`, `_max`, a histogram `spc[256]` saturated at 255 and `wght` — the number
+of distinct values (capped at 255). Cost is linear in block size, so scanning
+the file at four block sizes costs about four linear passes.
 
 ## 6. Architecture
 
@@ -234,9 +203,16 @@ Layering rules: `datasource` and `widerange` know nothing about SVG;
 and the two generators do not know each other. Both use `VHSvgTools` for
 XML-safe text and verified saving; `vhappcore` knows all of them.
 
-## 7. Class reference
+## 7. Documentation
 
-See [class reference](docs/class_reference.md) for detailed class information.
+- [Class reference](docs/class_reference.md) — per-class responsibilities and
+  API.
+- [Performance](docs/performance.md) — measured wall time, memory and output
+  sizes.
+- [Data limits and invariants](docs/data_limits.md) — processing limits and
+  invariants.
+- [Known limitations](docs/known_limitations.md) — current known issues.
+- [Troubleshooting](docs/troubleshooting.md) — message / symptom table.
 
 ## 8. Repository layout
 
@@ -245,7 +221,7 @@ CMakeLists.txt              build definition
 README.md                   this file
 AGENTS.md                   rules for contributors / AI agents
 data/                       sample binary assets
-docs/                       extended description of README.md sections
+docs/                       deep-dive documentation
 rules/                      per-class requirement documents
 src/main.cpp                entry point
 src/mods/                   first-party modules
@@ -253,7 +229,7 @@ src/mods/                   first-party modules
   vhappcorecfg/             CLI configuration
   datasource/               source buffer, SHA-256, size
   widerange/                fingerprints and scans
-  vhblockstat/               VHBlockStat
+  vhblockstat/              VHBlockStat
   generatewnd/              window sheet generator
   generatedna/              DNA sheet generator
   vhsvgdraw/                drawing helpers for window sheet
@@ -268,90 +244,11 @@ src/extmods/                read-only git submodules
   vhlibsvg/                 VHSVG, VHSVGRect, string tools
 ```
 
-## 9. Data limits and invariants
+## 9. Performance
 
-| Limit | Value | Where |
-|---|---|---|
-| Minimum source size | `-wndsz` bytes (default 128) | `VHSrcDataArray::LoadSource` |
-| Maximum source size | 32 768 bytes (32 KiB) | `VHSrcDataArray::MAX_SOURCE_SIZE` |
-| Minimum scan size | 2 bytes | `VHWideRangeScan::scanabs/scanrel` |
-| Maximum scan size | 32 768 bytes | `VHKeyFingerPrint::MAX_RANGE` |
-| Position type | `uint16_t` | `VHKeyFingerPrint` |
-| Values tracked | 256 | `VHWideRangeScan::MAX_ELMS` |
-| Fingerprint memory | 4096 bytes each, ~1 MB per scan | `VHKeyFingerPrint` |
-| Window block sizes | 64, 128, 256, 512 bytes | `VHDocWnd::kBaseChunkSize` |
-| Window sheet canvas | 3200 x 2400 px | `VHDocWnd` |
-| DNA sheet canvas | 2800 x 2600 px | `VHDocDNA` |
-| DNA rows | 256 | `VHDocDNA::Gen256Stat` |
+See [Performance](docs/performance.md) for details.
 
-The maximum source size for processing is 32 768 bytes (32 KiB). The cap
-follows directly from storing positions as `uint16_t` bit indices. Larger
-files are rejected by `VHAppCoreCfg::ParseArgs()` before the output folder
-is created (exit code `1`) and re-checked by `VHSrcDataArray::LoadSource()`
-(exit code `3`) in case the file grows between the two phases.
-
-## 10. Known limitations
-
-The code is a working prototype; the following items are known.
-
-**Correctness**
-
-- `DrawSection` / `DrawDensity` receive the total file size as the scale value
-  while the caption prints the block size, so the scale labels (16384, 8192,
-  ...) do not match the "window size" text.
-- The density view draws a full-width line for every value present in a block
-  and ignores the histogram count, so it does not display density.
-- The section bar height uses `wght * height / 128` while `wght` can reach 255,
-  so the bar can exceed the cell.
-- `DrawTypes` indexes the type list with `i * 4 + j` over a 7 x 4 grid, which
-  transposes the intended row-major order.
-
-**Robustness**
-
-- `VHSVG::savetosvg()` returns `void` and prints its own success message; the
-  application can only verify the result afterwards via `VHSvgTools::Save()`
-  (file exists, is non-empty and ends with `</svg>`), not detect the exact
-  write error or suppress the library message.
-- `VHSVG::begin()` does not clear appended content. Re-using a `VHSVG` instance
-  (for example `VHDocDNA::svg`) would nest two documents.
-- `VHWideRangeScan::operator[]` performs no bounds check.
-- `main()` maps failures to phase-level exit codes (3..8), but the detailed
-  code produced by `verrmsg()` is still discarded. Error text goes to
-  `stdout`, not `stderr`.
-
-**Design / product**
-
-- `-wndsz` doubles as a minimum file size and has no effect on the window
-  sheets.
-- Reports are written to the current working directory by default, never next
-  to the source; use `-outfolder` to select another folder (created if missing).
-- Every mark in the DNA map produces its own `<line>` element: a 16 384-byte
-  input already produces a 1.3 MB document; identical x positions are not
-  merged.
-- The window sheet header is empty; source name, size and hash are not printed.
-- The types legend requests the `noto` font family, which may be unavailable
-  and fall back to a default font. The only localised string is
-  `"Размер окна: N байт"` in `src/mods/vhsvgdraw/vhsvgdraw.cpp`.
-
-**Quality gates**
-
-- No unit tests, no golden-file/SVG regression tests, no CI configuration.
-- No compiler warning flags in `CMakeLists.txt`; a strict build with
-  `-Wall -Wextra -Wpedantic -Wconversion -Wshadow -Wunused -Wnon-virtual-dtor`
-  emits 76 warnings in first-party code, mostly
-  `int`/`float` conversions in `vhsvgdraw.cpp`.
-- Doxygen coverage is partial: `VHBlockStat`, `Colors`, `VHWideRangeScan` and
-  `VHKeyFingerPrint` methods have few or empty comments.
-- The per-class folder rule from `AGENTS.md` is not followed by `datasource`,
-  `widerange`, `generatewnd` and `generatedna`; `colors`,
-  `vhsvgdraw` and `svgtools` already follow it.
-- `tmp/` still contains early drafts that duplicate submodule headers.
-
-## 11. Performance
-
-See [docs/preformance.md](docs/preformance.md) for details.
-
-## 12. Conventions
+## 10. Conventions
 
 - C++17, `#pragma once`, no exceptions thrown explicitly in project code;
   errors use `verr` / `vok` / `verror()` / `verrmsg()` from `vhlibplatform`.
@@ -363,53 +260,8 @@ See [docs/preformance.md](docs/preformance.md) for details.
   edited, only read for API reference. `rules/` is the requirement source of
   truth; code changes must keep the corresponding document in sync.
 
-## 13. Troubleshooting
-
-| Message / symptom | Cause and fix |
-|---|---|
-| `Source file too large <path> (max 32768 bytes)` | Input exceeds the 32 KiB limit of the `uint16_t` bit-index representation. Slice the file or analyse a smaller region. |
-| `File too large <path> (max 32768 bytes)` | The file grew after `ParseArgs` and was rejected again by `VHSrcDataArray::LoadSource` (exit code `3`). |
-| `Invalid value for -wndsz: <value>` | `-wndsz` is not a plain decimal integer (`abc`, `2x`) or overflows `int`. |
-| `Minimal size less than N` | Source is smaller than `-wndsz` (default 128). Lower `-wndsz`, minimum 2. |
-| `Wrong input file <path>` | `-fname` does not exist or is not a regular file (directory, device, FIFO, ...). |
-| `Can't create output folder <path>` | `-outfolder` could not be created — check permissions or whether the path is occupied by a file. |
-| `key passed without param` | An option was supplied without a value, e.g. `-fname` as the last argument. |
-| No SVG although the source exists | Output goes to the CWD (or to `-outfolder`) — check the exit code and that the output folder is writable. |
-| `Error generating docwnd` (exit `6`) | The output folder is not writable or the SVG file could not be written. Check permissions and free space. |
-| `Error generating docdna abs` / `rel` (exit `7` / `8`) | Same as above for the DNA sheets; make sure the output folder did not become read-only between phases. |
-| `Data successfully saved ...` but the file is empty | `VHSVG::savetosvg()` prints its message before `VHSvgTools::Save()` verifies the file; the following `Error generating ...` line and the non-zero exit code indicate the real result. |
-| Everything renders in a generic font | Fonts are not embedded; the types legend requests `noto`, which may fall back. Install Noto or change the family in `src/mods/vhsvgdraw/vhsvgdraw.cpp`. |
-| The REL sheet looks almost empty | REL uses the same x scale as ABS: rows with a late first occurrence occupy only the left part of the row. |
-
-## 14. Roadmap
-
-1. Pass the block size, not the file size, to `DrawScale`; use the histogram in
-   the density view.
-2. Upstream `vhlibsvg`: make `savetosvg` return a status and stop printing to
-   `stdout` from the library layer; once available, replace the post-factum
-   check in `VHSvgTools::Save()`.
-3. Stream SVG to the output file instead of accumulating strings in memory.
-4. Add real `-wndsz` semantics and `--version` driven by the CMake
-   `PROJECT_VERSION`.
-5. Add unit tests for SHA-256, fingerprints and both coordinate modes, plus
-   golden-file tests for the three SVG documents.
-6. Enable `-Wall -Wextra -Wconversion` for project sources and a default
-   `Release` build type.
-
-**Glossary.** *Wide range scan* — a pass recording, for all 256 byte values,
-the positions where they occur. *Fingerprint* — the bit set plus first/last
-position of one byte value. *DNA map* — the 256-row visualisation of all
-fingerprints. *ABS / REL* — offsets from the file start / from the first
-occurrence. *Window* — a 64..512 byte slice reduced to `VHBlockStat`.
-
----
-
 ## License
 
 This project is distributed under the [MIT License](https://opensource.org/licenses/MIT).
 
----
-
-*This README documents version 0.1.0. The version is defined in
-`CMakeLists.txt` and exported as `APP_VERSION` through the generated
-`app_version.hpp`; keep this file in sync.*
+(С) Viktor Glebov 2026 V01G04A81

@@ -1,4 +1,4 @@
-## 11. Performance
+## 9. Performance
 
 Measured on a desktop x86-64 machine, release build, 16 384-byte sample
 (`data/backobjs_recombo.cells`):
