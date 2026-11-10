@@ -1,5 +1,16 @@
 # pushk2scn1svg
 
+[![C++](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](https://isocpp.org/)
+[![CMake](https://img.shields.io/badge/CMake-3.16+-green.svg)](https://cmake.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Version](https://img.shields.io/badge/Version-0.1.0-orange.svg)](https://github.com/vigatron/pushk2scn1svg/releases)
+
+**Tool name** `pushk2scn1svg`
+
+Author : V01G04A81 Viktor Glebov  
+Source code : https://github.com/vigatron/pushk2scn1svg  
+License : MIT
+
 **Binary structure scanner that renders SVG "DNA" fingerprints and windowed byte-statistics reports.**
 
 `pushk2scn1svg` reads a raw binary file (sprite sheets, tile cells, ROM dumps,
@@ -209,24 +220,7 @@ and the two generators do not know each other; `vhappcore` knows all of them.
 
 ## 7. Class reference
 
-| Class | Folder | Role |
-|---|---|---|
-| `VHAppCore` | `vhappcore` | Owns configuration, source data and both scans; exposes `LoadSource`, `ScanAbs`, `ScanRel`, `ScanAll`, `GenerateWnd`, `GenerateDNAAbs`, `GenerateDNARel`. |
-| `VHAppCoreCfg` | `vhappcorecfg` | Command-line parsing, output-name derivation, `subsize`. |
-| `VHSrcDataArray` | `datasource` | Whole-file load, SHA-256, size. |
-| `VHWideRangeScan` | `widerange` | 256 fingerprints plus `scanabs` / `scanrel`. |
-| `VHKeyFingerPrint` | `widerange` | Bit set of positions for one byte value. |
-| `BlockProps` | `structs` | Per-block min/max/histogram/width. |
-| `VHDocWnd` | `generatewnd` | Builds the window sheet. |
-| `VHDocDNA` | `generatedna` | Builds the DNA sheet. |
-| `VHSVGDraw` | `vhsvgdraw` | Stateless drawing helpers for window sheet elements (sections, density, scale, types). |
-| `Colors` | `colors` | Named palette used by the drawing helpers. |
-| `VHLogger` | `vhlogger` | Diagnostic output (stdout or file). |
-| `VHSHA256` | `vhsha256` | SHA-256 of a byte vector. |
-
-Each class has a requirement document in `rules/` (index:
-`rules/README.md`). The documents are the source of truth for
-responsibilities and must be updated together with the code.
+See [class reference](docs/class_reference.md) for detailed class information.
 
 ## 8. Repository layout
 
@@ -235,6 +229,7 @@ CMakeLists.txt              build definition
 README.md                   this file
 AGENTS.md                   rules for contributors / AI agents
 data/                       sample binary assets
+docs/                       extended description of README.md sections
 rules/                      per-class requirement documents
 src/main.cpp                entry point
 src/mods/                   first-party modules
@@ -337,23 +332,7 @@ The code is a working prototype; the following items are known.
 
 ## 11. Performance
 
-Measured on a desktop x86-64 machine, release build, 16 KB sample
-(`data/backobjs.recombo.cells`):
-
-| Metric | Value |
-|---|---|
-| Wall time, all three documents | ~0.05 s |
-| Peak RSS | ~8 MB |
-| Window sheet | ~319 KB |
-| DNA ABS sheet | ~1.38 MB |
-| DNA REL sheet | ~1.36 MB |
-| DNA ABS line elements | 16 384 |
-
-The algorithm is linear in input size. Because the input is capped at 32 KB,
-performance is not a practical concern today. If the cap is lifted, the first
-bottlenecks will be the `std::vector<std::string>` accumulation inside `VHSVG`
-(one heap string per SVG element), one `<line>` per marked position without
-coordinate deduplication, and two independent full passes for ABS and REL.
+See [docs/preformance.md](docs/preformance.md) for details.
 
 ## 12. Conventions
 
@@ -401,6 +380,12 @@ the positions where they occur. *Fingerprint* — the bit set plus first/last
 position of one byte value. *DNA map* — the 256-row visualisation of all
 fingerprints. *ABS / REL* — offsets from the file start / from the first
 occurrence. *Window* — a 64..512 byte slice reduced to `BlockProps`.
+
+---
+
+## License
+
+This project is distributed under the [MIT License](https://opensource.org/licenses/MIT).
 
 ---
 
