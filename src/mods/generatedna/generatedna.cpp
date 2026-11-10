@@ -5,9 +5,11 @@
 #include <ctime>
 
 // TODO: Colors set
-
 // Abs Map / Rel Map
+// svg.rect(rectbody, 1, "blue");
+// svg.rect(rectftr,  1, "green", "#F0F0F0");
 
+//
 void VHDocDNA::GenerateHeader(const std::string &caption, const VHSVGRect &rect)
 {
     svg.text(rect.startx() + 64, rect.starty() + 72, caption, "Arial", 48, "black");
@@ -85,8 +87,6 @@ verr VHDocDNA::GenerateDocument(
     const std::string &strsha256,
     size_t filesize)
 {
-    (void)caption;
-
     // SVG Area
     VHSVGRect rectabs(0, 0, doc_size_w, doc_size_h);
 
@@ -108,9 +108,6 @@ verr VHDocDNA::GenerateDocument(
     VHSVGRect rectftr;
 
     GenerateLayout(rect_paper_area, recthdr, rectbody, rectftr);
-
-    // svg.rect(rectbody, 1, "blue");
-    // svg.rect(rectftr,  1, "green", "#F0F0F0");
 
     //
     GenerateHeader(caption, recthdr);

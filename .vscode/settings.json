@@ -10,9 +10,9 @@
             // /**/
             
 
-            // "-fname", "../data/backobjs.cells",
+            "-fname", "../data/planets.c16",
 
-            "-fname", "../data/backobjs.recombo.cells",
+            // "-fname", "../data/backobjs.recombo.cells",
             "-wndsz", "128",
 
             /**/

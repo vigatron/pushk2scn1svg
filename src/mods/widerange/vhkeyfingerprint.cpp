@@ -82,6 +82,20 @@ bool VHKeyFingerPrint::empty() const
 
 /**
  *
+*/
+const uint16_t VHKeyFingerPrint::getStartPos() const {
+    return startpos;
+}
+
+/**
+ *
+*/
+const uint16_t VHKeyFingerPrint::getEndPos() const {
+    return endpos; 
+}
+
+/**
+ *
  */
 void VHKeyFingerPrint::dump() const
 {
