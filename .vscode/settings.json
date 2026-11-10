@@ -10,10 +10,12 @@
             // /**/
             
 
-            "-fname", "../data/planets.c16",
-
             // "-fname", "../data/backobjs.recombo.cells",
+
+
+            "-fname", "../data/planets.c16",
             "-wndsz", "128",
+            "-outfolder", "results/planets"
 
             /**/
             // "../packv81/data/chip_cut0.cells", "-s", "8"

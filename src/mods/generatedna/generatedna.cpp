@@ -200,7 +200,7 @@ void VHDocDNA::Gen256Stat(
         std::string strnum = "#" + std::to_string(s);
         int txtx = itemrect.startx() - cellh * 3;
         int txty = itemrect.starty() + cellh - (cellh - fonth + 1);
-        svg.text(txtx, txty, strnum, "verdna", fonth, color_text);
+        svg.text(txtx, txty, strnum, "verdana", fonth, color_text);
 
         // Move to the next
         itemrect.move(0, cellh + cellh_step);

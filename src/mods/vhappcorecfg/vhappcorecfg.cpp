@@ -1,11 +1,57 @@
 #include "vhappcorecfg/vhappcorecfg.hpp"
 
+#include <filesystem>
+
 #include "argsparser.hpp"
 #include "vhfile.hpp"
 #include "vhfsys.hpp"
 
 
 using namespace VHArgsParser;
+
+/**
+ * @brief Joins an output folder and an output file name.
+ *
+ * An empty folder means the current working directory, so the file name
+ * is returned unchanged. Otherwise the name is appended to the folder
+ * using std::filesystem path rules.
+ *
+ * @param dir Output folder (may be empty).
+ * @param fname Output file name.
+ * @return Path to the output file.
+ */
+static std::string MakeOutputPath(const std::string &dir, const std::string &fname)
+{
+    if (dir.empty())
+        return fname;
+
+    return (std::filesystem::path(dir) / fname).string();
+}
+
+/**
+ * @brief Ensures that the output folder exists, creating it when necessary.
+ *
+ * Uses VHFSYS::CreateNestedDir, which creates all missing parent
+ * directories. Exceptions thrown by std::filesystem are converted into
+ * an error status.
+ *
+ * @param dir Output folder (may be empty).
+ * @return vok if the folder exists or was created, or an error status.
+ */
+static verr EnsureOutputFolder(const std::string &dir)
+{
+    if (dir.empty())
+        return vok;
+
+    try
+    {
+        return VHFSYS::CreateNestedDir(dir);
+    }
+    catch (const std::filesystem::filesystem_error &)
+    {
+        return verror(1);
+    }
+}
 
 /**
  * @brief Parses command-line arguments and fills the configuration.
@@ -26,6 +72,7 @@ verr VHAppCoreCfg::ParseArgs(int argc, char *argv[])
 
     arrcmd.push_back(VHArgTypeFileName("-fname", "", "Source file"));
     arrcmd.push_back(VHArgTypeInteger("-wndsz", "Window size", 128, 2, 256));
+    arrcmd.push_back(VHArgTypeString("-outfolder", "", "Output Files folder"));
 
     // Wrong args or syntax error ?
     if (vok != cmdline.ParseCommandLine(arrcmd, argc, argv))
@@ -48,13 +95,21 @@ verr VHAppCoreCfg::ParseArgs(int argc, char *argv[])
         return verrmsg(3, "Wrong input file " + strfname);
     }
 
+    std::string stroutfolder = cmdline.GetString("-outfolder");
+
+    if (vok != EnsureOutputFolder(stroutfolder))
+    {
+        return verrmsg(4, "Can't create output folder " + stroutfolder);
+    }
+
     fnameSource = strfname;
+    dirOutput = stroutfolder;
 
     std::string basefname = VHFSYS::ExtractFilename(strfname);
 
-    fnameWND = basefname + "_wnd.svg";
-    fnameDNAAbs = basefname + "_dna_abs.svg";
-    fnameDNARel = basefname + "_dna_rel.svg";
+    fnameWND = MakeOutputPath(dirOutput, basefname + "_wnd.svg");
+    fnameDNAAbs = MakeOutputPath(dirOutput, basefname + "_dna_abs.svg");
+    fnameDNARel = MakeOutputPath(dirOutput, basefname + "_dna_rel.svg");
 
     subsize = cmdline.GetInt("-wndsz");
 

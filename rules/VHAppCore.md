@@ -30,7 +30,7 @@
 
 | Поле | Тип | Назначение |
 |---|---|---|
-| `appcfg` | `VHAppCoreCfg` | Конфигурация приложения (имена файлов, `subsize`, парсинг командной строки). |
+| `appcfg` | `VHAppCoreCfg` | Конфигурация приложения (имена файлов, `dirOutput`, `subsize`, парсинг командной строки — см. `CMDLine.md`). |
 | `datasource` | `VHSrcDataArray` | Исходные данные: загруженный файл, SHA-256, размер файла. Владелец буфера данных (`arrsrc`), живёт пока жив `VHAppCore`. |
 | `wscanabs` | `VHWideRangeScan` | Результат сканирования в абсолютных позициях. |
 | `wscanrel` | `VHWideRangeScan` | Результат сканирования в относительных смещениях. |
@@ -73,9 +73,9 @@ if (vok != appcore.GenerateDNARel())
     return verror(8);
 ```
 
-До переноса `ParseArgs` внутрь класса это была свободная функция
-`verr ParseArgs(int argc, char *argv[], VHAppCore &appcfg)` из модуля
-`src/mods/cmdline/`. После переноса папка `cmdline/` удалена.
+Парсинг командной строки и его параметры вынесены в `VHAppCoreCfg`
+(`appcfg.ParseArgs`); синтаксис, правила разбора и коды ошибок описаны
+в [CMDLine.md](CMDLine.md).
 
 До переноса загрузки и сканирования внутрь класса этот блок жил в `main.cpp`
 с локальным `VHSrcDataArray datasource;`. После переноса `datasource` —
@@ -95,9 +95,10 @@ if (vok != appcore.GenerateDNARel())
 (реализация в `vhappcore/vhappcore.cpp`).
 
 Конфигурация (`fnameSource`, `fnameWND`, `fnameDNAAbs`, `fnameDNARel`,
-`subsize`) и парсинг командной строки (`ParseArgs`) выделены из `VHAppCore`
-в отдельный класс `VHAppCoreCfg` (`vhappcorecfg/`). В `VHAppCore` конфиг
-хранится как поле `VHAppCoreCfg appcfg;`, вызов — `appcore.appcfg.ParseArgs(...)`.
+`dirOutput`, `subsize`) и парсинг командной строки (`ParseArgs`) выделены
+из `VHAppCore` в отдельный класс `VHAppCoreCfg` (`vhappcorecfg/`).
+В `VHAppCore` конфиг хранится как поле `VHAppCoreCfg appcfg;`, вызов —
+`appcore.appcfg.ParseArgs(...)`. Требования к CLI — в `CMDLine.md`.
 
 ## Ограничения / Замечания
 

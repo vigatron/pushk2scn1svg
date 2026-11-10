@@ -26,6 +26,11 @@ class VHAppCoreCfg
     std::string fnameDNAAbs;
     std::string fnameDNARel;
 
+    /**
+     * @brief Output files folder (empty means current working directory).
+     */
+    std::string dirOutput;
+
     uint16_t subsize;
 
 };

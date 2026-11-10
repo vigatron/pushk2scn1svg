@@ -62,22 +62,27 @@ Notes:
 ## 3. Usage
 
 ```text
-vhpackv81scan -fname <source-file> [-wndsz <2..256>]
+vhpackv81scan -fname <source-file> [-wndsz <2..256>] [-outfolder <folder>]
 ```
 
 | Option | Default | Meaning |
 |---|---|---|
 | `-fname` | — (required) | Path to the binary file to analyse. |
 | `-wndsz` | `128` | Window size in bytes, range `2..256`. |
+| `-outfolder` | current directory | Folder for the three output SVG files. Created automatically (including nested paths) if missing. |
 
 `-fname` must point to an existing regular file. Out-of-range `-wndsz` values
-are rejected by the argument parser.
+are rejected by the argument parser. `-outfolder` is created automatically,
+including missing parent directories; if creation fails, the tool exits with
+code `1`. Full CLI rules are in [`rules/CMDLine.md`](rules/CMDLine.md).
 
 ```sh
 ./build/vhpackv81scan -fname data/backobjs.recombo.cells -wndsz 128
+./build/vhpackv81scan -fname data/backobjs.recombo.cells -outfolder out
 ```
 
-Output (written to the current working directory, not next to the source):
+Output (written to the current working directory by default, or to
+`-outfolder`):
 
 ```text
 Data successfully saved to backobjs.recombo.cells_wnd.svg
@@ -140,8 +145,9 @@ first occurrence occupies only the left part of the row.
 
 The pipeline is short and single-threaded:
 
-1. **Parse CLI.** `VHAppCoreCfg::ParseArgs()` validates `-fname` and `-wndsz`,
-   checks that the file exists, derives the three output names.
+1. **Parse CLI.** `VHAppCoreCfg::ParseArgs()` validates `-fname`, `-wndsz`
+   and `-outfolder`, checks that the input file exists, creates the output
+   folder if needed, and derives the three output names.
 2. **Load.** `VHAppCore::LoadSource()` delegates to
    `VHSrcDataArray::LoadSource()`, which reads the whole file into
    `std::vector<uint8_t>`, records the size and computes SHA-256.
@@ -300,8 +306,8 @@ The code is a working prototype; the following items are known.
 - `-wndsz` doubles as a minimum file size and has no effect on the window
   sheets.
 - Input is limited to 32 KB, which is small for a "wide range" scanner.
-- Reports are written to the current working directory, never next to the
-  source; there is no `-outdir` option.
+- Reports are written to the current working directory by default, never next
+  to the source; use `-outfolder` to select another folder (created if missing).
 - Every mark in the DNA map produces its own `<line>` element: a 16 KB input
   already produces a 1.3 MB document; identical x positions are not merged.
 - `generatedna.hpp` includes `vhappcore.hpp`, a reverse dependency that is not
@@ -363,8 +369,9 @@ coordinate deduplication, and two independent full passes for ABS and REL.
 | `Wide Range (abs) analisys failed` | Input is larger than 32 768 bytes — a hard limit of the bit-index representation. |
 | `Minimal size less than N` | Source is smaller than `-wndsz` (default 128). Lower `-wndsz`, minimum 2. |
 | `Wrong input file <path>` | `-fname` does not exist or points to a directory. |
+| `Can't create output folder <path>` | `-outfolder` could not be created — check permissions or whether the path is occupied by a file. |
 | `key passed without param` | An option was supplied without a value, e.g. `-fname` as the last argument. |
-| No SVG although the source exists | Output goes to the CWD — check the exit code and that the CWD is writable. |
+| No SVG although the source exists | Output goes to the CWD (or to `-outfolder`) — check the exit code and that the output folder is writable. |
 | Everything renders in a generic font | Fonts are not embedded and family names are misspelled; fix `draw_*.cpp`. |
 | The REL sheet looks almost empty | REL uses the same x scale as ABS: rows with a late first occurrence occupy only the left part of the row. |
 
@@ -377,7 +384,7 @@ coordinate deduplication, and two independent full passes for ABS and REL.
 3. Make `VHSVG::savetosvg` report failures and stop printing to `stdout` from
    the library layer.
 4. Stream SVG to the output file instead of accumulating strings in memory.
-5. Add `-outdir`, real `-wndsz` semantics and `--version` driven by the CMake
+5. Add real `-wndsz` semantics and `--version` driven by the CMake
    `PROJECT_VERSION`.
 6. Add unit tests for SHA-256, fingerprints and both coordinate modes, plus
    golden-file tests for the three SVG documents.

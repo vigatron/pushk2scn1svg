@@ -5,7 +5,7 @@
 | Файл | Класс | Модуль | Назначение |
 |---|---|---|---|
 | [VHAppCore.md](VHAppCore.md) | `VHAppCore` | `src/mods/vhappcore/` | Состояние анализа: загрузка, сканирования, генерация SVG. Конфиг — в поле `appcfg`. |
-| [VHAppCoreCfg.md](VHAppCoreCfg.md) | `VHAppCoreCfg` | `src/mods/vhappcorecfg/` | Конфигурация приложения (имена файлов, `subsize`) и парсинг командной строки (`ParseArgs`). |
+| [VHAppCoreCfg.md](VHAppCoreCfg.md) | `VHAppCoreCfg` | `src/mods/vhappcorecfg/` | Конфигурация приложения (имена файлов, `dirOutput`, `subsize`); требования к CLI — в `CMDLine.md`. |
 | [VHSrcDataArray.md](VHSrcDataArray.md) | `VHSrcDataArray` | `src/mods/datasource/` | Загрузка исходного файла в память, SHA-256, размер файла. |
 | [BlockProps.md](BlockProps.md) | `BlockProps` | `src/mods/structs/` | Статистика одного блока данных: min/max/уникальные значения, гистограмма. |
 | [VHWideRangeScan.md](VHWideRangeScan.md) | `VHWideRangeScan` | `src/mods/widerange/` | Сканирование массива, отпечатки позиций 256 значений (abs/rel). |
@@ -15,6 +15,12 @@
 | [VHDocDNA.md](VHDocDNA.md) | `VHDocDNA` | `src/mods/generatedna/` | Генерация SVG «DNA»-документа из wide-range сканирования (256 строк). |
 | [Colors.md](Colors.md) | `Colors` | `src/mods/draw/` | Палитра цветов SVG-генераторов. |
 | [VHSHA256.md](VHSHA256.md) | `VHSHA256` | `src/mods/vhsha256/` | Вычисление SHA-256 хеша массива байтов. |
+
+## Прочие документы
+
+| Файл | Назначение |
+|---|---|
+| [CMDLine.md](CMDLine.md) | Параметры командной строки: `-fname`, `-wndsz`, `-outfolder`; синтаксис, правила разбора, валидация, коды ошибок, формирование имён выходных файлов. |
 
 ## Структура зависимостей
 
