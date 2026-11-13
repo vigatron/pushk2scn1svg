@@ -120,6 +120,7 @@ verr VHAppCoreCfg::ParseArgs(int argc, char *argv[])
 
     std::vector<VHArgTypeBase> arrcmd;
 
+    arrcmd.push_back(VHArgTypeOption("--version", "Application version", false));
     arrcmd.push_back(VHArgTypeString("-fname", "", "Source file"));
     arrcmd.push_back(VHArgTypeInteger("-wndsz", "Window size", 128, 2, 256));
     arrcmd.push_back(VHArgTypeString("-outfolder", "", "Output Files folder"));
@@ -129,7 +130,8 @@ verr VHAppCoreCfg::ParseArgs(int argc, char *argv[])
     if (argc < 2)
     {
         cmdline.ShowUsage(arrcmd);
-        return verror(1);
+        exit(0);
+        return vok;
     }
 
     // std::stoi inside vhlibargs accepts trailing characters and throws on
@@ -153,6 +155,11 @@ verr VHAppCoreCfg::ParseArgs(int argc, char *argv[])
     catch (const std::exception &)
     {
         return verrmsg(1, "Error parsing command line");
+    }
+
+    if(cmdline.GetOpt("--version")) {
+        std::cout << APP_VERSION << std::endl;
+        exit(0);
     }
 
     std::string strfname = cmdline.GetString("-fname");
